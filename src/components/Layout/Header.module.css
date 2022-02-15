@@ -1,0 +1,17 @@
+.header {
+    @apply max-w-7xl mx-auto my-4 px-4 sm:px-6 flex justify-between items-center;
+}
+
+.ease {
+    -webkit-animation:fadeIn 1s;
+    animation: fadeIn 1s;
+    -moz-animation: fadeIn 1s;
+}
+
+.header img {
+    @apply object-scale-down w-1/2 h-1/2 sm:w-1/6 sm:h-1/6;
+}
+
+.header Button {
+    @apply flex items-end;
+}

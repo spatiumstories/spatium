@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+/* :root {
+  /* galaxy image from https://unsplash.com/s/photos/galaxy
+  --bg-image: url('./assets/galaxy.jpg');
+} */
+
+html {
+  font-family: sans-serif;
+  @apply bg-gradient-to-r from-black via-purple-900 to-black;
+}
+/* .bg {
+  content: '';
+  background-image: var(--bg-image);
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: -1;
+  filter: blur(30px);
+} */
+
+.bg {
+  background-color: black;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+body {
+  margin: 0;
+}
+
+.bg-blur {
+  overflow: hidden;
+}
+.bg-blur::before {
+  content: '';
+  background-image: var(--bg-image);
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: -1;
+  filter: blur(30px);
+}
+
+
