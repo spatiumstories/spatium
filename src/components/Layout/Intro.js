@@ -1,5 +1,6 @@
 import classes from './Intro.module.css';
 import image from '../../assets/pencil.svg';
+import React from 'react';
 
 const Intro = (props) => {
     return (
@@ -13,4 +14,4 @@ const Intro = (props) => {
     );
 };
 
-export default Intro;
+export default React.memo(Intro);

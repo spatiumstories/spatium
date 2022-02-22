@@ -1,6 +1,6 @@
 import RoadmapItem from "./RoadmapItem";
 import RoadmapDescription from "./RoadmapDescription";
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import classes from './RoadmapItemContainer.module.css';
 
 const RoadmapItemContainer = (props) => {
@@ -9,21 +9,22 @@ const RoadmapItemContainer = (props) => {
     const [flip, setFlip] = useState(0);
     const [ease, setEase] = useState(1);
 
-    const onClickHandler = () => {
+
+    const onClickHandler = useCallback(() => {
         setFlip(1);
         setEase(1);
-    }
+    }, []);
 
-    const animationEndedHandler = () => {
+    const animationEndedHandler = useCallback(() => {
         setFlip(0);
         setShowDescription(oldRes => {
             return !oldRes;
         })
-    }
+    }, []);
 
-    const easeEndedHandler = () => {
+    const easeEndedHandler = useCallback(() => {
         setEase(0);
-    }
+    }, []);
 
     return (
         <div

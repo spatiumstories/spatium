@@ -1,6 +1,7 @@
 import image from '../../assets/S.png';
 import Button from '../UI/Button';
 import classes from './Header.module.css';
+import React from 'react';
 
 const onClickHandler = () => {
     window.open("https://diamondapp.com/u/Spatium");
@@ -26,4 +27,4 @@ const Header = (props) => {
     );
 };
 
-export default Header;
+export default React.memo(Header);
