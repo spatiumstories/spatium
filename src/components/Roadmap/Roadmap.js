@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import RoadmapItemContainer from './RoadmapItemContainer';
 import classes from './Roadmap.module.css';
 import { data } from '../../data/data';
@@ -6,20 +6,24 @@ import RoadmapPicker from './RoadmapPicker';
 
 const Roadmap = () => {
     const [picker, setPicker] = useState("first");
+    const firstRender = useRef(true);
 
     const changePickerHandler = (change) => {
         setPicker(change);
     };
 
     useEffect(() => {
-        console.log("hello?");
-        window.scroll({
-            top: document.body.offsetHeight,
-            left: 0,
-            behavior: 'smooth'
-          });
+        if (firstRender.current) {
+            firstRender.current = false;
+        } else {
+            window.scroll({
+                top: document.body.offsetHeight,
+                left: 0,
+                behavior: 'smooth'
+            });
+        }
     }, [picker]);
-    
+
     let first = [];
     let second = [];
     let third = [];
@@ -28,7 +32,7 @@ const Roadmap = () => {
 
     const allItems = data.map(item => {
 
-        if (item.id <= 5) {
+        if (item.id <= 6) {
             first.push(
                 <RoadmapItemContainer
                     name={item.name}
@@ -38,7 +42,7 @@ const Roadmap = () => {
                     key={item.id}>
                 </RoadmapItemContainer>
             );
-        } else if (item.id === 6) {
+        } else if (item.id === 7) {
             second.push(
                 <RoadmapItemContainer
                     name={item.name}
@@ -48,7 +52,7 @@ const Roadmap = () => {
                     key={item.id}>
                 </RoadmapItemContainer>
             );
-        } else if (item.id === 7) {
+        } else if (item.id === 8) {
             third.push(
                 <RoadmapItemContainer
                     name={item.name}
@@ -58,7 +62,7 @@ const Roadmap = () => {
                     key={item.id}>
                 </RoadmapItemContainer>
             );
-        } else if (item.id <= 9) {
+        } else if (item.id <= 10) {
             fourth.push(
                 <RoadmapItemContainer
                     name={item.name}
