@@ -4,15 +4,17 @@ import classes from './Header.module.css';
 import DesktopNavBar from '../Nav/DesktopNavBar';
 import MobileNavBar from '../Nav/MobileNavBar';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 
 
 
 const Header = (props) => {
-    const classList = "";
+    const classList = !isMobile ? `${classes.header}` : "";
     return (
         <header className={classList}>
             <nav className="w-full">
-                <MobileNavBar mobileMenu={props.showMenu} mobileToggle={props.mobileToggle}/>
+                {isMobile && <MobileNavBar mobileMenu={props.showMenu} mobileToggle={props.mobileToggle}/>}
+                {!isMobile && <DesktopNavBar />}
             </nav>
         </header>
     );
