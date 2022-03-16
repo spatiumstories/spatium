@@ -26,13 +26,13 @@ export const data = [
     {
         "name": "Private Coin Sale Closed",
         "description": "The Spatium private coin list will be closed and the sales will begin for the week leading up to the public coin sale.",
-        "date": "March 22nd 2022",
+        "date": "March 31st 2022",
         "id": 5
     },
     {
         "name": "Public Coin Sale Open",
         "description": "The Spatium coin will be opened up to the public at 20% FR. All FR will go towards project funding and future writing competitions.",
-        "date": "April 1st 2022",
+        "date": "April 2022",
         "id": 6
     },
     {
