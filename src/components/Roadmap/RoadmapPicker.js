@@ -1,5 +1,5 @@
 import classes from './RoadmapPicker.module.css';
-import Navigation from '../UI/Navigation';
+import RoadMapNav from '../Nav/RoadMapNav';
 
 const RoadmapPicker = (props) => {
 
@@ -10,11 +10,11 @@ const RoadmapPicker = (props) => {
     }
     return (
         <div className={classes.picker}>
-            <Navigation onClick={onClickHandler} active={props.selected === "first" ? "true" : "false"} id="first" label="1st Quarter"></Navigation>
-            <Navigation onClick={onClickHandler} active={props.selected === "second" ? "true" : "false"} id="second" label="2nd Quarter"></Navigation>
-            <Navigation onClick={onClickHandler} active={props.selected === "third" ? "true" : "false"} id="third" label="3rd Quarter"></Navigation>
-            <Navigation onClick={onClickHandler} active={props.selected === "fourth" ? "true" : "false"} id="fourth" label="4th Quarter"></Navigation>
-            <Navigation onClick={onClickHandler} active={props.selected === "future" ? "true" : "false"} id="future" label="Future"></Navigation>
+            <RoadMapNav onClick={onClickHandler} active={props.selected === "first" ? "true" : "false"} id="first" label="1st Quarter"></RoadMapNav>
+            <RoadMapNav onClick={onClickHandler} active={props.selected === "second" ? "true" : "false"} id="second" label="2nd Quarter"></RoadMapNav>
+            <RoadMapNav onClick={onClickHandler} active={props.selected === "third" ? "true" : "false"} id="third" label="3rd Quarter"></RoadMapNav>
+            <RoadMapNav onClick={onClickHandler} active={props.selected === "fourth" ? "true" : "false"} id="fourth" label="4th Quarter"></RoadMapNav>
+            <RoadMapNav onClick={onClickHandler} active={props.selected === "future" ? "true" : "false"} id="future" label="Future"></RoadMapNav>
         </div>
     );
 };
