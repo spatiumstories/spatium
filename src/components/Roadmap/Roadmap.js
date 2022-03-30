@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import RoadmapItemContainer from './RoadmapItemContainer';
 import classes from './Roadmap.module.css';
 import { data } from '../../data/data';
 import RoadmapPicker from './RoadmapPicker';
+import { useSelector } from 'react-redux';
+
+let firstRender = true;
 
 const Roadmap = () => {
-    const [picker, setPicker] = useState("first");
-    const firstRender = useRef(true);
-
-    const changePickerHandler = (change) => {
-        setPicker(change);
-    };
+    const picker = useSelector(state => state.roadmap.currentQuarter);
 
     useEffect(() => {
-        if (firstRender.current) {
-            firstRender.current = false;
+        if (firstRender) {
+            firstRender = false;
         } else {
             window.scroll({
                 top: document.body.offsetHeight,
@@ -84,16 +82,17 @@ const Roadmap = () => {
             );
         }
     });
+
     const currentSelection = 
-        picker === "first" ? first :
-        picker === "second" ? second :
-        picker === "third" ? third :
-        picker === "fourth" ? fourth :
+        picker === "0" ? first :
+        picker === "1" ? second :
+        picker === "2" ? third :
+        picker === "3" ? fourth :
         future;
 
     return (
         <React.Fragment>
-            <RoadmapPicker changePickerHandler={changePickerHandler} selected={picker}/>
+            <RoadmapPicker/>
             <ul className={classes.list}>
                 {currentSelection}
             </ul>
