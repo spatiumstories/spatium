@@ -1,6 +1,6 @@
 import RoadmapItem from "./RoadmapItem";
 import RoadmapDescription from "./RoadmapDescription";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import classes from './RoadmapItemContainer.module.css';
 
 const RoadmapItemContainer = (props) => {

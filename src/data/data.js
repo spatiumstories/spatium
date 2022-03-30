@@ -1,4 +1,4 @@
-export const data = [
+export const rawData = [
     {
         "name": "First Story in Season 1 Released!",
         "description": "The first Spatium Story, Lost at Sea, was released! Characters are coming soon! Enjoy it free on CloutPub!",
