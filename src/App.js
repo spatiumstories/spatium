@@ -1,29 +1,25 @@
 import React from "react";
-import Roadmap from "./components/Roadmap/Roadmap";
 import Header from "./components/Layout/Header";
-import Intro from "./components/Layout/Intro";
 import { useState } from 'react';
 import "./index.css";
-import MobileMenu from "./components/Nav/MobileMenu";
+import {Routes, Route, Router} from 'react-router-dom';
+import Home from "./pages/Home";
+import ComingSoon from "./pages/ComingSoon";
 
 
 function App() {
-  const [showMenu, setShowMenu] = useState(false);
-
-  const toggleMobileMenuHandler = () => {
-    console.log(showMenu);
-    setShowMenu(oldState => {
-      return !oldState;
-    });
-  }
 
   return (
     <React.Fragment>
       <div className="bg"/>
-      <Header mobileMenu={showMenu} mobileToggle={toggleMobileMenuHandler}/>
-      {!showMenu && <Intro />}
-      {!showMenu && <Roadmap />}
-      {showMenu && <MobileMenu />}
+      <Header/>
+      <main>
+        <Routes>
+          <Route path='/' element={<Home/>}/>
+          <Route path='/characters' element={<ComingSoon/>}/>
+          <Route path='/stories' element={<ComingSoon/>}/>
+        </Routes>
+      </main>
     </React.Fragment>
   );
 }
