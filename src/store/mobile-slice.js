@@ -4,7 +4,7 @@ const mobileSlice = createSlice({
     name: 'mobile',
     initialState: { 
         showMenu: false,
-        activeMenu: 0,
+        activeMenu: "0",
     },
     reducers: {
         toggleMenu(state) {
