@@ -9,11 +9,12 @@ import { isMobile } from 'react-device-detect';
 
 
 const Header = (props) => {
+
     const classList = !isMobile ? `${classes.header}` : "";
     return (
         <header className={classList}>
             <nav className="w-full">
-                {isMobile && <MobileNavBar mobileMenu={props.showMenu} mobileToggle={props.mobileToggle}/>}
+                {isMobile && <MobileNavBar/>}
                 {!isMobile && <DesktopNavBar />}
             </nav>
         </header>
