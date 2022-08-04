@@ -5,6 +5,7 @@ import "./index.css";
 import {Routes, Route, Router} from 'react-router-dom';
 import Home from "./pages/Home";
 import ComingSoon from "./pages/ComingSoon";
+import Signup from "./components/Blog/Signup";
 
 
 function App() {
@@ -20,6 +21,9 @@ function App() {
           <Route path='/stories' element={<ComingSoon/>}/>
         </Routes>
       </main>
+      <footer>
+        <Signup/>
+      </footer>
     </React.Fragment>
   );
 }
