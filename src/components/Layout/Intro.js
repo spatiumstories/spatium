@@ -7,8 +7,8 @@ const Intro = (props) => {
     return (
         <div className={classes.intro}>
             <span>
-                <h1>Spatium Roadmap</h1>
-                <p>The first NFT project based on fictional short stories.</p>
+                <h1>Spatium Stories</h1>
+                <p>A brand new NFT book marketplace.</p>
             </span>
             {!isMobile && <img className={classes.animate} src={image}/>}
         </div>
