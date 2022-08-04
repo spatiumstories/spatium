@@ -21,9 +21,6 @@ function App() {
           <Route path='/stories' element={<ComingSoon/>}/>
         </Routes>
       </main>
-      <footer>
-        <Signup/>
-      </footer>
     </React.Fragment>
   );
 }
