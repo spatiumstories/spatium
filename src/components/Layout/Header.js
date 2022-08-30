@@ -1,6 +1,5 @@
 import image from '../../assets/S.png';
 import Button from '../UI/Button';
-import classes from './Header.module.css';
 import DesktopNavBar from '../Nav/DesktopNavBar';
 import MobileNavBar from '../Nav/MobileNavBar';
 import React from 'react';
@@ -10,9 +9,9 @@ import { isMobile } from 'react-device-detect';
 
 const Header = (props) => {
 
-    const classList = !isMobile ? `${classes.header}` : "";
+    // const classList = !isMobile ? `${classes.header}` : "";
     return (
-        <header className={classList}>
+        <header>
             <nav className="w-full">
                 {isMobile && <MobileNavBar/>}
                 {!isMobile && <DesktopNavBar />}
