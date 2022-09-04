@@ -55,16 +55,7 @@ const Signup = () => {
               backgroundColor: (t) =>
                 t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900], 
             }}>
-                <MailchimpSubscribe
-                    url={url}
-                    render={({ subscribe, status, message }) => (
-                        <SignupForm 
-                            status={status}
-                            message={message}
-                            onValidated={formData => subscribe(formData)}
-                        />
-                    )}
-                />
+                <SignupForm/>
             </Grid>
         </Grid>
     );

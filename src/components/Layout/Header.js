@@ -1,4 +1,3 @@
-import image from '../../assets/S.png';
 import Button from '../UI/Button';
 import DesktopNavBar from '../Nav/DesktopNavBar';
 import MobileNavBar from '../Nav/MobileNavBar';

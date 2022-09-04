@@ -12,7 +12,6 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import Logo from './Logo';
 import image from '../../assets/S.png';
 import { makeStyles } from '@mui/styles';
 import { NavLink } from 'react-router-dom';

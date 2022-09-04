@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import Book from "../components/UI/Book";
 import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
+import NoBooks from "../components/UI/NoBooks";
 
 
 import React from 'react';
@@ -28,7 +29,7 @@ const Marketplace = () => {
             //loading books
             const fetchData = async () => {
                 const request = {
-                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
+                    "UserPublicKeyBase58Check": "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP"
                 };
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
@@ -37,6 +38,7 @@ const Marketplace = () => {
                     let description = book['PostEntryResponse']['Body'];
                     let title = "A Spatium Story";
                     let type = "MOD"; //Spatium Publisher public key
+                    let bookID = null;
 
                     if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
                         author = book['PostEntryResponse']['PostExtraData']['autor'];
@@ -50,17 +52,21 @@ const Marketplace = () => {
                     if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
                         type = book['PostEntryResponse']['PostExtraData']['type'];
                     }
-                    var newBook = {
-                        cover: book['PostEntryResponse']['ImageURLs'][0],
-                        body: book['PostEntryResponse']['Body'],
-                        author: author,
-                        title: title,
-                        description: description,
-                        type: type,
-                    };
-                    data.push(newBook);
+                    if (book['PostEntryResponse']['PostExtraData']['book_id'] != null) {
+                        bookID = book['PostEntryResponse']['PostExtraData']['book_id'];
+                    }
+                    if (bookID !== null) {
+                        var newBook = {
+                            cover: book['PostEntryResponse']['ImageURLs'][0],
+                            body: book['PostEntryResponse']['Body'],
+                            author: author,
+                            title: title,
+                            description: description,
+                            type: type,
+                        };
+                        data.push(newBook);
+                    }
                 });
-
                 setBooks(data);
                 console.log(response['data']);
                 console.log(typeof response['data']);
@@ -101,7 +107,7 @@ const Marketplace = () => {
                 Spatium Stories Marketplace
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                We offer both limited edition and Mint on Demand books!
+                We offer both rare edition and Mint on Demand books!
                 You can also publish your own book or read your book directly through Spatium Stories!
                 </Typography>
                 <Stack
@@ -121,11 +127,16 @@ const Marketplace = () => {
                 cards.map((card) => (
                     <Book loading={true} card={card}/>
                 ))}
-                {booksLoaded &&
+                {booksLoaded && books.length > 0 &&
                     Object.values(books).map((book) => {
                         console.log(book);
                         return <Book loading={false} bookData={book} marketplace={true}/>;
                     })
+                }
+                {booksLoaded && books.length === 0 &&
+                    <Grid item xs={12}>
+                        <NoBooks linkToMarketplace={false} message="Coming Soon!!"/>
+                    </Grid>
                 }
             </Grid>
             </Container>

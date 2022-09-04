@@ -27,6 +27,7 @@ import Landing from './pages/Landing';
 import NavList from "./components/Nav/NavList";
 import Nav from "./components/Nav/Nav";
 import Marketplace from "./pages/Marketplace";
+import Roadmap from "./pages/Roadmap";
 
 
 const themeLight = createTheme({
@@ -84,7 +85,7 @@ const App = () => {
           <Route path='/' element={<Landing/>}/>
           <Route path='/marketplace' element={<Marketplace/>}/>
           <Route path='/publish' element={<Publisher/>}/>
-          <Route path='/roadmap' element={<RoadmapPage/>}/>
+          <Route path='/roadmap' element={<Roadmap/>}/>
           <Route path='/bookshelf/:id' element={<Bookshelf/>}/>
         </Routes>
       </body>
