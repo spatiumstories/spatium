@@ -17,6 +17,7 @@
     "@testing-library/user-event": "^13.5.0",
     "claymorphism-css": "^1.0.5",
     "deso-protocol": "^0.0.9",
+    "hash-router": "^0.4.0",
     "html-entities": "^2.3.3",
     "react": "^17.0.2",
     "react-device-detect": "^2.1.2",
