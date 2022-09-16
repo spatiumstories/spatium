@@ -4,6 +4,7 @@ import CameraIcon from '@mui/icons-material/PhotoCamera';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
+import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
     nav: {

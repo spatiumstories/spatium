@@ -32,15 +32,20 @@ const Bookshelf = () => {
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
                 Object.values(response['data']['NFTsMap']).map((book) => {
-                    if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP") {
-                        console.log(book['PostEntryResponse']['PostExtraData']);
-                        let author = "SpatiumPublisher";
+                    if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5") {
+                        console.log(book['PostEntryResponse']);
+                        let postHashHex = book['PostEntryResponse']['PostHashHex'];
+                        let author = "Spatium Publisher";
+                        let publisher = "SpatiumPublisher";
                         let description = book['PostEntryResponse']['Body'];
                         let title = "A Spatium Story";
                         let type = "MOD"; //Spatium Publisher public key
 
                         if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
-                            author = book['PostEntryResponse']['PostExtraData']['autor'];
+                            author = book['PostEntryResponse']['PostExtraData']['author'];
+                        }
+                        if (book['PostEntryResponse']['PostExtraData']['published_by'] != null) {
+                            publisher = book['PostEntryResponse']['PostExtraData']['published_by'];
                         }
                         if (book['PostEntryResponse']['PostExtraData']['title'] != null) {
                             title = book['PostEntryResponse']['PostExtraData']['title'];
@@ -55,9 +60,11 @@ const Bookshelf = () => {
                             cover: book['PostEntryResponse']['ImageURLs'][0],
                             body: book['PostEntryResponse']['Body'],
                             author: author,
+                            publisher: publisher,
                             title: title,
                             description: description,
                             type: type,
+                            postHashHex: postHashHex,
                         };
                         data.push(newBook);
                     }

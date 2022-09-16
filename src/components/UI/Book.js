@@ -21,11 +21,23 @@ import rare from '../../assets/rare.png';
 
 
 const Book = (props) => {
+    const user = useSelector(state => state.user);
     const loading = props.loading;
     const marketplace = props.marketplace;
 
+    const onBuyHandler = (event) => {
+        props.onBuy(props.bookData);
+    }
 
+    const onReadHandler = (event) => {
+        console.log("read");
+    }
 
+    const onSellHandler = (event) => {
+        window.open(`https://${user.userName}.nftz.zone/nft/${props.bookData.postHashHex}`);
+    }
+
+    console.log(props);
     return (
         <Grid item key={props.card} xs={12} sm={6} md={4}>
             <Card
@@ -42,9 +54,9 @@ const Book = (props) => {
                     )
                     }
                     action={
-                    loading ? null : (
-                        <IconButton aria-label="settings">
-                        <MoreVertIcon />
+                    loading || props.bookData.type === 'MOD' ? null : (
+                        <IconButton aria-label="numLeft">
+                            <Typography>{props.bookData.left.length}/{props.bookData.total}</Typography>
                         </IconButton>
                     )
                     }
@@ -67,6 +79,7 @@ const Book = (props) => {
                         <Typography>by {props.bookData.author}</Typography>
                     )
                     }
+
                 /> 
                 {loading ? (
                     <Skeleton sx={{ height: 190 }} animation="wave" variant="rectangular" />
@@ -96,7 +109,10 @@ const Book = (props) => {
                             {props.bookData.title}
                             </Typography>
                             <Typography>
-                            by {props.bookData.author}
+                            Written by {props.bookData.author}
+                            </Typography>
+                            <Typography sx={{paddingTop: '20px', paddingBottom: '20px'}}>
+                            Published by {props.bookData.publisher}
                             </Typography>
                             <Typography>
                             {props.bookData.description}
@@ -104,13 +120,12 @@ const Book = (props) => {
                         </CardContent>
                         {marketplace ? (
                             <CardActions>
-                                <Button size="small">Buy</Button>
-                                <Button size="small">More</Button>
-                            </CardActions>
+                                <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
+                                <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            </CardActions>
                         ) : (
                             <CardActions>
-                                <Button size="small">Read</Button>
-                                <Button size="small">More</Button>
+                                <Button onClick={onReadHandler} size="medium" variant="contained">Read</Button>
+                                <Button onClick={onSellHandler} size="medium" variant="outlined">Sell</Button>
                             </CardActions>
                         )}
                     </React.Fragment>

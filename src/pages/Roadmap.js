@@ -25,16 +25,17 @@ import Success from '../components/UI/Success';
 import { useState } from 'react';
 
 const authorToolsData = [
-    "Publish Your Book",
-    "Mint on Demand or Rarely Minted Options",
-    "Engagement tools for you and your fans",
+    "Publish Your Book - Q4 2022",
+    "Mint on Demand or Rarely Minted Options - Q4 2022",
+    "Engagement tools for you and your fans - Q1 2023",
     "Character NFT Creation Tool",
     "Random Book Cover Generation Tool for Rare Mints",
     "Multichain Mints",
+    "Audio book generation tools"
 ];
 
 const decentralizeData = [
-    "Move our Dragon encryption to a Solana smart contract",
+    "Move our Dragon encryption to a Solana smart contract - Q4 2022",
     "Dev tools to expand the Spatium Stories ecosystem",
     "A fully decentralized e-reader device",
     "Book Staking",
@@ -42,10 +43,10 @@ const decentralizeData = [
 ];
 
 const readerData = [
-    "Review system stored on chain",
-    "Reader app on iOS and Android",
-    "Keep track of where you left off",
-    "Discounts for Spatium coin holders",
+    "Discounts for Spatium coin holders - Q3 2022",
+    "Review system stored on chain - Q1 2023",
+    "Reader app on iOS and Android - Q1 2023",
+    "Keep track of where you left off - Q1 2023",
     "PrintaMint",
 ];
 
@@ -106,6 +107,13 @@ const Roadmap = () => {
             <RoadmapItem type="fun" title="The Fun Stuff" data={funData}/>
             <RoadmapItem type="crazy" title="The Crazy Stuff" data={crazyData}/>
         </Grid>
+        <Stack
+            alignItems="center"
+            spacing={2}
+            sx={{paddingTop:'50px'}}
+        >
+            <Typography variant="h7" sx={{paddingBottom: '20px', fontStyle: 'italic'}}>Dates proposed may change. Items with no date are TBD.</Typography>
+        </Stack>
     </React.Fragment>
     );
 };
