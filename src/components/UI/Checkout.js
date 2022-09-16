@@ -31,18 +31,12 @@ const Checkout = (props) => {
         if (buying) {
             const acceptNFT = async () => {
                 const request = {
-                    "publicKey": user.publicKey,
-                    "transactionSpendingLimitResponse": {
-                        "NFTOperationLimitMap": {
-                            [nft] : {
-                                "0": {
-                                "accept_transfer": 1,
-                                }
-                            }
-                        },
-                    }
-                };
-                const response = await deso.identity.derive(request);
+                    "UpdaterPublicKeyBase58Check": user.publicKey,
+                    "NFTPostHashHex": nft,
+                    "SerialNumber": 0,
+                    "MinFeeRateNanosPerKB": 1000
+                  };
+                const response = await deso.nft.acceptNftBid(request);
                 console.log(response);
                 setBuying(false);
                 props.close();
@@ -67,14 +61,6 @@ const Checkout = (props) => {
           
         setBuying(true);
         const response = await deso.identity.derive(request);
-        // const derive = window.open('https://identity.deso.org/derive');
-        // center the window.
-        // const h = 1000;
-        // const w = 800;
-        // const y = window.outerHeight / 2 + window.screenY - h / 2;
-        // const x = window.outerWidth / 2 + window.screenX - w / 2;
-        // const win = window.open(`https://identity.deso.org/derive?publicKey=${user.publicKey}&transactionSpendingLimitResponse=${JSON.stringify(request)}`, request, `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
-        // // https://identity.deso.org/derive?publicKey=BC1YLhx475r19kA9CkzchSWen6hbF6W2GHTFEPqngMd2YwtFfAewRjE&transactionSpendingLimitResponse=%7B%22GlobalDESOLimit%22:100000000000,%22TransactionCountLimitMap%22:%7B%22SUBMIT_POST%22:120948,%22FOLLOW%22:82943%7D,%22CreatorCoinOperationLimitMap%22:%7B%22%22:%7B%22any%22:2183%7D,%22BC1YLhtBTFXAsKZgoaoYNW8mWAJWdfQjycheAeYjaX46azVrnZfJ94s%22:%7B%22buy%22:123,%22sell%22:4123,%22transfer%22:9198%7D%7D,%22DAOCoinOperationLimitMap%22:%7B%22%22:%7B%22mint%22:1%7D%7D,%22NFTOperationLimitMap%22:%7B%2201855d9ca9c54d797e53df0954204ae7d744c98fe853bc846f5663459ac9cb7b%22:%7B%220%22:%7B%22update%22:10,%22nft_bid%22:501%7D%7D%7D,%22DAOCoinLimitOrderLimitMap%22:%7B%22DESO%22:%7B%22BC1YLhtBTFXAsKZgoaoYNW8mWAJWdfQjycheAeYjaX46azVrnZfJ94s%22:10%7D,%22BC1YLhtBTFXAsKZgoaoYNW8mWAJWdfQjycheAeYjaX46azVrnZfJ94s%22:%7B%22DESO%22:5%7D,%22BC1YLjMYu2ahUtWgSX34cNLeM9BM9y37cqXzxAjbvPfbxppDh16Jwog%22:%7B%22BC1YLhtBTFXAsKZgoaoYNW8mWAJWdfQjycheAeYjaX46azVrnZfJ94s%22:1092%7D%7D%7D
         console.log(response);
 
         const buyNFTResponse = await fetch(nft);
