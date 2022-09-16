@@ -15,6 +15,7 @@ import Copyright from '../components/Layout/Copyright';
 import Intro from '../components/Layout/Intro';
 import Signup from '../components/Blog/Signup';
 import React from 'react';
+import Info from '../components/Layout/Info';
 
 const Landing = () => {
     const handleSubmit = (event) => {
@@ -47,8 +48,11 @@ const Landing = () => {
               backgroundPosition: 'center',
             }}
           />
-        </Grid>
         <Signup/>
+        <Grid item xs={12} component={Paper} square>
+            <Info/>
+          </Grid>
+        </Grid>
         </React.Fragment>
     );
 };

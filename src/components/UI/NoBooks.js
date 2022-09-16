@@ -1,10 +1,12 @@
+import nobooks from '../../assets/nobooks.png';
+
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
-import image from '../assets/hour.png';
+import { Button } from "@mui/material";
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -15,7 +17,7 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-const Publisher = () => {
+const NoBooks = (props) => {
     return (
         <Stack sx={{
             width: '100%',
@@ -26,18 +28,19 @@ const Publisher = () => {
         spacing={4}
         >
         <Item>
-            <Typography variant="h3">The future of web3 publishing is here!</Typography>
+            <Typography variant="h3">No Books Found :/</Typography>
         </Item>
-        <Box component="img"src={image} alt="Logo" sx={{
-            display: 'flex',
-            maxWidth: {xs: '100%', md: '40%'},
-        }}/>
+            <Box component="img"src={nobooks} alt="Logo" sx={{
+                display: 'center',
+                width: {xs: '100%', md: '40%'},
+            }}/>
 
         <Item>
-            <Typography variant="h3">Well...not quite here yet, but very very soon!</Typography>
+            <Typography variant="h3">{props.message}</Typography>
         </Item>
+        {props.linkToMarketplace && <Button onClick={props.handleMarketplace} variant="contained">Marketplace</Button>}
         </Stack>
     );
 };
 
-export default Publisher;
+export default NoBooks;

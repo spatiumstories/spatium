@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import Book from "../components/UI/Book";
 import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
+import NoBooks from "../components/UI/NoBooks";
 
 
 import React from 'react';
@@ -32,14 +33,19 @@ const Bookshelf = () => {
                 let data = [];
                 Object.values(response['data']['NFTsMap']).map((book) => {
                     if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5") {
-                        console.log(book['PostEntryResponse']['PostExtraData']);
-                        let author = "SpatiumPublisher";
+                        console.log(book['PostEntryResponse']);
+                        let postHashHex = book['PostEntryResponse']['PostHashHex'];
+                        let author = "Spatium Publisher";
+                        let publisher = "SpatiumPublisher";
                         let description = book['PostEntryResponse']['Body'];
                         let title = "A Spatium Story";
                         let type = "MOD"; //Spatium Publisher public key
 
                         if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
-                            author = book['PostEntryResponse']['PostExtraData']['autor'];
+                            author = book['PostEntryResponse']['PostExtraData']['author'];
+                        }
+                        if (book['PostEntryResponse']['PostExtraData']['published_by'] != null) {
+                            publisher = book['PostEntryResponse']['PostExtraData']['published_by'];
                         }
                         if (book['PostEntryResponse']['PostExtraData']['title'] != null) {
                             title = book['PostEntryResponse']['PostExtraData']['title'];
@@ -54,14 +60,15 @@ const Bookshelf = () => {
                             cover: book['PostEntryResponse']['ImageURLs'][0],
                             body: book['PostEntryResponse']['Body'],
                             author: author,
+                            publisher: publisher,
                             title: title,
                             description: description,
                             type: type,
+                            postHashHex: postHashHex,
                         };
                         data.push(newBook);
                     }
                 });
-
                 setBooks(data);
                 setBooksLoaded(true);
             };
@@ -119,11 +126,16 @@ const Bookshelf = () => {
                 cards.map((card) => (
                     <Book loading={true} card={card}/>
                 ))}
-                {booksLoaded &&
+                {booksLoaded && books.length > 0 &&
                     Object.values(books).map((book) => {
                         console.log(book);
                         return <Book loading={false} bookData={book} marketplace={false}/>;
                     })
+                }
+                {booksLoaded && books.length === 0 &&
+                    <Grid item xs={12}>
+                        <NoBooks linkToMarketplace={true} message="Go buy your first book now!" handleMarketplace={handleMarketplace}/>
+                    </Grid>
                 }
             </Grid>
             </Container>
