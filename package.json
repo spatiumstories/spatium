@@ -14,7 +14,6 @@
     "@mui/styles": "^5.9.3",
     "@reduxjs/toolkit": "^1.8.0",
     "deso-protocol": "^0.7.12",
-    "eslint": "^6.6.0",
     "hash-router": "^0.4.0",
     "html-entities": "^2.3.3",
     "react": "^17.0.2",
