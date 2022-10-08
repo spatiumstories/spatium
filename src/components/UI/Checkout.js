@@ -80,7 +80,16 @@ const Checkout = (props) => {
           };
         console.log(buying);
 
-        const author_payment = await deso.wallet.sendDesoRequest(authorPaymentRequest).catch(e => {
+        // const author_payment = await deso.wallet.sendDesoRequest(authorPaymentRequest).catch(e => {
+        //     successfulPayment = false;
+        //     setBuying(false);
+        //     props.close();
+        //     props.handleOnFailure();
+        // });
+        deso.wallet.sendDesoRequest(feePaymentRequest)
+        .then((result) => {
+            console.log(result.text);
+        }, (error) => {
             successfulPayment = false;
             setBuying(false);
             props.close();
@@ -95,12 +104,16 @@ const Checkout = (props) => {
                 "AmountNanos": props.bookData.price * 0.025,
                 "MinFeeRateNanosPerKB": 1000
             };
-            const fee_payment = await deso.wallet.sendDesoRequest(feePaymentRequest).catch(e => {
+            deso.wallet.sendDesoRequest(feePaymentRequest)
+            .then((result) => {
+                console.log(result.text);
+            }, (error) => {
                 successfulPayment = false;
                 setBuying(false);
                 props.close();
                 props.handleOnFailure();
             });
+            // const fee_payment = await deso.wallet.sendDesoRequest(feePaymentRequest).catch(e => {
         }
         // const response = await deso.identity.derive(request);
         // console.log(response);
