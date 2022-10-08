@@ -53,10 +53,12 @@ const CheckoutRare = (props) => {
           
         console.log(request2);
         setBuying(true);
-        const response2 = await deso.nft.createNftBid(request2).catch(console.error);
-
-        // console.log(response);
-        console.log(response2);
+        deso.nft.createNftBid(request2)
+        .then((result) => {
+            console.log(result.text);
+        }, (error) => {
+            console.log(error.text);
+        });
 
         setBuying(false);
         props.close();
