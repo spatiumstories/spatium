@@ -86,7 +86,7 @@ const Checkout = (props) => {
         //     props.close();
         //     props.handleOnFailure();
         // });
-        deso.wallet.sendDesoRequest(feePaymentRequest)
+        deso.wallet.sendDesoRequest(authorPaymentRequest)
         .then((result) => {
             console.log(result.text);
         }, (error) => {
