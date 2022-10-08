@@ -43,7 +43,8 @@ const decentralizeData = [
 ];
 
 const readerData = [
-    "Discounts for Spatium coin holders - Q3 2022",
+    "Discounts for Spatium coin holders - Q4 2022",
+    "Switch to DeSoDollar Payments - Q4 2022",
     "Review system stored on chain - Q1 2023",
     "Reader app on iOS and Android - Q1 2023",
     "Keep track of where you left off - Q1 2023",

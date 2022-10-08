@@ -13,6 +13,7 @@ import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
 import CheckoutModal from '../components/UI/CheckoutModal';
 import Success from '../components/UI/Success';
+import Failure from "../components/UI/Failure";
 
 
 import React from 'react';
@@ -34,6 +35,7 @@ const Marketplace = () => {
     }
     const handleClose = () => setOpen(false);
     const [success, setSuccess] = useState(false);
+    const [failure, setFailure] = useState(false);
 
     const handleCloseSuccess = () => {
         setSuccess(false);
@@ -41,6 +43,14 @@ const Marketplace = () => {
 
     const handleOnSuccess = () => {
         setSuccess(true);
+    }
+
+    const handleOnFailure = () => {
+        setFailure(true);
+    }
+
+    const handleCloseFailure = () => {
+        setFailure(false);
     }
 
     useEffect(() => {
@@ -86,7 +96,7 @@ const Marketplace = () => {
                     }
 
                     if (type === 'RARE') {
-                        total = book['NFTEntryResponses'].length;
+                        total = book['PostEntryResponse']['NumNFTCopies'];
                         let booksLeft = [];
                         book['NFTEntryResponses'].forEach(function (item, index) {
                             if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
@@ -169,12 +179,13 @@ const Marketplace = () => {
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
             <Success open={success} handleClose={handleCloseSuccess} message="Thank you for your purchase! Happy reading!"/>
+            <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...could not process payment"/>
             <Stack
                 alignItems="center"
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

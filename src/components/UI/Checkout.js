@@ -23,24 +23,35 @@ const Checkout = (props) => {
     const [nft, setNFT] = useState();
     const deso = new Deso();
 
-    const price = (props.bookData.price / 1000000000).toFixed(2);
-    const fee = 0.025 * price;
-    const total = (Number(price) + Number(fee)).toFixed(2);
+    const total = (props.bookData.price / 1000000000).toFixed(2);
+    const fee = 0.025 * total;
+    const price = (Number(total) - Number(fee)).toFixed(2);
+    // const total = (Number(price) + Number(fee)).toFixed(2);
 
     useEffect(() => {
         if (buying) {
             const acceptNFT = async () => {
+                console.log(nft);
                 const request = {
                     "UpdaterPublicKeyBase58Check": user.publicKey,
                     "NFTPostHashHex": nft,
-                    "SerialNumber": 0,
+                    "SerialNumber": 1,
                     "MinFeeRateNanosPerKB": 1000
                   };
-                const response = await deso.nft.acceptNftBid(request);
-                console.log(response);
-                setBuying(false);
-                props.close();
-                props.handleOnSuccess();
+                let successResponse = true;
+                const response = await deso.nft.acceptNftTransfer(request).catch(e => {
+                    successResponse = false;
+                    console.log(e);
+                    setBuying(false);
+                    props.close();
+                    props.handleOnFailure();
+                });
+                if (successResponse) {
+                    console.log(response);
+                    setBuying(false);
+                    props.close();
+                    props.handleOnSuccess();
+                }
             };
             acceptNFT().catch(console.error);
         }
@@ -48,23 +59,74 @@ const Checkout = (props) => {
 
     const onBuyHandler = async () => {
         let nft = props.bookData.postHashHex;
-        const request = {
-            "publicKey": user.publicKey,
-            "transactionSpendingLimitResponse": {
-              "GlobalDESOLimit": props.bookData.price + (props.bookData.price * 0.025),
-              "TransactionCountLimitMap": {
-                "BASIC_TRANSFER": 2,
-              }
-            }
-          };
+        let successfulPayment = true;
+        // const request = {
+        //     "publicKey": user.publicKey,
+        //     "transactionSpendingLimitResponse": {
+        //       "GlobalDESOLimit": (props.bookData.price + (props.bookData.price * 0.025)) * 1000,
+        //       "TransactionCountLimitMap": {
+        //         "BASIC_TRANSFER": 2,
+        //       }
+        //     }
+        //   };
           
           
         setBuying(true);
-        const response = await deso.identity.derive(request);
-        console.log(response);
 
-        const buyNFTResponse = await fetch(nft);
-        setNFT(buyNFTResponse);
+        const authorPaymentRequest = {
+            "SenderPublicKeyBase58Check": user.publicKey,
+            "RecipientPublicKeyOrUsername": props.bookData.publisher,
+            "AmountNanos": (props.bookData.price - (props.bookData.price * 0.025)),
+            "MinFeeRateNanosPerKB": 1000
+          };
+        console.log(buying);
+
+        const author_payment = await deso.wallet.sendDesoRequest(authorPaymentRequest).catch(e => {
+            successfulPayment = false;
+            setBuying(false);
+            props.close();
+            props.handleOnFailure();
+        });
+
+        if (successfulPayment) {
+            console.log("sending fee payment");
+            const feePaymentRequest = {
+                "SenderPublicKeyBase58Check": user.publicKey,
+                "RecipientPublicKeyOrUsername": "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq",
+                "AmountNanos": props.bookData.price * 0.025,
+                "MinFeeRateNanosPerKB": 1000
+            };
+            const fee_payment = await deso.wallet.sendDesoRequest(feePaymentRequest).catch(e => {
+                successfulPayment = false;
+                setBuying(false);
+                props.close();
+                props.handleOnFailure();
+            });
+        }
+        // const response = await deso.identity.derive(request);
+        // console.log(response);
+
+        const requestOptions = {
+            mode: 'cors',
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                post_hash_hex: nft,
+                buyer_pub_key: user.publicKey,
+                buyer_prv_key: '',
+                author: props.bookData.publisher,
+                nanos:  props.bookData.price
+            })
+        };
+
+        if (successfulPayment) {
+            fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                    setNFT(data);
+                });
+        }
     }
 
     return (
