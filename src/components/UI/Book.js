@@ -30,6 +30,7 @@ const Book = (props) => {
     }
 
     const onReadHandler = (event) => {
+        // window.open(`/reader/`)
         console.log("read");
     }
 
@@ -54,7 +55,7 @@ const Book = (props) => {
                     )
                     }
                     action={
-                    loading || props.bookData.type === 'MOD' ? null : (
+                    loading || props.bookData.type === 'MOD' || !marketplace ? null : (
                         <IconButton aria-label="numLeft">
                             <Typography>{props.bookData.left.length}/{props.bookData.total}</Typography>
                         </IconButton>

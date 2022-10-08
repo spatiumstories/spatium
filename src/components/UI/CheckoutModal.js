@@ -39,8 +39,8 @@ const CheckoutModal = (props) => {
         <Fade in={props.open}>
           <Box sx={style}>
             {props.bookToBuy.type === "MOD" ? (
-              <Checkout bookData={props.bookToBuy} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
-            <CheckoutRareStepper bookData={props.bookToBuy} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)}
+              <Checkout bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
+            <CheckoutRareStepper bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)}
           </Box>
         </Fade>
       </Modal>
