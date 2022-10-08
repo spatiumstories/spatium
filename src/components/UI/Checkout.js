@@ -119,7 +119,7 @@ const Checkout = (props) => {
         };
 
         if (successfulPayment) {
-            fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
+            fetch('/api/buy-book', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
