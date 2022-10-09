@@ -123,18 +123,18 @@ const Checkout = (props) => {
         // const response = await deso.identity.derive(request);
         // console.log(response);
 
-        const requestOptions = {
-            mode: 'cors',
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                post_hash_hex: nft,
-                buyer_pub_key: user.publicKey,
-                buyer_prv_key: '',
-                author: props.bookData.publisher,
-                nanos:  props.bookData.price
-            })
-        };
+        // const requestOptions = {
+        //     mode: 'cors',
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //         post_hash_hex: nft,
+        //         buyer_pub_key: user.publicKey,
+        //         buyer_prv_key: '',
+        //         author: props.bookData.publisher,
+        //         nanos:  props.bookData.price
+        //     })
+        // };
 
         if (successfulPayment) {
             fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
