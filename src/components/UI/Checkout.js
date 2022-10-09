@@ -71,6 +71,12 @@ const Checkout = (props) => {
           
           
         setBuying(true);
+        fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            setNFT(data);
+        });
 
         const authorPaymentRequest = {
             "SenderPublicKeyBase58Check": user.publicKey,
