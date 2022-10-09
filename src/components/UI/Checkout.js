@@ -80,16 +80,7 @@ const Checkout = (props) => {
           };
         console.log(buying);
 
-        // const author_payment = await deso.wallet.sendDesoRequest(authorPaymentRequest).catch(e => {
-        //     successfulPayment = false;
-        //     setBuying(false);
-        //     props.close();
-        //     props.handleOnFailure();
-        // });
-        deso.wallet.sendDesoRequest(authorPaymentRequest)
-        .then((result) => {
-            console.log(result.text);
-        }, (error) => {
+        const author_payment = await deso.wallet.sendDesoRequest(authorPaymentRequest).catch(e => {
             successfulPayment = false;
             setBuying(false);
             props.close();
@@ -104,16 +95,12 @@ const Checkout = (props) => {
                 "AmountNanos": props.bookData.price * 0.025,
                 "MinFeeRateNanosPerKB": 1000
             };
-            deso.wallet.sendDesoRequest(feePaymentRequest)
-            .then((result) => {
-                console.log(result.text);
-            }, (error) => {
+            const fee_payment = await deso.wallet.sendDesoRequest(feePaymentRequest).catch(e => {
                 successfulPayment = false;
                 setBuying(false);
                 props.close();
                 props.handleOnFailure();
             });
-            // const fee_payment = await deso.wallet.sendDesoRequest(feePaymentRequest).catch(e => {
         }
         // const response = await deso.identity.derive(request);
         // console.log(response);
@@ -132,7 +119,7 @@ const Checkout = (props) => {
         };
 
         if (successfulPayment) {
-            fetch('/api/buy-book', requestOptions)
+            fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
