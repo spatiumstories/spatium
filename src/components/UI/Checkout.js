@@ -71,24 +71,6 @@ const Checkout = (props) => {
           
           
         setBuying(true);
-        const requestOptions = {
-            mode: 'cors',
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                post_hash_hex: nft,
-                buyer_pub_key: user.publicKey,
-                buyer_prv_key: '',
-                author: props.bookData.publisher,
-                nanos:  props.bookData.price
-            })
-        };
-        fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-            setNFT(data);
-        });
 
         const authorPaymentRequest = {
             "SenderPublicKeyBase58Check": user.publicKey,
@@ -120,24 +102,22 @@ const Checkout = (props) => {
                 props.handleOnFailure();
             });
         }
-        // const response = await deso.identity.derive(request);
-        // console.log(response);
 
-        // const requestOptions = {
-        //     mode: 'cors',
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({
-        //         post_hash_hex: nft,
-        //         buyer_pub_key: user.publicKey,
-        //         buyer_prv_key: '',
-        //         author: props.bookData.publisher,
-        //         nanos:  props.bookData.price
-        //     })
-        // };
 
         if (successfulPayment) {
-            fetch('http://spatium-dev.us-east-1.elasticbeanstalk.com/api/buy-book', requestOptions)
+            const requestOptions = {
+                mode: 'cors',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    post_hash_hex: nft,
+                    buyer_pub_key: user.publicKey,
+                    buyer_prv_key: '',
+                    author: props.bookData.publisher,
+                    nanos:  props.bookData.price
+                })
+            };
+            fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
@@ -180,6 +160,7 @@ const Checkout = (props) => {
                         <Typography variant="h5">{total} DeSo</Typography>
                     </Grid>
                 </Grid>
+                <Typography sx={{paddingTop: '10px'}} variant="p">By completing your purchase, you agree to our <a href="https://diamondapp.com/u/Spatium/blog/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use.</a></Typography>
                 <LoadingButton
                     loading={buying}
                     onClick={onBuyHandler}
