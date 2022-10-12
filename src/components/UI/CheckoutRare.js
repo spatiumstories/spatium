@@ -86,6 +86,7 @@ const CheckoutRare = (props) => {
                         <Typography variant="h5">{price} DeSo</Typography>
                     </Grid>
                 </Grid>
+                <Typography sx={{paddingTop: '10px'}} variant="p">By completing your purchase, you agree to our <a href="https://diamondapp.com/u/Spatium/blog/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use.</a></Typography>
                 <LoadingButton
                     loading={buying}
                     onClick={onBuyHandler}
