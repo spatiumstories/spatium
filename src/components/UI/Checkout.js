@@ -105,17 +105,15 @@ const Checkout = (props) => {
 
 
         if (successfulPayment) {
+            let data = new FormData();
+            data.append("post_hash_hex", nft);
+            data.append("buyer_pub_key", user.publicKey);
+            data.append("buyer_prv_key", "");
+            data.append("author", props.bookData.publisher);
+            data.append("nanos", props.bookData.price);
             const requestOptions = {
-                mode: 'cors',
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    post_hash_hex: nft,
-                    buyer_pub_key: user.publicKey,
-                    buyer_prv_key: '',
-                    author: props.bookData.publisher,
-                    nanos:  props.bookData.price
-                })
+                body: data,
             };
             fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
                 .then(response => response.text())
