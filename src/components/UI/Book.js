@@ -32,6 +32,7 @@ const Book = (props) => {
     const onReadHandler = (event) => {
         // window.open(`/reader/`)
         console.log("read");
+        alert("Cloud reader Coming soon!");
     }
 
     const onSellHandler = (event) => {
