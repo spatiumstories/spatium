@@ -117,7 +117,7 @@ const Checkout = (props) => {
                     nanos:  props.bookData.price
                 })
             };
-            fetch('/api/buy-book', requestOptions)
+            fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
