@@ -32,7 +32,7 @@ const Bookshelf = () => {
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
                 Object.values(response['data']['NFTsMap']).map((book) => {
-                    if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5") {
+                    if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP") {
                         console.log(book['PostEntryResponse']);
                         let postHashHex = book['PostEntryResponse']['PostHashHex'];
                         let author = "Spatium Publisher";

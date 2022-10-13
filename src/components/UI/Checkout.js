@@ -23,7 +23,7 @@ const Checkout = (props) => {
     const deso = new Deso();
 
     const total = (props.bookData.price / 1000000000).toFixed(2);
-    const fee = 0.025 * total;
+    const fee = (0.025 * total).toFixed(4);
     const price = (Number(total) - Number(fee)).toFixed(2);
     // const total = (Number(price) + Number(fee)).toFixed(2);
 
