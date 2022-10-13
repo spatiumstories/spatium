@@ -11,8 +11,8 @@ import HandymanTwoToneIcon from '@mui/icons-material/HandymanTwoTone';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import Success from './Success';
-import emailjs from '@emailjs/browser';
 import { useSelector } from 'react-redux';
+import { Deso } from 'deso-protocol';
 
 const FeatureRequestForm = (props) => {
     const user = useSelector(state => state.user);
@@ -43,6 +43,7 @@ const FeatureRequestForm = (props) => {
     }
 
     const handleSubmit = (event) => {
+        let deso = new Deso();
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
@@ -58,7 +59,13 @@ const FeatureRequestForm = (props) => {
                 subscribe: data.get('subscribe') === 'true' ? 'yes' : 'no',
                 user: user.userName
             };
-            emailjs.send('service_zwwc6z5', 'template_0yllygi', email, 'KF6mBGbiQtVex61xQ')
+            let message = `New Idea!\n From: ${email.user}\n Email: ${email.email}\n Idea: ${email.idea}\n Please subscribe? ${email.subscribe}`;
+            const request = {
+                "RecipientPublicKeyBase58Check": "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq",
+                "SenderPublicKeyBase58Check": user.publicKey,
+                "MessageText": message
+            };
+            deso.social.sendMessage(request)
             .then((result) => {
                 console.log(result.text);
             }, (error) => {

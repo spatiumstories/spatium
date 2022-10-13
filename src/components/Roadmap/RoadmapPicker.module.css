@@ -1,4 +1,0 @@
-.picker {
-    align-items: center;
-    @apply max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 sm:grid-cols-5;
-}

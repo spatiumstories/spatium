@@ -49,7 +49,7 @@ const useStyles = makeStyles({
     }
 });
 
-const pages = [['Home', '/'], ['Marketplace', '/marketplace'], ['Publish', '/publish'], ['Road Map', 'roadmap']];
+const pages = [['Home', '/'], ['Marketplace', '/marketplace'], ['Publish', '/publish'], ['Road Map', '/roadmap']];
 
 const Nav = () => {
   const navigate = useNavigate();

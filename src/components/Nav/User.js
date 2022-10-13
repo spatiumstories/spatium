@@ -42,7 +42,7 @@ const User = (props) => {
     const user = useSelector(state => state.user);
     const dispatch = useDispatch();
     const deso = new Deso();
-    const request = 3;
+    const request = 4;
 
     useEffect(() => {
         if (!pageLoaded) {
@@ -88,6 +88,7 @@ const User = (props) => {
         } else if (setting === "Publish") {
             navigate('/publish');
         } else if (setting === "Logout") {
+            deso.identity.logout(user.publicKey);
             dispatch(userActions.logOut());
             navigate('/');
         }
