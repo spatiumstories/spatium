@@ -99,7 +99,7 @@ const Marketplace = () => {
                         total = book['PostEntryResponse']['NumNFTCopies'];
                         let booksLeft = [];
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP' &&
                                 item['IsForSale']) {
                                     booksLeft.push(item['SerialNumber']);
                                 }
