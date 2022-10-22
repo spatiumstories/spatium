@@ -19,6 +19,7 @@ import Avatar from '@mui/material/Avatar';
 import Checkout from './Checkout';
 import QRCodePayment from './QRCodePayment';
 import PaymentOptions from './PaymentOptions';
+import FinalizeAltPayment from './FinalizeAltPayment';
 import { useState } from 'react';
 
 
@@ -37,9 +38,9 @@ const CheckoutStepper = (props) => {
       case 0:
         return <PaymentOptions setCurrency={handleCurrencyChange}/>;
       case 1:
-        return <Checkout bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
+        return <FinalizeAltPayment bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
       case 2:
-        return <QRCodePayment/>
+        return <QRCodePayment currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>
         default:
         throw new Error('Unknown step');
     }
@@ -49,7 +50,6 @@ const CheckoutStepper = (props) => {
   };
 
   const handleBack = () => {
-    setCurrency(null);
     setActiveStep(activeStep - 1);
   };
 
