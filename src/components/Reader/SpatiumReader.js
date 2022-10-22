@@ -7,6 +7,8 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import {isMobile} from 'react-device-detect';
+
 
 
 
@@ -61,6 +63,56 @@ const SpatiumReader = () => {
       setLocation(epubcifi);
   }
 
+  const getReader = () => {
+      if (isMobile) {
+        return (
+            <ReactReader
+            url={bookUrl}
+            epubInitOptions={{
+              openAs: 'epub'
+            }}
+            epubOptions={{
+              flow: "scrolled",
+              manager: "continuous"
+            }}
+            location={location}
+            locationChanged={locationChanged}
+            tocChanged={toc => tocRef.current = toc}
+            getRendition={(rendition) => {
+              renditionRef.current = rendition
+              // renditionRef.current.themes.default({
+              //   '::selection': {
+              //     'background': 'blue'
+              //   }
+              // })
+              setSelections([])
+            }}
+          />
+        );
+      } else {
+          return (
+            <ReactReader
+            url={bookUrl}
+            epubInitOptions={{
+              openAs: 'epub'
+            }}
+            location={location}
+            locationChanged={locationChanged}
+            tocChanged={toc => tocRef.current = toc}
+            getRendition={(rendition) => {
+              renditionRef.current = rendition
+              // renditionRef.current.themes.default({
+              //   '::selection': {
+              //     'background': 'blue'
+              //   }
+              // })
+              setSelections([])
+            }}
+          />
+          );
+      }
+  }
+
   useEffect(() => {
 
   }, [tocRef])
@@ -68,31 +120,16 @@ const SpatiumReader = () => {
   return (
     <>
       <div style={{ height: "100vh" }}>
-        <ReactReader
-          url={bookUrl}
-          epubInitOptions={{
-            openAs: 'epub'
-          }}
-          location={location}
-          locationChanged={locationChanged}
-          tocChanged={toc => tocRef.current = toc}
-          getRendition={(rendition) => {
-            renditionRef.current = rendition
-            // renditionRef.current.themes.default({
-            //   '::selection': {
-            //     'background': 'blue'
-            //   }
-            // })
-            setSelections([])
-          }}
-        />
-      <div style={{ position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'center', zIndex: 1}}>
-        {page}
-      </div>
-      <div style={{ position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'right', zIndex: 1}}>
-                <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'none', md: 'inline'}}}>Toggle Font</Button>
-                <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'inline', md: 'none'}}}>+/-</Button>
-      </div>
+        {getReader()}
+        {!isMobile && 
+            <div style={{position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'center', zIndex: 1}}>
+                {page}
+            </div>
+        }  
+        <div style={{position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'right', zIndex: 1}}>
+                    <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'none', md: 'inline'}}}>Toggle Font</Button>
+                    <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'inline', md: 'none'}}}>+/-</Button>
+        </div>
 
     </div>
 

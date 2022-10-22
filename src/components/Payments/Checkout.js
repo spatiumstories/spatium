@@ -170,6 +170,7 @@ const Checkout = (props) => {
                 >
                 Complete Purchase!
                 </LoadingButton>
+                <Button onClick={props.handleAltPayment}>Or Pay With Other Crypto (Beta)</Button>
         </Box>
     );
 };

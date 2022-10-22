@@ -12,7 +12,7 @@ const PaymentOptions = (props) => {
     return (
         <React.Fragment>
         <Typography variant="h6" gutterBottom>
-          Choose Your Serial Number
+          Choose Your Payment Option
         </Typography>
         <Grid container spacing={3} sx={{paddingTop: '30px'}}>
           <Grid item xs={12} justifyItems="center" sx={{height: '200px', overflow:'scroll'}}>
