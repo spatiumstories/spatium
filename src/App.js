@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from 'react';
-import {Routes, Route, Router} from 'react-router-dom';
+import {Routes, Route, useLocation} from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import Bookshelf from "./pages/Bookshelf";
@@ -12,6 +12,7 @@ import NavList from "./components/Nav/NavList";
 import Nav from "./components/Nav/Nav";
 import Marketplace from "./pages/Marketplace";
 import Roadmap from "./pages/Roadmap";
+import SpatiumReader from "./components/Reader/SpatiumReader";
 
 
 const themeLight = createTheme({
@@ -50,20 +51,13 @@ const themeDark = createTheme({
 const App = () => {
   const [light, setLight] = useState(true);
   let theme = light ? themeLight : themeDark;
-  // theme.typography.h1 = {
-  //   fontSize: '1.2rem',
-  //   '@media (min-width:600px)': {
-  //     fontSize: '4.5rem',
-  //   },
-  //   [theme.breakpoints.up('md')]: {
-  //     fontSize: '2.4rem',
-  //   },
-  // };
+  let location = useLocation();
+  console.log(location.pathname);
   theme = responsiveFontSizes(theme);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Nav/>
+      {!location.pathname.includes('/read') && <Nav/>}
       <body>
         <Routes>
           <Route path='/' element={<Landing/>}/>
@@ -71,9 +65,10 @@ const App = () => {
           <Route path='/publish' element={<Publisher/>}/>
           <Route path='/roadmap' element={<Roadmap/>}/>
           <Route path='/bookshelf/:id' element={<Bookshelf/>}/>
+          <Route path='/read/:book' element={<SpatiumReader/>}/>
         </Routes>
       </body>
-      <Footer/>
+      {!location.pathname.includes('/read') && <Footer/>}
     </ThemeProvider>
   );
 }

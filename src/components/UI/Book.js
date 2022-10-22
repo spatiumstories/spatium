@@ -21,6 +21,7 @@ import rare from '../../assets/rare.png';
 
 
 const Book = (props) => {
+    const navigate = useNavigate();
     const user = useSelector(state => state.user);
     const loading = props.loading;
     const marketplace = props.marketplace;
@@ -32,11 +33,12 @@ const Book = (props) => {
     const onReadHandler = (event) => {
         // window.open(`/reader/`)
         console.log("read");
-        alert("Cloud reader Coming soon!");
+        console.log(event);
+        window.open(`#/read/${props.bookData.postHashHex}`);
     }
 
     const onSellHandler = (event) => {
-        window.open(`https://${user.userName}.nftz.zone/nft/${props.bookData.postHashHex}`);
+        window.open(`https://${user.userName}.nftz.zone/nft/${props.bookData.postHashHex}`, '_blank', 'noopener,noreferrer');
     }
 
     console.log(props);
