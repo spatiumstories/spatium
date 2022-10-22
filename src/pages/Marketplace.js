@@ -11,7 +11,7 @@ import Book from "../components/UI/Book";
 import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
-import CheckoutModal from '../components/UI/CheckoutModal';
+import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 
@@ -27,29 +27,40 @@ const Marketplace = () => {
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
     const [open, setOpen] = useState(false);
+    const [altPayment, setAltPayment] = useState(false);
 
+    const handleUseAltPayment = (useAltPayment) => {
+      setAltPayment(useAltPayment);
+    }
 
     const handleOpen = (bookData) => {
         setBookToBuy(bookData);
         setOpen(true);
     }
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setAltPayment(false);
+    }
     const [success, setSuccess] = useState(false);
     const [failure, setFailure] = useState(false);
 
     const handleCloseSuccess = () => {
+        setAltPayment(false);
         setSuccess(false);
     }
 
     const handleOnSuccess = () => {
+        setAltPayment(false);
         setSuccess(true);
     }
 
     const handleOnFailure = () => {
+        setAltPayment(false);
         setFailure(true);
     }
 
     const handleCloseFailure = () => {
+        setAltPayment(false);
         setFailure(false);
     }
 
@@ -99,7 +110,7 @@ const Marketplace = () => {
                         total = book['PostEntryResponse']['NumNFTCopies'];
                         let booksLeft = [];
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP' &&
                                 item['IsForSale']) {
                                     booksLeft.push(item['SerialNumber']);
                                 }
@@ -185,7 +196,7 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

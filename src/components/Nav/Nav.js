@@ -134,7 +134,7 @@ const Nav = () => {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            <NavLink to='/' className={navData => navData.isActive ? classes.linkActive : classes.link}>Home</NavLink>
+            <NavLink exact to='/' className={classes.link}>Home</NavLink>
             <NavLink to='/marketplace' className={navData => navData.isActive ? classes.linkActive : classes.link}>Marketplace</NavLink>
             <NavLink to='/publish' className={navData => navData.isActive ? classes.linkActive : classes.link}>Publish</NavLink>
             <NavLink to='/roadmap' className={navData => navData.isActive ? classes.linkActive : classes.link}>Road Map</NavLink>

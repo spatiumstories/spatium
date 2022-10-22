@@ -5,9 +5,11 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Checkout from './Checkout';
 import CheckoutRareStepper from './CheckoutRareStepper';
+import CheckoutStepper from './CheckoutStepper';
 import CheckoutRare from './CheckoutRare';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 
 const style = {
   position: 'absolute',
@@ -38,9 +40,12 @@ const CheckoutModal = (props) => {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            {props.bookToBuy.type === "MOD" ? (
-              <Checkout bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
-            <CheckoutRareStepper bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)}
+            {props.bookToBuy.type === "MOD" && props.altPayment ? (
+              <CheckoutStepper bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : 
+              props.bookToBuy.type === "MOD" ? (
+                <Checkout handleAltPayment={props.setAltPayment} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
+              <CheckoutRareStepper bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)
+            }
           </Box>
         </Fade>
       </Modal>

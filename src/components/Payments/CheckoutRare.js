@@ -10,7 +10,6 @@ import Box from '@mui/material/Box';
 import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 import Typography from '@mui/material/Typography';
 import { useState, useEffect } from 'react';
-import Success from './Success';
 import { useSelector } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
