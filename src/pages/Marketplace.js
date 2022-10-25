@@ -11,7 +11,7 @@ import Book from "../components/UI/Book";
 import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
-import CheckoutModal from '../components/UI/CheckoutModal';
+import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 
@@ -27,29 +27,40 @@ const Marketplace = () => {
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
     const [open, setOpen] = useState(false);
+    const [altPayment, setAltPayment] = useState(false);
 
+    const handleUseAltPayment = (useAltPayment) => {
+      setAltPayment(useAltPayment);
+    }
 
     const handleOpen = (bookData) => {
         setBookToBuy(bookData);
         setOpen(true);
     }
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setAltPayment(false);
+    }
     const [success, setSuccess] = useState(false);
     const [failure, setFailure] = useState(false);
 
     const handleCloseSuccess = () => {
+        setAltPayment(false);
         setSuccess(false);
     }
 
     const handleOnSuccess = () => {
+        setAltPayment(false);
         setSuccess(true);
     }
 
     const handleOnFailure = () => {
+        setAltPayment(false);
         setFailure(true);
     }
 
     const handleCloseFailure = () => {
+        setAltPayment(false);
         setFailure(false);
     }
 
@@ -69,6 +80,7 @@ const Marketplace = () => {
                     let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
                     let author = "Spatium Publisher";
                     let publisher = "SpatiumPublisher";
+                    let publisher_key = "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq";
                     let description = book['PostEntryResponse']['Body'];
                     let title = "A Spatium Story";
                     let type = "MOD"; //Spatium Publisher public key
@@ -76,6 +88,9 @@ const Marketplace = () => {
                     let total = null;
                     let left = [];
 
+                    if (book['PostEntryResponse']['PostExtraData']['published_by_key'] != null) {
+                        publisher_key = book['PostEntryResponse']['PostExtraData']['published_by_key'];
+                    }
                     if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
                         author = book['PostEntryResponse']['PostExtraData']['author'];
                     }
@@ -112,6 +127,7 @@ const Marketplace = () => {
                             body: book['PostEntryResponse']['Body'],
                             author: author,
                             publisher: publisher,
+                            publisher_key: publisher_key,
                             title: title,
                             description: description,
                             type: type,
@@ -185,7 +201,7 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
