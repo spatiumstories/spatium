@@ -70,7 +70,7 @@ const Marketplace = () => {
             //loading books
             const fetchData = async () => {
                 const request = {
-                    "UserPublicKeyBase58Check": "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP"
+                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
                 };
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
@@ -114,7 +114,7 @@ const Marketplace = () => {
                         total = book['PostEntryResponse']['NumNFTCopies'];
                         let booksLeft = [];
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP' &&
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
                                 item['IsForSale']) {
                                     booksLeft.push(item['SerialNumber']);
                                 }

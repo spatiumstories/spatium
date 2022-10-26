@@ -30,8 +30,9 @@ const steps = ['Choose Payment Option', 'Review your order', 'QR Code'];
 const theme = createTheme();
 
 const CheckoutStepper = (props) => {
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const [currency, setCurrency] = useState(null);
+  const [timesUp, setTimesUp] = useState(false);
 
   function getStepContent(step) {
     switch (step) {
@@ -40,7 +41,7 @@ const CheckoutStepper = (props) => {
       case 1:
         return <FinalizeAltPayment bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
       case 2:
-        return <QRCodePayment currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>
+        return <QRCodePayment handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>
         default:
         throw new Error('Unknown step');
     }
@@ -58,6 +59,10 @@ const CheckoutStepper = (props) => {
     setCurrency(event.target.value);
   };
 
+  const handleTimesUp = () => {
+    setTimesUp(true);
+  }
+
   return (
     <Box
     sx={{
@@ -65,19 +70,24 @@ const CheckoutStepper = (props) => {
     flexDirection: 'column',
     alignItems: 'center',
     }}
->        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                <ShoppingCartTwoToneIcon />
-            </Avatar>
-          <Typography component="h1" variant="h4" align="center">
-            Checkout
-          </Typography>
-          <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+    >
+        {!timesUp && 
+        <React.Fragment>
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                  <ShoppingCartTwoToneIcon />
+              </Avatar>
+            <Typography component="h1" variant="h4" align="center">
+              Checkout
+            </Typography>
+            <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </React.Fragment>
+        }
           <React.Fragment>
             {activeStep === steps.length ? (
               <React.Fragment>
@@ -89,27 +99,36 @@ const CheckoutStepper = (props) => {
               <React.Fragment>
                 {getStepContent(activeStep)}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  {activeStep !== 0 && (
+                  {activeStep !== 0 && !timesUp && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
                       Back
                     </Button>
                   )}
-                  {activeStep < steps.length - 1 && currency !== null && (
+                  {activeStep < steps.length - 1 && currency !== null ? (
                   <Button
                     variant="contained"
                     onClick={handleNext}
                     sx={{ mt: 3, ml: 1 }}
                   >
                     Next
-                  </Button>)}
-                  {activeStep < steps.length - 1 && currency === null && (
+                  </Button>) :
+                  activeStep < steps.length - 1 && currency === null ? (
                   <Button
                     variant="contained"
                     disabled
                     sx={{ mt: 3, ml: 1 }}
                   >
                     Next
-                  </Button>)}
+                  </Button>) : (
+                    timesUp &&
+                    <Button variant="contained"
+                    sx={{ mt: 3, ml: 1}}
+                    onClick={props.close}
+                    >
+                      Ok!
+                    </Button>
+                  )
+                  }
                 </Box>
               </React.Fragment>
             )}
