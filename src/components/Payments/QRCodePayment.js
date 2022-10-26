@@ -14,12 +14,17 @@ import { useSelector } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
 import QRCode from 'react-qr-code';
+import Timer from '../UI/Timer';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+
 
 const QRCodePayment = (props) => {
     console.log(props.bookData);
     const user = useSelector(state => state.user);
-    const [buying, setBuying] = useState(false);
-    const [nft, setNFT] = useState();
+    const [timesUp, setTimesUp] = useState(false);
+    const [depositConfirmed, setDepositConfirmed] = useState(false);
     const [depositKey, setDepositKey] = useState(null);
     const [amount, setAmount] = useState(0);
     const deso = new Deso();
@@ -27,7 +32,6 @@ const QRCodePayment = (props) => {
     const total = (props.bookData.price / 1000000000).toFixed(2);
     const fee = (0.025 * total).toFixed(4);
     const price = (Number(total) - Number(fee)).toFixed(2);
-    // const amount = total;
 
     // Get amount and qr code
     useEffect(() => {
@@ -51,7 +55,7 @@ const QRCodePayment = (props) => {
             });
         fetch(`https://megaswap.dev/api/v1/destination-amount-for-deposit-amount/${props.currency}/DESO/${total}`).then(response => response.text()).then(data => {
             let json = JSON.parse(data);
-            setAmount(total / json['SwapRateDestinationTickerPerDepositTicker']);
+            setAmount((total / json['SwapRateDestinationTickerPerDepositTicker']) * 1.025);
         });
     }, [])
 
@@ -63,81 +67,103 @@ const QRCodePayment = (props) => {
     }, [amount, depositKey]);
 
     const waitForDeposit = async () => {
-        if (amount !== null && depositKey !== null) {
-            let deposit = [];
-            let counter = 0;
-            while (deposit.length === 0) {
-                counter = counter + 1;
-                fetch(`https://megaswap.dev/api/v1/new-deposits/${props.currency}/${depositKey}`).then(response => response.text()).then(data => {
-                    let json = JSON.parse(data);
-                    deposit = json['Deposits'];
-                });
-                console.log(deposit);
-                if (counter === 5) {
-                    deposit = [1, 2, 3];
-                }
-                await new Promise(r => setTimeout(r, 15000));
-                console.log("after 7 seconds?");
-            }
-        }
-    };
-
-    useEffect(() => {
-        if (buying) {
-            const acceptNFT = async () => {
-                console.log(nft);
-                const request = {
-                    "UpdaterPublicKeyBase58Check": user.publicKey,
-                    "NFTPostHashHex": nft,
-                    "SerialNumber": 1,
-                    "MinFeeRateNanosPerKB": 1000
-                  };
-                let successResponse = true;
-                const response = await deso.nft.acceptNftTransfer(request).catch(e => {
-                    successResponse = false;
-                    console.log(e);
-                    setBuying(false);
-                    props.close();
-                    props.handleOnFailure();
-                });
-                if (successResponse) {
-                    console.log(response);
-                    setBuying(false);
-                    props.close();
-                    props.handleOnSuccess();
-                }
-            };
-            acceptNFT().catch(console.error);
-        }
-    }, [nft]);
-
-    const onBuyHandler = async () => {
         let nft = props.bookData.postHashHex;
-        let successfulPayment = true;
-          
-          
-        setBuying(true);
+        let newNft = null;
+        let successfulPayment = true;  
+
+        // Wait for deposit, then backend mints book
+        let data = new FormData();
+        data.append("currency", props.currency);
+        data.append("deposit_key", depositKey);
+        const requestOptions = {
+            method: 'POST',
+            body: data,
+        };
+
+        let depositTx = "";
+        await fetch('http://0.0.0.0:4201/api/poll-deposits', requestOptions)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                depositTx = data;
+                setDepositConfirmed(true);
+        });
+
+        if (depositTx === "") {
+            successfulPayment = false;
+        }
 
 
         if (successfulPayment) {
-            let data = new FormData();
             data.append("post_hash_hex", nft);
             data.append("buyer_pub_key", user.publicKey);
             data.append("buyer_prv_key", "");
             data.append("author", props.bookData.publisher);
             data.append("nanos", props.bookData.price);
+            data.append("deposit_tx", depositTx);
+
+            await fetch('http://0.0.0.0:4201/api/alt-buy-book', requestOptions)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                newNft = data;
+            });
+        }
+
+
+        if (newNft !== null) {
+            // Place bid on new NFT
+            const request = {
+                "UpdaterPublicKeyBase58Check": user.publicKey,
+                "NFTPostHashHex": newNft,
+                "SerialNumber": 1,
+                "BidAmountNanos": props.bookData.price,
+                "MinFeeRateNanosPerKB": 1000
+                };
+            const response = await deso.nft.createNftBid(request).catch(e => {
+                successfulPayment = false;
+                console.log(e);
+                props.close();
+                props.handleOnFailure();
+            });
+        } else {
+            successfulPayment = false;
+        }
+
+
+        // Pay Author
+        if (successfulPayment) {
+            let data = new FormData();
+            data.append("post_hash_hex", nft);
+            data.append("buyer", user.publicKey);
+            data.append("author", props.bookData.publisher);
+            data.append("amount", props.bookData.price);
             const requestOptions = {
                 method: 'POST',
                 body: data,
             };
-            fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
+            fetch('http://0.0.0.0:4201/api/accept-bid-and-pay-author', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
-                    setNFT(data);
-                });
+            });
+            handleSuccessfulPurchase();
         }
+    };
+
+    const handleTimesUp = () => {
+        setTimesUp(true);
+        props.handleTimesUp();
     }
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+
+    const handleSuccessfulPurchase = async () => {
+        await delay(3000);
+        props.close();
+        props.handleOnSuccess();
+    }
+
+    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your book with DeSo :)";
 
 
     return (
@@ -148,16 +174,31 @@ const QRCodePayment = (props) => {
             alignItems: 'center',
             }}
         >
-            {!buying ? (
+
+        {timesUp ? (
                 <React.Fragment>
-                    <Typography variant="h6">Send {amount} {props.currency} to this address to buy your book!</Typography>
-                    <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>{depositKey}</Typography>
+                    <Alert severity="warning">
+                        <AlertTitle>Time Expired!</AlertTitle>
+                        Don't worry! — <strong>you can still get yoru book!</strong>
+                    </Alert>
+                    <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>{timesUpText}</Typography>
+                </React.Fragment>
+
+            ) : !timesUp && depositConfirmed ? (
+                <React.Fragment>
+                <Typography variant="h6">Deposit Confirmed!</Typography>
+                <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>Verifying Transfer...</Typography>
+                <CircularProgress color="success" />
+            </React.Fragment>
+            ) : (
+                <React.Fragment>
+                    {amount !== null && depositKey !== null && <Timer handleTimesUp={handleTimesUp}/>}
+                    <Typography variant="h6" sx={{paddingTop: '10px', paddingBottom: '10px', paddingLeft: '10px', paddingRight: '10px'}}>Send {amount} {props.currency} to this address to buy your book!</Typography>
+                    <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px', paddingLeft: '10px', paddingRight: '10px'}}>{depositKey}</Typography>
                     <QRCode value={depositKey ? depositKey : ""}/>
                 </React.Fragment>
-            ) :(
-                <Typography>wait</Typography>
             )
-            }
+        }
         </Box>
     );
 };
