@@ -48,45 +48,74 @@ const Checkout = (props) => {
                 nft = data;
         });
 
-        // Place bid on new NFT
+        if (total > 0) {
+
+            // Place bid on new NFT
+            const request = {
+                "UpdaterPublicKeyBase58Check": user.publicKey,
+                "NFTPostHashHex": nft,
+                "SerialNumber": 1,
+                "BidAmountNanos": props.bookData.price,
+                "MinFeeRateNanosPerKB": 1000
+            };
+            const response = await deso.nft.createNftBid(request).catch(e => {
+                successfulPayment = false;
+                console.log(e);
+                setBuying(false);
+                props.close();
+                props.handleOnFailure();
+            });
+
+
+            // Accept NFT Bid and Pay Author
+            if (successfulPayment) {
+                let data = new FormData();
+                data.append("post_hash_hex", nft);
+                data.append("buyer", user.publicKey);
+                data.append("author", props.bookData.publisher);
+                data.append("amount", props.bookData.price);
+                const requestOptions = {
+                    method: 'POST',
+                    body: data,
+                };
+                fetch('https://api.spatiumstories.xyz/api/accept-bid-and-pay-author', requestOptions)
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                });
+                setBuying(false);
+                props.close();
+                props.handleOnSuccess();
+            }
+        } else {
+            acceptNFT(nft);
+        }
+
+    }
+
+    const acceptNFT = async (nft) => {
+        console.log(nft);
         const request = {
             "UpdaterPublicKeyBase58Check": user.publicKey,
             "NFTPostHashHex": nft,
             "SerialNumber": 1,
-            "BidAmountNanos": props.bookData.price,
             "MinFeeRateNanosPerKB": 1000
           };
-        const response = await deso.nft.createNftBid(request).catch(e => {
-            successfulPayment = false;
+        let successResponse = true;
+        const response = await deso.nft.acceptNftTransfer(request).catch(e => {
+            successResponse = false;
             console.log(e);
             setBuying(false);
             props.close();
             props.handleOnFailure();
         });
-
-
-        // Accept NFT Bid and Pay Author
-        if (successfulPayment) {
-            let data = new FormData();
-            data.append("post_hash_hex", nft);
-            data.append("buyer", user.publicKey);
-            data.append("author", props.bookData.publisher);
-            data.append("amount", props.bookData.price);
-            const requestOptions = {
-                method: 'POST',
-                body: data,
-            };
-            fetch('https://api.spatiumstories.xyz/api/accept-bid-and-pay-author', requestOptions)
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-            });
+        if (successResponse) {
+            console.log(response);
             setBuying(false);
             props.close();
             props.handleOnSuccess();
         }
-
-    }
+    };
 
     const handleAltPayment = () => {
         props.handleAltPayment(true);
