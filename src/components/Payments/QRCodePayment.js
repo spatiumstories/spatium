@@ -30,11 +30,7 @@ const QRCodePayment = (props) => {
     useEffect(() => {
         let data = {
             "DestinationTicker": "DESO",
-            "DestinationAddress": props.bookData.publisher_key
-        }
-        let data2 = {
-            "DestinationTicker": "DESO",
-            "DestinationAddress": "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq"
+            "DestinationAddress": user.publicKey
         }
         const requestOptions = {
             method: 'POST',
