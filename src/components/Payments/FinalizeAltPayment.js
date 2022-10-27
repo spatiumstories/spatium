@@ -21,8 +21,6 @@ const FinalizeAltPayment = (props) => {
     const deso = new Deso();
 
     const total = (props.bookData.price / 1000000000).toFixed(2);
-    const fee = (0.025 * total).toFixed(4);
-    const price = (Number(total) - Number(fee)).toFixed(2);
 
 
     return (
@@ -38,13 +36,7 @@ const FinalizeAltPayment = (props) => {
                         <Typography variant="h6">{props.bookData.title} x1</Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="h6">{price} DeSo</Typography>
-                    </Grid>
-                    <Grid item xs={6} sx={{paddingTop: '10px'}}>
-                        <Typography variant="h6">Spatium Stories Fee</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography variant="h6">{fee} DeSo</Typography>
+                        <Typography variant="h6">{total} DeSo</Typography>
                     </Grid>
                     <Grid item xs={6} sx={{paddingTop: '10px'}}>
                         <Typography variant="h5">Total</Typography>

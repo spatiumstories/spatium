@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
+import Countdown from 'react-countdown';
 
 const Checkout = (props) => {
     console.log(props.bookData);
@@ -22,109 +23,110 @@ const Checkout = (props) => {
     const deso = new Deso();
 
     const total = (props.bookData.price / 1000000000).toFixed(2);
-    const fee = (0.025 * total).toFixed(4);
-    const price = (Number(total) - Number(fee)).toFixed(2);
-    // const total = (Number(price) + Number(fee)).toFixed(2);
-
-    useEffect(() => {
-        if (buying) {
-            const acceptNFT = async () => {
-                console.log(nft);
-                const request = {
-                    "UpdaterPublicKeyBase58Check": user.publicKey,
-                    "NFTPostHashHex": nft,
-                    "SerialNumber": 1,
-                    "MinFeeRateNanosPerKB": 1000
-                  };
-                let successResponse = true;
-                const response = await deso.nft.acceptNftTransfer(request).catch(e => {
-                    successResponse = false;
-                    console.log(e);
-                    setBuying(false);
-                    props.close();
-                    props.handleOnFailure();
-                });
-                if (successResponse) {
-                    console.log(response);
-                    setBuying(false);
-                    props.close();
-                    props.handleOnSuccess();
-                }
-            };
-            acceptNFT().catch(console.error);
-        }
-    }, [nft]);
 
     const onBuyHandler = async () => {
         let nft = props.bookData.postHashHex;
-        let successfulPayment = true;
-        // const request = {
-        //     "publicKey": user.publicKey,
-        //     "transactionSpendingLimitResponse": {
-        //       "GlobalDESOLimit": (props.bookData.price + (props.bookData.price * 0.025)) * 1000,
-        //       "TransactionCountLimitMap": {
-        //         "BASIC_TRANSFER": 2,
-        //       }
-        //     }
-        //   };
-          
-          
+        let successfulPayment = true;          
         setBuying(true);
 
-        const authorPaymentRequest = {
-            "SenderPublicKeyBase58Check": user.publicKey,
-            "RecipientPublicKeyOrUsername": props.bookData.publisher,
-            "AmountNanos": (props.bookData.price - (props.bookData.price * 0.025)),
-            "MinFeeRateNanosPerKB": 1000
-          };
-        console.log(buying);
-
-        const author_payment = await deso.wallet.sendDesoRequest(authorPaymentRequest).catch(e => {
-            successfulPayment = false;
-            setBuying(false);
-            props.close();
-            props.handleOnFailure();
+        // Mint New NFT and Set For Sale
+        let data = new FormData();
+        data.append("post_hash_hex", nft);
+        data.append("buyer_pub_key", user.publicKey);
+        data.append("buyer_prv_key", "");
+        data.append("author", props.bookData.publisher);
+        data.append("nanos", props.bookData.price);
+        const requestOptions = {
+            method: 'POST',
+            body: data,
+        };
+        await fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                setNFT(data);
+                nft = data;
         });
 
-        if (successfulPayment) {
-            console.log("sending fee payment");
-            const feePaymentRequest = {
-                "SenderPublicKeyBase58Check": user.publicKey,
-                "RecipientPublicKeyOrUsername": "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq",
-                "AmountNanos": props.bookData.price * 0.025,
+        if (total > 0) {
+
+            // Place bid on new NFT
+            const request = {
+                "UpdaterPublicKeyBase58Check": user.publicKey,
+                "NFTPostHashHex": nft,
+                "SerialNumber": 1,
+                "BidAmountNanos": props.bookData.price,
                 "MinFeeRateNanosPerKB": 1000
             };
-            const fee_payment = await deso.wallet.sendDesoRequest(feePaymentRequest).catch(e => {
+            const response = await deso.nft.createNftBid(request).catch(e => {
                 successfulPayment = false;
+                console.log(e);
                 setBuying(false);
                 props.close();
                 props.handleOnFailure();
             });
-        }
 
 
-        if (successfulPayment) {
-            let data = new FormData();
-            data.append("post_hash_hex", nft);
-            data.append("buyer_pub_key", user.publicKey);
-            data.append("buyer_prv_key", "");
-            data.append("author", props.bookData.publisher);
-            data.append("nanos", props.bookData.price);
-            const requestOptions = {
-                method: 'POST',
-                body: data,
-            };
-            fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                    setNFT(data);
+            // Accept NFT Bid and Pay Author
+            if (successfulPayment) {
+                let data = new FormData();
+                data.append("post_hash_hex", nft);
+                data.append("buyer", user.publicKey);
+                data.append("author", props.bookData.publisher);
+                data.append("amount", props.bookData.price);
+                const requestOptions = {
+                    method: 'POST',
+                    body: data,
+                };
+                fetch('https://api.spatiumstories.xyz/api/accept-bid-and-pay-author', requestOptions)
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
                 });
+                setBuying(false);
+                props.close();
+                props.handleOnSuccess();
+            }
+        } else {
+            acceptNFT(nft);
         }
+
     }
+
+    const acceptNFT = async (nft) => {
+        console.log(nft);
+        const request = {
+            "UpdaterPublicKeyBase58Check": user.publicKey,
+            "NFTPostHashHex": nft,
+            "SerialNumber": 1,
+            "MinFeeRateNanosPerKB": 1000
+          };
+        let successResponse = true;
+        const response = await deso.nft.acceptNftTransfer(request).catch(e => {
+            successResponse = false;
+            console.log(e);
+            setBuying(false);
+            props.close();
+            props.handleOnFailure();
+        });
+        if (successResponse) {
+            console.log(response);
+            setBuying(false);
+            props.close();
+            props.handleOnSuccess();
+        }
+    };
 
     const handleAltPayment = () => {
         props.handleAltPayment(true);
+    }
+
+    const getButtonText = (paid) => {
+        if (!paid) {
+            return ("Get Your FREE Book!");
+        } else {
+            return ("Complete Purchase!");
+        }
     }
 
     return (
@@ -146,13 +148,7 @@ const Checkout = (props) => {
                         <Typography variant="h6">{props.bookData.title} x1</Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="h6">{price} DeSo</Typography>
-                    </Grid>
-                    <Grid item xs={6} sx={{paddingTop: '10px'}}>
-                        <Typography variant="h6">Spatium Stories Fee</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography variant="h6">{fee} DeSo</Typography>
+                        <Typography variant="h6">{total} DeSo</Typography>
                     </Grid>
                     <Grid item xs={6} sx={{paddingTop: '10px'}}>
                         <Typography variant="h5">Total</Typography>
@@ -168,9 +164,9 @@ const Checkout = (props) => {
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
                 >
-                Complete Purchase!
+                {getButtonText(total > 0)}
                 </LoadingButton>
-                {/* <Button onClick={props.handleAltPayment}>Or Pay With Other Crypto (Beta)</Button> */}
+                {total > 0 && <Button onClick={props.handleAltPayment}>Or Pay With Other Crypto (Beta)</Button>}
         </Box>
     );
 };
