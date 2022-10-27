@@ -1,23 +1,15 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 import Typography from '@mui/material/Typography';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
 import QRCode from 'react-qr-code';
 import Timer from '../UI/Timer';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+
 
 
 const QRCodePayment = (props) => {
@@ -27,6 +19,7 @@ const QRCodePayment = (props) => {
     const [depositConfirmed, setDepositConfirmed] = useState(false);
     const [depositKey, setDepositKey] = useState(null);
     const [amount, setAmount] = useState(0);
+    const [progress, setProgress] = useState(0);
     const deso = new Deso();
 
     const total = (props.bookData.price / 1000000000).toFixed(2);
@@ -66,6 +59,41 @@ const QRCodePayment = (props) => {
         }
     }, [amount, depositKey]);
 
+    const awaitNewDeposit = async () => {
+        await delay(5000);
+        let i = 0;
+        let txID = null;
+        while (true) {
+            i += 1;
+            await fetch(`https://megaswap.dev/api/v1/new-deposits/${props.currency}/${depositKey}`)
+            .then(response => response.text())
+            .then(data => {
+                let json = JSON.parse(data);
+                try {
+                    console.log(json['Deposits']);
+                    if (json['Deposits'].length > 0) {
+                        console.log(json['Deposits'][0]['DepositTxId']);
+                        txID = json['Deposits'][0]['DepositTxId'];
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+            await delay(10000);
+            if (txID !== null) {
+                return txID;
+            }
+            if (i === 10) {
+                setProgress(1);
+            } else if (i === 20) {
+                setProgress(2);
+            }
+            if (i === 30) {
+                return txID;
+            }
+        }
+    }
+
     const waitForDeposit = async () => {
         let nft = props.bookData.postHashHex;
         let newNft = null;
@@ -80,17 +108,12 @@ const QRCodePayment = (props) => {
             body: data,
         };
 
-        let depositTx = "";
-        await fetch('http://0.0.0.0:4201/api/poll-deposits', requestOptions)
-            .then(response => response.text())
-            .then(data => {
-                console.log(data);
-                depositTx = data;
-                setDepositConfirmed(true);
-        });
+        let depositTx = await awaitNewDeposit();
 
-        if (depositTx === "") {
+        if (depositTx === null) {
             successfulPayment = false;
+        } else {
+            setDepositConfirmed(true);
         }
 
 
@@ -102,7 +125,7 @@ const QRCodePayment = (props) => {
             data.append("nanos", props.bookData.price);
             data.append("deposit_tx", depositTx);
 
-            await fetch('http://0.0.0.0:4201/api/alt-buy-book', requestOptions)
+            await fetch('https://api.spatiumstories.xyz/api/alt-buy-book', requestOptions)
             .then(response => response.text())
             .then(data => {
                 console.log(data);
@@ -142,7 +165,7 @@ const QRCodePayment = (props) => {
                 method: 'POST',
                 body: data,
             };
-            fetch('http://0.0.0.0:4201/api/accept-bid-and-pay-author', requestOptions)
+            fetch('https://api.spatiumstories.xyz/api/accept-bid-and-pay-author', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
@@ -179,7 +202,7 @@ const QRCodePayment = (props) => {
                 <React.Fragment>
                     <Alert severity="warning">
                         <AlertTitle>Time Expired!</AlertTitle>
-                        Don't worry! — <strong>you can still get yoru book!</strong>
+                        Don't worry! — <strong>you can still get your book!</strong>
                     </Alert>
                     <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>{timesUpText}</Typography>
                 </React.Fragment>
@@ -199,6 +222,24 @@ const QRCodePayment = (props) => {
                 </React.Fragment>
             )
         }
+        {progress === 1 ? (
+            <Alert sx={{ marginTop: '10px'}} severity="info">
+                <AlertTitle>Please Be Patient...</AlertTitle>
+                It can take some time to verify the payment.
+            </Alert>
+        ) : progress === 2 ? (
+            <Alert sx={{ marginTop: '10px'}} severity="info">
+                <AlertTitle>Any second now :)</AlertTitle>
+                Still waiting...should be any moment now
+            </Alert>
+        ) : !timesUp ? (
+            <Alert sx={{ marginTop: '10px'}} severity="warning">
+                <AlertTitle>Please Don't Leave This Window</AlertTitle>
+                You won't lose your crypto, but it could cancel your order :/
+            </Alert>
+        ): (
+            <React.Fragment></React.Fragment>
+        )}
         </Box>
     );
 };
