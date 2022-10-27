@@ -40,7 +40,7 @@ const Checkout = (props) => {
             method: 'POST',
             body: data,
         };
-        await fetch('http://0.0.0.0:4201/api/buy-book', requestOptions)
+        await fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
             .then(response => response.text())
             .then(data => {
                 console.log(data);
@@ -57,7 +57,7 @@ const Checkout = (props) => {
             "MinFeeRateNanosPerKB": 1000
           };
         const response = await deso.nft.createNftBid(request).catch(e => {
-            let successfulPayment = false;
+            successfulPayment = false;
             console.log(e);
             setBuying(false);
             props.close();
@@ -76,7 +76,7 @@ const Checkout = (props) => {
                 method: 'POST',
                 body: data,
             };
-            fetch('http://0.0.0.0:4201/api/accept-bid-and-pay-author', requestOptions)
+            fetch('https://api.spatiumstories.xyz/api/accept-bid-and-pay-author', requestOptions)
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
@@ -90,6 +90,14 @@ const Checkout = (props) => {
 
     const handleAltPayment = () => {
         props.handleAltPayment(true);
+    }
+
+    const getButtonText = (paid) => {
+        if (!paid) {
+            return ("Get Your FREE Book!");
+        } else {
+            return ("Complete Purchase!");
+        }
     }
 
     return (
@@ -127,7 +135,7 @@ const Checkout = (props) => {
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
                 >
-                Complete Purchase!
+                {getButtonText(total > 0)}
                 </LoadingButton>
                 {total > 0 && <Button onClick={props.handleAltPayment}>Or Pay With Other Crypto (Beta)</Button>}
         </Box>

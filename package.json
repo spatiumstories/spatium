@@ -57,5 +57,5 @@
     "postcss": "^8.4.6",
     "tailwindcss": "^3.0.19"
   },
-  "proxy": "https://megaswap.dev/api/docs/v1/"
+  "proxy": "https://spatiumstories.xyz"
 }
