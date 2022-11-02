@@ -41,10 +41,10 @@ const CheckoutModal = (props) => {
         <Fade in={props.open}>
           <Box sx={style}>
             {props.bookToBuy.type === "MOD" && props.altPayment ? (
-              <CheckoutStepper bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : 
+              <CheckoutStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : 
               props.bookToBuy.type === "MOD" ? (
-                <Checkout handleAltPayment={props.setAltPayment} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
-              <CheckoutRareStepper bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)
+                <Checkout buyer={props.buyer} handleAltPayment={props.setAltPayment} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
+              <CheckoutRareStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)
             }
           </Box>
         </Fade>

@@ -28,14 +28,46 @@ const Marketplace = () => {
     const deso = new Deso();
     const [open, setOpen] = useState(false);
     const [altPayment, setAltPayment] = useState(false);
+    const [derivedKeyData, setDerivedKeyData] = useState({});
 
     const handleUseAltPayment = (useAltPayment) => {
       setAltPayment(useAltPayment);
     }
 
-    const handleOpen = (bookData) => {
+    const handleOpen = async (bookData) => {
+        getDerivedKey(bookData);
         setBookToBuy(bookData);
         setOpen(true);
+    }
+
+    const getDerivedKey = async (bookData) => {
+        const request = {
+            "publicKey": "",
+            "transactionSpendingLimitResponse": {
+              "GlobalDESOLimit": bookData.price * 1.25,
+              "TransactionCountLimitMap": {
+                "AUTHORIZE_DERIVED_KEY": 2
+              },
+              "NFTOperationLimitMap": {
+                "": {
+                  "0": {
+                    "any": 1
+                  }
+                }
+              },
+            },
+          };
+        console.log(request);
+        const response = await deso.identity.derive(request);
+        console.log(response);
+        setDerivedKeyData({
+            derivedSeedHex: response['derivedSeedHex'],
+            derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
+            accessSignature: response['accessSignature'],
+            expirationBlock: response['expirationBlock'],
+            transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
+        });
+        return response;
     }
     const handleClose = () => {
         setOpen(false);
@@ -70,7 +102,7 @@ const Marketplace = () => {
             //loading books
             const fetchData = async () => {
                 const request = {
-                    "UserPublicKeyBase58Check": "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP"
+                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
                 };
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
@@ -114,7 +146,7 @@ const Marketplace = () => {
                         total = book['PostEntryResponse']['NumNFTCopies'];
                         let booksLeft = [];
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP' &&
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
                                 item['IsForSale']) {
                                     booksLeft.push(item['SerialNumber']);
                                 }
@@ -201,7 +233,7 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

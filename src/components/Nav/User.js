@@ -42,7 +42,7 @@ const User = (props) => {
     const user = useSelector(state => state.user);
     const dispatch = useDispatch();
     const deso = new Deso();
-    const request = 4;
+    const request = 3;
 
     useEffect(() => {
         if (!pageLoaded) {

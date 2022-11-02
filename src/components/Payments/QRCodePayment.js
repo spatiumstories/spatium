@@ -92,7 +92,6 @@ const QRCodePayment = (props) => {
 
     const waitForDeposit = async () => {
         let nft = props.bookData.postHashHex;
-        let newNft = null;
         let successfulPayment = true;  
 
         // Wait for deposit, then backend mints book
@@ -116,56 +115,23 @@ const QRCodePayment = (props) => {
         if (successfulPayment) {
             data.append("post_hash_hex", nft);
             data.append("buyer_pub_key", user.publicKey);
-            data.append("buyer_prv_key", "");
+            data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
+            data.append("buyer_prv_key", props.buyer.derivedSeedHex);
             data.append("author", props.bookData.publisher);
             data.append("nanos", props.bookData.price);
+            data.append("expiration_block", props.buyer.expirationBlock);
+            data.append("access_sig", props.buyer.accessSignature);
+            data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
 
-            await fetch('https://api.spatiumstories.xyz/api/alt-buy-book', requestOptions)
+            await fetch('http://0.0.0.0:4201/api/buy-book', requestOptions)
             .then(response => response.text())
             .then(data => {
                 console.log(data);
-                newNft = data;
             });
         }
 
-
-        if (newNft !== null) {
-            // Place bid on new NFT
-            const request = {
-                "UpdaterPublicKeyBase58Check": user.publicKey,
-                "NFTPostHashHex": newNft,
-                "SerialNumber": 1,
-                "BidAmountNanos": props.bookData.price,
-                "MinFeeRateNanosPerKB": 1000
-                };
-            const response = await deso.nft.createNftBid(request).catch(e => {
-                successfulPayment = false;
-                console.log(e);
-                props.close();
-                props.handleOnFailure();
-            });
-        } else {
-            successfulPayment = false;
-        }
-
-
-        // Pay Author
         if (successfulPayment) {
-            let data = new FormData();
-            data.append("post_hash_hex", nft);
-            data.append("buyer", user.publicKey);
-            data.append("author", props.bookData.publisher);
-            data.append("amount", props.bookData.price);
-            const requestOptions = {
-                method: 'POST',
-                body: data,
-            };
-            fetch('https://api.spatiumstories.xyz/api/accept-bid-and-pay-author', requestOptions)
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-            });
             handleSuccessfulPurchase();
         }
     };

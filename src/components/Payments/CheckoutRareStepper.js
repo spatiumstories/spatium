@@ -34,7 +34,7 @@ const CheckoutRareStepper = (props) => {
       case 0:
         return <CheckoutRareForm setSerial={handleSerialChange} serialNumbers={props.bookData.left.sort(function(a, b){return a-b})}/>;
       case 1:
-        return <CheckoutRare serial={serial} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
+        return <CheckoutRare buyer={props.buyer} serial={serial} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
       default:
         throw new Error('Unknown step');
     }
