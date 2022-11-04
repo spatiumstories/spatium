@@ -26,41 +26,45 @@ const CheckoutRare = (props) => {
 
     const onBuyHandler = async () => {
         let nft = props.bookData.postHashHex;
-        // const request = {
-        //     "publicKey": user.publicKey,
-        //     "transactionSpendingLimitResponse": {
-        //       "GlobalDESOLimit": props.bookData.price,
-        //       "NFTOperationLimitMap": {
-        //         [nft] : {
-        //             "0": {
-        //                 "any": 1,
-        //             }
-        //         }
-        //     },
-        //     }
-        //   };
-        // const response = await deso.identity.derive(request);
-        // deso.identity.submitTransaction()
-
-        const request2 = {
-            "UpdaterPublicKeyBase58Check": user.publicKey,
-            "NFTPostHashHex": nft,
-            "SerialNumber": Number(props.serial),
-            "BidAmountNanos": Number(props.bookData.price),
-            "MinFeeRateNanosPerKB": 1000
-          };
-          
-        console.log(request2);
         setBuying(true);
-        deso.nft.createNftBid(request2)
-        .then((result) => {
-            console.log(result.text);
+
+
+        let data = new FormData();
+        data.append("post_hash_hex", nft);
+        data.append("buyer_pub_key", user.publicKey);
+        data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
+        data.append("buyer_prv_key", props.buyer.derivedSeedHex);
+        data.append("author", props.bookData.publisher);
+        data.append("nanos", props.bookData.price);
+        data.append("expiration_block", props.buyer.expirationBlock);
+        data.append("access_sig", props.buyer.accessSignature);
+        data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
+        data.append("serial_number", props.serial);
+        const requestOptions = {
+            method: 'POST',
+            body: data,
+        };
+
+        let successResponse = true;
+
+        const response = await fetch('https://api.spatiumstories.xyz/api/bid-rare-book', requestOptions).catch(e => {
+            successResponse = false;
+            console.log(e);
+            setBuying(false);
+            props.close();
+            props.handleOnFailure();
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+        });
+
+        if (successResponse) {
+            console.log(response);
             setBuying(false);
             props.close();
             props.handleOnSuccess();
-        }, (error) => {
-            console.log(error.text);
-        });
+        }
     }
 
     return (
