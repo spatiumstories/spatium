@@ -122,14 +122,20 @@ const Book = (props) => {
                             {props.bookData.description}
                             </Typography>
                         </CardContent>
-                        {marketplace ? (
+                        {marketplace && props.bookData.price > 0 ? (
                             <CardActions>
                                 <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
-                                <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            </CardActions>
+                                <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            
+                            </CardActions>
+                        ) : marketplace ? (
+                            <CardActions>
+                                <Button onClick={onReadHandler} size="large" variant="contained">Read</Button>
+                                <Button onClick={onBuyHandler} size="large" variant="outlined">Collect for Free</Button>
+                            </CardActions>
                         ) : (
                             <CardActions>
                                 <Button onClick={onReadHandler} size="medium" variant="contained">Read</Button>
-                                <Button onClick={onSellHandler} size="medium" variant="outlined">Sell</Button>
+                                <Button onClick={onSellHandler} size="medium" variant="outlined">Sell on NFTz</Button>
                             </CardActions>
                         )}
                     </React.Fragment>

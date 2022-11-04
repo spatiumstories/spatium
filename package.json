@@ -57,5 +57,5 @@
     "postcss": "^8.4.6",
     "tailwindcss": "^3.0.19"
   },
-  "proxy": "https://spatiumstories.xyz"
+  "proxy": "http://spatiumtest-env.eba-mmtyfmkt.us-east-1.elasticbeanstalk.com "
 }
