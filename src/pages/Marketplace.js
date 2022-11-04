@@ -28,7 +28,7 @@ const Marketplace = () => {
     const deso = new Deso();
     const [open, setOpen] = useState(false);
     const [altPayment, setAltPayment] = useState(false);
-    const [derivedKeyData, setDerivedKeyData] = useState({});
+    const [derivedKeyData, setDerivedKeyData] = useState(null);
 
     const handleUseAltPayment = (useAltPayment) => {
       setAltPayment(useAltPayment);
@@ -44,7 +44,7 @@ const Marketplace = () => {
         const request = {
             "publicKey": "",
             "transactionSpendingLimitResponse": {
-              "GlobalDESOLimit": bookData.price * 1.25,
+              "GlobalDESOLimit": (bookData.price * 1.25) + 1700,
               "TransactionCountLimitMap": {
                 "AUTHORIZE_DERIVED_KEY": 2
               },

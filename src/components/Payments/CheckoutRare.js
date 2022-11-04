@@ -46,8 +46,8 @@ const CheckoutRare = (props) => {
         };
 
         let successResponse = true;
-        
-        const response = await fetch('http://0.0.0.0:4201/api/bid-rare-book', requestOptions).catch(e => {
+
+        const response = await fetch('https://api.spatiumstories.xyz/api/bid-rare-book', requestOptions).catch(e => {
             successResponse = false;
             console.log(e);
             setBuying(false);

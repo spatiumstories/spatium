@@ -124,7 +124,7 @@ const QRCodePayment = (props) => {
             data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
 
-            await fetch('http://0.0.0.0:4201/api/buy-book', requestOptions)
+            await fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
             .then(response => response.text())
             .then(data => {
                 console.log(data);
