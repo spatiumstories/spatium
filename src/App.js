@@ -13,6 +13,7 @@ import Nav from "./components/Nav/Nav";
 import Marketplace from "./pages/Marketplace";
 import Roadmap from "./pages/Roadmap";
 import SpatiumReader from "./components/Reader/SpatiumReader";
+import MintingNow from "./pages/MintingNow";
 
 
 const themeLight = createTheme({
@@ -65,6 +66,7 @@ const App = () => {
           <Route path='/publish' element={<Publisher/>}/>
           <Route path='/roadmap' element={<Roadmap/>}/>
           <Route path='/bookshelf/:id' element={<Bookshelf/>}/>
+          <Route path='/minting' element={<MintingNow/>}/>
           <Route path='/read/:book' element={<SpatiumReader/>}/>
         </Routes>
       </body>

@@ -17,28 +17,44 @@ import CheckoutRare from './CheckoutRare';
 import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 import Avatar from '@mui/material/Avatar';
 import { useState } from 'react';
+import CheckoutGetReservation from './CheckoutGetReservation';
+import Book from '../UI/Book';
+import Deso from 'deso-protocol';
+import { Stack } from '@mui/system';
 
 
 
-const steps = ['Serial Number', 'Review your order'];
+const steps = ['Get Reservation', 'Review your order', 'Showcase Book'];
 
 
 const theme = createTheme();
 
-const CheckoutRareStepper = (props) => {
+const CheckoutRandomStepper = (props) => {
   const [activeStep, setActiveStep] = React.useState(0);
   const [serial, setSerial] = useState(null);
+  const [bookBought, setBookBought] = useState({});
 
   function getStepContent(step) {
     switch (step) {
       case 0:
-        return <CheckoutRareForm setSerial={handleSerialChange} serialNumbers={props.bookData.left.sort(function(a, b){return a-b})}/>;
+        return <CheckoutGetReservation setBook={handleBookChange}/>;
       case 1:
-        return <CheckoutRare buyer={props.buyer} serial={serial} showSerial={true} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
+        return <CheckoutRare buyer={props.buyer} serial={serial} showSerial={false} bookData={props.bookData} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
+      case 2:
+        return (
+          <Stack sx={{
+              width: {xs: '100%', sm: '50%'},
+              height: {xs: '50%', sm: '25%'}
+            }}>
+            <Typography sx={{paddingBottom: '10px'}} variant="h5">Here is your book! Enjoy!</Typography>
+            <Book loading={false} bookData={bookBought} marketplace={false}/>
+          </Stack>
+        );
       default:
         throw new Error('Unknown step');
     }
   }
+
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -48,9 +64,32 @@ const CheckoutRareStepper = (props) => {
     setActiveStep(activeStep - 1);
   };
 
-  const handleSerialChange = (event) => {
-    setSerial(event.target.value);
+  const handleBookChange = (serial, postHashHex) => {
+    setSerial(serial);
+    props.bookData.postHashHex = postHashHex;
+    handleNext();
   };
+
+  React.useEffect(() => {
+    const updateBook = async () => {
+      const deso = new Deso();
+      const request = {
+        "PostHashHex": props.bookData.postHashHex
+      };
+       const response = await deso.posts.getSinglePost(request);
+       console.log(response);
+       setBookBought({
+         ...props.bookData,
+         cover: [response['PostFound']['ImageURLs'][0]],
+         description: response['PostFound']['PostExtraData']['description'],
+       });
+      //  props.bookData.cover = [response['PostFound']['ImageURLs'][0]];
+      //  console.log(response['PostFound']['PostExtraData']['description']);
+      //  props.bookData.description = response['PostFound']['PostExtraData']['description'];
+    };
+
+    updateBook();
+  }, [serial]);
 
   return (
     <Box
@@ -73,22 +112,20 @@ const CheckoutRareStepper = (props) => {
             ))}
           </Stepper>
           <React.Fragment>
-            {activeStep === steps.length ? (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  Thank you for your order!
-                </Typography>
-              </React.Fragment>
-            ) : (
               <React.Fragment>
                 {getStepContent(activeStep)}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  {activeStep !== 0 && (
+                  {activeStep !== 0 && activeStep !== 2 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
                       Back
                     </Button>
                   )}
-                  {activeStep < steps.length - 1 && serial !== null && (
+                  {activeStep === 2 && (
+                    <Button onClick={props.close} sx={{ mt: 3, ml: 1 }}>
+                      Close
+                    </Button>
+                  )}
+                  {activeStep < steps.length - 2 && serial !== null && (
                   <Button
                     variant="contained"
                     onClick={handleNext}
@@ -96,7 +133,7 @@ const CheckoutRareStepper = (props) => {
                   >
                     Next
                   </Button>)}
-                  {activeStep < steps.length - 1 && serial === null && (
+                  {activeStep < steps.length - 2 && serial === null && (
                   <Button
                     variant="contained"
                     disabled
@@ -106,10 +143,9 @@ const CheckoutRareStepper = (props) => {
                   </Button>)}
                 </Box>
               </React.Fragment>
-            )}
           </React.Fragment>
       </Box>
   );
 };
 
-export default CheckoutRareStepper;
+export default CheckoutRandomStepper;

@@ -42,6 +42,7 @@ const FeatureRequestForm = (props) => {
         setIdeaErr(false);
     }
 
+
     const handleSubmit = (event) => {
         let deso = new Deso();
         event.preventDefault();

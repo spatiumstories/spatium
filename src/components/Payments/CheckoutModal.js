@@ -6,6 +6,7 @@ import Fade from '@mui/material/Fade';
 import Checkout from './Checkout';
 import CheckoutRareStepper from './CheckoutRareStepper';
 import CheckoutStepper from './CheckoutStepper';
+import CheckoutRandomStepper from './CheckoutRandomStepper';
 import CheckoutRare from './CheckoutRare';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -17,10 +18,12 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: {xs: '100%', sm: '50%'},
+  maxHeight: '90%',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
+  overflow: 'scroll',
 };
 
 const CheckoutModal = (props) => {
@@ -37,10 +40,16 @@ const CheckoutModal = (props) => {
         BackdropProps={{
           timeout: 500,
         }}
+        sx={{
+          overflow: 'scroll'
+        }}
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            {props.bookToBuy.type === "MOD" && props.altPayment ? (
+            {props.randomMint === true ? (
+              <CheckoutRandomStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
+            ) :
+              props.bookToBuy.type === "MOD" && props.altPayment ? (
               <CheckoutStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : 
               props.bookToBuy.type === "MOD" ? (
                 <Checkout buyer={props.buyer} handleAltPayment={props.setAltPayment} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (

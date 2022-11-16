@@ -31,6 +31,7 @@ const CheckoutRare = (props) => {
 
         let data = new FormData();
         data.append("post_hash_hex", nft);
+        data.append("username", user.userName);
         data.append("buyer_pub_key", user.publicKey);
         data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
         data.append("buyer_prv_key", props.buyer.derivedSeedHex);
@@ -40,6 +41,7 @@ const CheckoutRare = (props) => {
         data.append("access_sig", props.buyer.accessSignature);
         data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
         data.append("serial_number", props.serial);
+        data.append("random_mint", !props.showSerial ? "true" : "false");
         const requestOptions = {
             method: 'POST',
             body: data,
@@ -47,7 +49,7 @@ const CheckoutRare = (props) => {
 
         let successResponse = true;
 
-        const response = await fetch('https://api.spatiumstories.xyz/api/bid-rare-book', requestOptions).catch(e => {
+        const response = await fetch('http://0.0.0.0:4201/api/bid-rare-book', requestOptions).catch(e => {
             successResponse = false;
             console.log(e);
             setBuying(false);
@@ -77,7 +79,8 @@ const CheckoutRare = (props) => {
         >
                 <Grid container sx={{ paddingTop: '20px', width: '100%'}}>
                     <Grid item xs={6} alignItems='flex-start'>
-                        <Typography variant="h6">{props.bookData.title} #{props.serial}</Typography>
+                        {props.showSerial && <Typography variant="h6">{props.bookData.title} #{props.serial}</Typography>}
+                        {!props.showSerial && <Typography variant="h6">{props.bookData.title}</Typography>}
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="h6">{price} DeSo</Typography>

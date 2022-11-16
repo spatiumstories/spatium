@@ -18,7 +18,7 @@ import Failure from "../components/UI/Failure";
 
 import React from 'react';
 
-const Marketplace = () => {
+const MintingNow = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
     const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ const Marketplace = () => {
     }
 
     const handleOpen = async (bookData) => {
-        getDerivedKey(bookData);
+        await getDerivedKey(bookData);
         setBookToBuy(bookData);
         setOpen(true);
     }
@@ -101,13 +101,45 @@ const Marketplace = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                const request = {
-                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
-                };
-                const response = await deso.nft.getNftsForUser(request);
-                let data = [];
-                console.log(response['data']['NFTsMap']);
-                Object.values(response['data']['NFTsMap']).map((book) => {
+                let nftMap = [];
+                const nfts = await fetch("/default/getRareMintNow");
+                const nftJSON = await nfts.json();
+                console.log(nftJSON);
+                for (var i = 0; i < nftJSON.length; i++) {
+                    let nft = nftJSON[i];
+                    console.log(nft);
+                    const request = {
+                        "PostHashHex": nft
+                    };
+                    const response = await deso.nft.getNftBidsForNftPost(request);
+                    nftMap.push(response['data']);
+                }
+                // First collect all the 
+                let coversMap = new Map();
+                let descriptionMap = new Map();
+                nftMap.map((nft) => {
+                    let bookId = nft['PostEntryResponse']['PostExtraData']['book_id'];
+                    if (coversMap.has(bookId)) {
+                        let arr = coversMap.get(bookId);
+                        let newArr = [...arr, nft['PostEntryResponse']['ImageURLs'][0]];
+                        coversMap.set(bookId, newArr);
+                    } else {
+                        coversMap.set(bookId, [nft['PostEntryResponse']['ImageURLs'][0]]);
+                    }
+
+                    let desc = nft['PostEntryResponse']['PostExtraData']['description'];
+                    if (descriptionMap.has(bookId)) {
+                        let arr = descriptionMap.get(bookId);
+                        let newArr = [...arr, desc];
+                        descriptionMap.set(bookId, newArr);
+                    } else {
+                        descriptionMap.set(bookId, [desc]);
+                    }
+                });
+                
+                let ids = new Map();
+                console.log(nftMap);
+                nftMap.map((book) => {
                     let postHashHex = book['PostEntryResponse']['PostHashHex'];
                     let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
                     let author = "Spatium Publisher";
@@ -144,36 +176,38 @@ const Marketplace = () => {
 
                     if (type === 'RARE') {
                         total = book['PostEntryResponse']['NumNFTCopies'];
-                        let booksLeft = [];
+                        let booksLeft = 0;
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
-                                item['IsForSale']) {
-                                    booksLeft.push(item['SerialNumber']);
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5') {
+                                    booksLeft += 1;
                                 }
                         });
                         left = booksLeft;
                     }
                     if (bookID !== null) {
                         var newBook = {
-                            cover: [book['PostEntryResponse']['ImageURLs'][0]],
+                            cover: coversMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
                             body: book['PostEntryResponse']['Body'],
                             author: author,
                             publisher: publisher,
                             publisher_key: publisher_key,
                             title: title,
-                            description: description,
+                            description: descriptionMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
                             type: type,
                             postHashHex: postHashHex,
                             price: price,
                             total: total,
                             left: left
                         };
-                        data.push(newBook);
+                        if (ids.has(bookID)) {
+                            let currBook = ids.get(bookID);
+                            newBook.total += currBook.total;
+                            newBook.left += currBook.left;
+                        }
+                        ids.set(bookID, newBook);
                     }
                 });
-                setBooks(data);
-                console.log(response['data']);
-                console.log(typeof response['data']);
+                setBooks(Array.from(ids.values()));
                 setBooksLoaded(true);
                 setLoading(false);
             };
@@ -184,8 +218,8 @@ const Marketplace = () => {
 
     const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    const handlePublish = () => {
-        navigate('/publish');
+    const handleMarketplace = () => {
+        navigate('/marketplace');
     }
 
     const handleRead = () => {
@@ -208,11 +242,10 @@ const Marketplace = () => {
                 color="text.primary"
                 gutterBottom
                 >
-                Spatium Stories Marketplace
+                Minting Now!
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                We offer both rare edition and Mint on Demand books!
-                You can also publish your own book or read your book directly through Spatium Stories!
+                All books here are RARE editions with random rarity picking. This means if you buy a book you will be given a random cover, it could be the rarest one!
                 </Typography>
                 <Stack
                 sx={{ pt: 4 }}
@@ -220,7 +253,7 @@ const Marketplace = () => {
                 spacing={2}
                 justifyContent="center"
                 >
-                    <Button onClick={handlePublish} variant="contained">Publish My Book!</Button>
+                    <Button onClick={handleMarketplace} variant="contained">Marketplace!</Button>
                     <Button onClick={handleRead} variant="outlined">Read My Books!</Button>
                 </Stack>
             </Container>
@@ -233,7 +266,7 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} randomMint={true} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
@@ -242,7 +275,6 @@ const Marketplace = () => {
                 ))}
                 {booksLoaded && books.length > 0 &&
                     Object.values(books).map((book) => {
-                        console.log(book);
                         return <Book onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
                     })
                 }
@@ -257,4 +289,4 @@ const Marketplace = () => {
     );
 };
 
-export default Marketplace;
+export default MintingNow;

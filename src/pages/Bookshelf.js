@@ -57,7 +57,7 @@ const Bookshelf = () => {
                             type = book['PostEntryResponse']['PostExtraData']['type'];
                         }
                         var newBook = {
-                            cover: book['PostEntryResponse']['ImageURLs'][0],
+                            cover: [book['PostEntryResponse']['ImageURLs'][0]],
                             body: book['PostEntryResponse']['Body'],
                             author: author,
                             publisher: publisher,

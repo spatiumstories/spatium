@@ -170,7 +170,7 @@ const QRCodePayment = (props) => {
                 </React.Fragment>
 
             ) : !timesUp && depositConfirmed ? (
-                <React.Fragment>
+            <React.Fragment>
                 <Typography variant="h6">Deposit Confirmed!</Typography>
                 <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>Verifying Transfer...</Typography>
                 <CircularProgress color="success" />

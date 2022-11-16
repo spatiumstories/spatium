@@ -23,8 +23,26 @@ import rare from '../../assets/rare.png';
 const Book = (props) => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
+    const [coverIndex, setCoverIndex] = useState(0);
     const loading = props.loading;
     const marketplace = props.marketplace;
+
+    // useEffect(() => {
+    //     if (props.bookData.cover !== undefined) {
+    //         if (props.bookData.cover.length > 1) {
+    //             console.log("hello??");
+    //             setTimeout(() => {
+    //             setCoverIndex((prevState) => (prevState.coverIndex + 1) % props.bookData.cover.length);
+    //             }, 1000);
+    //         }
+    //     }
+    //   }, []);
+    useEffect(() => {
+        if (props.bookData !== undefined && props.bookData.cover.length > 1) {
+            const timerId = setTimeout(() => setCoverIndex(old => (old + 1) % props.bookData.cover.length), 1000);
+            return () => clearTimeout(timerId);
+        }
+    }, [coverIndex]);
 
     const onBuyHandler = (event) => {
         props.onBuy(props.bookData);
@@ -60,7 +78,7 @@ const Book = (props) => {
                     action={
                     loading || props.bookData.type === 'MOD' || !marketplace ? null : (
                         <IconButton aria-label="numLeft">
-                            <Typography>{props.bookData.left.length}/{props.bookData.total}</Typography>
+                            <Typography>{Array.isArray(props.bookData.left) ? props.bookData.left.length : props.bookData.left}/{props.bookData.total}</Typography>
                         </IconButton>
                     )
                     }
@@ -94,7 +112,7 @@ const Book = (props) => {
                         // 16:9
                         //   `pt: '56.25%',
                         }}
-                        image={props.bookData.cover}
+                        image={props.bookData.cover[coverIndex]}
                         alt="random"
                     />
                 )}
@@ -119,12 +137,25 @@ const Book = (props) => {
                             Published by {props.bookData.publisher}
                             </Typography>
                             <Typography>
-                            {props.bookData.description}
+                            {Array.isArray(props.bookData.description) ? props.bookData.description[coverIndex] : props.bookData.description}
                             </Typography>
                         </CardContent>
                         {marketplace && props.bookData.price > 0 ? (
                             <CardActions>
-                                <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
+                                {
+                                    (Array.isArray(props.bookData.left) && props.bookData.left.length > 0) || props.bookData.type === 'MOD' ? (
+                                        <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
+
+                                    ) : Array.isArray(props.bookData.left) ? (
+                                        <Button onClick={onBuyHandler} disabled size="large" variant="contained">Buy</Button>
+
+                                    ): props.bookData.left > 0 ? (
+                                        <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
+
+                                    ): (
+                                        <Button onClick={onBuyHandler} disabled size="large" variant="contained">Buy</Button>
+                                    )
+                                }
                                 <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            
                             </CardActions>
                         ) : marketplace ? (
