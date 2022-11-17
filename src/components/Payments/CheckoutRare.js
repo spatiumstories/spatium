@@ -1,19 +1,12 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 import Typography from '@mui/material/Typography';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
-import InputUnstyled from '@mui/base/InputUnstyled';
 
 const CheckoutRare = (props) => {
     console.log(props.bookData);
@@ -53,7 +46,7 @@ const CheckoutRare = (props) => {
             successResponse = false;
             console.log(e);
             setBuying(false);
-            props.close();
+            props.closeFail();
             props.handleOnFailure();
         })
         .then(response => response.text())
@@ -101,6 +94,7 @@ const CheckoutRare = (props) => {
                 >
                 Complete Purchase!
                 </LoadingButton>
+                {price > 0 && !props.showSerial && <Button onClick={props.handleAltPayment}>Or Pay With Other Crypto (Beta)</Button>}
         </Box>
     );
 };

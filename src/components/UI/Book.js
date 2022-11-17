@@ -1,21 +1,15 @@
-import { Container } from "@mui/system";
 import Grid from '@mui/material/Grid';
 import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Button } from "@mui/material";
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import Skeleton from '@mui/material/Skeleton';
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import CardHeader from '@mui/material/CardHeader';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Deso from "deso-protocol";
 import mod from '../../assets/mod.png';
 import rare from '../../assets/rare.png';
 

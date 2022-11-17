@@ -5,10 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import Bookshelf from "./pages/Bookshelf";
 import Publisher from "./pages/Publisher";
-
 import Footer from './components/Layout/Footer';
 import Landing from './pages/Landing';
-import NavList from "./components/Nav/NavList";
 import Nav from "./components/Nav/Nav";
 import Marketplace from "./pages/Marketplace";
 import Roadmap from "./pages/Roadmap";
@@ -66,7 +64,7 @@ const App = () => {
           <Route path='/publish' element={<Publisher/>}/>
           <Route path='/roadmap' element={<Roadmap/>}/>
           <Route path='/bookshelf/:id' element={<Bookshelf/>}/>
-          <Route path='/minting' element={<MintingNow/>}/>
+          <Route path='/r2m2' element={<MintingNow/>}/>
           <Route path='/read/:book' element={<SpatiumReader/>}/>
         </Routes>
       </body>

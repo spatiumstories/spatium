@@ -1,12 +1,7 @@
 import React, { useRef, useState, useEffect } from "react"
 import { ReactReader } from "react-reader"
 import { useParams } from "react-router";
-import Link from '@mui/material/Link';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import {isMobile} from 'react-device-detect';
 
 

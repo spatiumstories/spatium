@@ -242,10 +242,10 @@ const MintingNow = () => {
                 color="text.primary"
                 gutterBottom
                 >
-                Minting Now!
+                Random RARE Books Minting Now!
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                All books here are RARE editions with random rarity picking. This means if you buy a book you will be given a random cover, it could be the rarest one!
+                All books here are RARE editions with a randomized minting process. This means if you buy one of these books you will be given a random cover, it could be the rarest one!
                 </Typography>
                 <Stack
                 sx={{ pt: 4 }}

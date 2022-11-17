@@ -1,14 +1,9 @@
-import custom from './Intro.module.css';
 import React from 'react';
-import { isMobile } from 'react-device-detect';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
 import { Button } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
 
 import { makeStyles } from '@mui/styles';
 

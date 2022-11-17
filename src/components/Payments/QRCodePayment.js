@@ -148,7 +148,7 @@ const QRCodePayment = (props) => {
         props.handleOnSuccess();
     }
 
-    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your book with DeSo :)";
+    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your book with DeSo :) If this is for an R2M2 mint, we will keep your reserved book for 30 minutes.";
 
 
     return (

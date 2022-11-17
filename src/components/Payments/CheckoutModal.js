@@ -7,10 +7,6 @@ import Checkout from './Checkout';
 import CheckoutRareStepper from './CheckoutRareStepper';
 import CheckoutStepper from './CheckoutStepper';
 import CheckoutRandomStepper from './CheckoutRandomStepper';
-import CheckoutRare from './CheckoutRare';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { useState } from 'react';
 
 const style = {
   position: 'absolute',
