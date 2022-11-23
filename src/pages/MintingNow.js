@@ -1,7 +1,6 @@
 import { Container } from "@mui/system";
 import Grid from '@mui/material/Grid';
 import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
-import Pagination from '@mui/material/Pagination';
 import { Typography } from "@mui/material";
 import { Button } from "@mui/material";
 import Stack from '@mui/material/Stack';
@@ -9,7 +8,7 @@ import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
 import { useSelector } from "react-redux";
 import Book from "../components/UI/Book";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
 import CheckoutModal from '../components/Payments/CheckoutModal';
@@ -19,31 +18,24 @@ import Failure from "../components/UI/Failure";
 
 import React from 'react';
 
-const Marketplace = () => {
+const MintingNow = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
-    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [books, setBooks] = useState(new Map());
+    const [books, setBooks] = useState();
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
     const [open, setOpen] = useState(false);
     const [altPayment, setAltPayment] = useState(false);
     const [derivedKeyData, setDerivedKeyData] = useState(null);
-    const BOOKS_PER_PAGE = 6;
-
-    const handlePageChange = (e, p) => {
-        setPage(p);
-        console.log(p);
-    }
 
     const handleUseAltPayment = (useAltPayment) => {
       setAltPayment(useAltPayment);
     }
 
     const handleOpen = async (bookData) => {
-        getDerivedKey(bookData);
+        await getDerivedKey(bookData);
         setBookToBuy(bookData);
         setOpen(true);
     }
@@ -65,7 +57,9 @@ const Marketplace = () => {
               },
             },
           };
+        console.log(request);
         const response = await deso.identity.derive(request);
+        console.log(response);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
@@ -107,13 +101,45 @@ const Marketplace = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                const request = {
-                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
-                };
-                const response = await deso.nft.getNftsForUser(request);
-                let data = [];
+                let nftMap = [];
+                const nfts = await fetch("/default/getRareMintNow");
+                const nftJSON = await nfts.json();
+                console.log(nftJSON);
+                for (var i = 0; i < nftJSON.length; i++) {
+                    let nft = nftJSON[i];
+                    console.log(nft);
+                    const request = {
+                        "PostHashHex": nft
+                    };
+                    const response = await deso.nft.getNftBidsForNftPost(request);
+                    nftMap.push(response['data']);
+                }
+                // First collect all the 
+                let coversMap = new Map();
+                let descriptionMap = new Map();
+                nftMap.map((nft) => {
+                    let bookId = nft['PostEntryResponse']['PostExtraData']['book_id'];
+                    if (coversMap.has(bookId)) {
+                        let arr = coversMap.get(bookId);
+                        let newArr = [...arr, nft['PostEntryResponse']['ImageURLs'][0]];
+                        coversMap.set(bookId, newArr);
+                    } else {
+                        coversMap.set(bookId, [nft['PostEntryResponse']['ImageURLs'][0]]);
+                    }
 
-                Object.values(response['data']['NFTsMap']).map((book) => {
+                    let desc = nft['PostEntryResponse']['PostExtraData']['description'];
+                    if (descriptionMap.has(bookId)) {
+                        let arr = descriptionMap.get(bookId);
+                        let newArr = [...arr, desc];
+                        descriptionMap.set(bookId, newArr);
+                    } else {
+                        descriptionMap.set(bookId, [desc]);
+                    }
+                });
+                
+                let ids = new Map();
+                console.log(nftMap);
+                nftMap.map((book) => {
                     let postHashHex = book['PostEntryResponse']['PostHashHex'];
                     let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
                     let author = "Spatium Publisher";
@@ -150,34 +176,38 @@ const Marketplace = () => {
 
                     if (type === 'RARE') {
                         total = book['PostEntryResponse']['NumNFTCopies'];
-                        let booksLeft = [];
+                        let booksLeft = 0;
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
-                                item['IsForSale']) {
-                                    booksLeft.push(item['SerialNumber']);
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5') {
+                                    booksLeft += 1;
                                 }
                         });
                         left = booksLeft;
                     }
                     if (bookID !== null) {
                         var newBook = {
-                            cover: [book['PostEntryResponse']['ImageURLs'][0]],
+                            cover: coversMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
                             body: book['PostEntryResponse']['Body'],
                             author: author,
                             publisher: publisher,
                             publisher_key: publisher_key,
                             title: title,
-                            description: description,
+                            description: descriptionMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
                             type: type,
                             postHashHex: postHashHex,
                             price: price,
                             total: total,
                             left: left
                         };
-                        data.push(newBook);
+                        if (ids.has(bookID)) {
+                            let currBook = ids.get(bookID);
+                            newBook.total += currBook.total;
+                            newBook.left += currBook.left;
+                        }
+                        ids.set(bookID, newBook);
                     }
                 });
-                setBooks(paginateList(data));
+                setBooks(Array.from(ids.values()));
                 setBooksLoaded(true);
                 setLoading(false);
             };
@@ -186,31 +216,10 @@ const Marketplace = () => {
         }
     }, []);
 
-    const paginateList = (list) => {
-        list.sort(function(a, b) {
-            return a.title.localeCompare(b.title);
-        });
-        let data = new Map();
-        let i = 0;
-        let pageNum = 1;
-        list.map((book) => {
-            i += 1;
-            if (data.get(pageNum) === undefined) {
-                data.set(pageNum, [book]);
-            } else {
-                data.set(pageNum, [...data.get(pageNum), book]);
-            }
-            if (i === BOOKS_PER_PAGE) {
-                pageNum += 1;
-                i = 0;
-            }
-        });
-        return data;
-    }
     const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    const handlePublish = () => {
-        navigate('/publish');
+    const handleMarketplace = () => {
+        navigate('/marketplace');
     }
 
     const handleRead = () => {
@@ -233,11 +242,10 @@ const Marketplace = () => {
                 color="text.primary"
                 gutterBottom
                 >
-                Spatium Stories Marketplace
+                Random RARE Books Minting Now!
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                We offer both rare edition and Mint on Demand books!
-                You can also publish your own book or read your book directly through Spatium Stories!
+                All books here are RARE editions with a randomized minting process. This means if you buy one of these books you will be given a random cover, it could be the rarest one!
                 </Typography>
                 <Stack
                 sx={{ pt: 4 }}
@@ -245,7 +253,7 @@ const Marketplace = () => {
                 spacing={2}
                 justifyContent="center"
                 >
-                    <Button onClick={handlePublish} variant="contained">Publish My Book!</Button>
+                    <Button onClick={handleMarketplace} variant="contained">Marketplace!</Button>
                     <Button onClick={handleRead} variant="outlined">Read My Books!</Button>
                 </Stack>
             </Container>
@@ -258,30 +266,27 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} randomMint={true} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
                 cards.map((card) => (
                     <Book loading={true} card={card}/>
                 ))}
-                {booksLoaded && books.size > 0 &&
-                    Object.values(books.get(page)).map((book) => {
+                {booksLoaded && books.length > 0 &&
+                    Object.values(books).map((book) => {
                         return <Book onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
                     })
                 }
-                {booksLoaded && books.size === 0 &&
+                {booksLoaded && books.length === 0 &&
                     <Grid item xs={12}>
                         <NoBooks linkToMarketplace={false} message="Coming Soon!!"/>
                     </Grid>
                 }
             </Grid>
-            <Stack sx={{marginTop: '20px', alignItems: 'center', justifyItems: 'center'}} spacing={2}>
-                <Pagination page={page} onChange={handlePageChange} count={books.size} color="primary" />
-            </Stack>
             </Container>
         </React.Fragment>
     );
 };
 
-export default Marketplace;
+export default MintingNow;

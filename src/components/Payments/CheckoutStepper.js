@@ -34,7 +34,7 @@ const CheckoutStepper = (props) => {
       case 1:
         return <FinalizeAltPayment bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
       case 2:
-        return <QRCodePayment buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>
+        return <QRCodePayment type={"MOD"} buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>
         default:
         throw new Error('Unknown step');
     }

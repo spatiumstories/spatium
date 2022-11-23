@@ -123,12 +123,24 @@ const QRCodePayment = (props) => {
             data.append("access_sig", props.buyer.accessSignature);
             data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
-
-            await fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions)
-            .then(response => response.text())
-            .then(data => {
-                console.log(data);
-            });
+            // let uri = 'https://api.spatiumstories.xyz/api';
+            let uri = 'http://0.0.0.0:4201/api';
+            if (props.type === "RARE") {
+                data.append("random_mint", "true");
+                data.append("serial_number", props.serial);
+                data.append("username", user.userName);
+                await fetch(`${uri}/bid-rare-book`, requestOptions)
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                });
+            } else {
+                await fetch(`${uri}/buy-book`, requestOptions)
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                });
+            }
         }
 
         if (successfulPayment) {
@@ -148,7 +160,7 @@ const QRCodePayment = (props) => {
         props.handleOnSuccess();
     }
 
-    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your book with DeSo :)";
+    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your book with DeSo :) If this is for an R2M2 mint, we will keep your reserved book for 30 minutes.";
 
 
     return (
@@ -170,7 +182,7 @@ const QRCodePayment = (props) => {
                 </React.Fragment>
 
             ) : !timesUp && depositConfirmed ? (
-                <React.Fragment>
+            <React.Fragment>
                 <Typography variant="h6">Deposit Confirmed!</Typography>
                 <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>Verifying Transfer...</Typography>
                 <CircularProgress color="success" />
