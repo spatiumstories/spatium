@@ -8,7 +8,8 @@ const CheckoutGetReservation = (props) => {
     const user = useSelector(state => state.user);
 
     useEffect(() => {
-        let uri = `/default/rareMint?username=${user.userName}`;
+        // let uri = `/default/rareMint?username=${user.userName}`; => local dev
+        let uri = `https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/rareMint?username=${user.userName}`;
         fetch(uri)
             .then(response => response.text())
             .then(data => {
