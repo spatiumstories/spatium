@@ -42,7 +42,7 @@ const CheckoutRandomStepper = (props) => {
       case 2:
         return <PaymentOptions setCurrency={handleCurrencyChange}/>;
       case 3:
-        return <QRCodePayment buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
+        return <QRCodePayment type={"RARE"} serial={serial} buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
       case 4:
         return (
           <Stack sx={{

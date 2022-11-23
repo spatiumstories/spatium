@@ -1,6 +1,7 @@
 import { Container } from "@mui/system";
 import Grid from '@mui/material/Grid';
 import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
+import Pagination from '@mui/material/Pagination';
 import { Typography } from "@mui/material";
 import { Button } from "@mui/material";
 import Stack from '@mui/material/Stack';
@@ -8,7 +9,7 @@ import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
 import { useSelector } from "react-redux";
 import Book from "../components/UI/Book";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
 import CheckoutModal from '../components/Payments/CheckoutModal';
@@ -21,14 +22,21 @@ import React from 'react';
 const Marketplace = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [books, setBooks] = useState();
+    const [books, setBooks] = useState(new Map());
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
     const [open, setOpen] = useState(false);
     const [altPayment, setAltPayment] = useState(false);
     const [derivedKeyData, setDerivedKeyData] = useState(null);
+    const BOOKS_PER_PAGE = 6;
+
+    const handlePageChange = (e, p) => {
+        setPage(p);
+        console.log(p);
+    }
 
     const handleUseAltPayment = (useAltPayment) => {
       setAltPayment(useAltPayment);
@@ -57,9 +65,7 @@ const Marketplace = () => {
               },
             },
           };
-        console.log(request);
         const response = await deso.identity.derive(request);
-        console.log(response);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
@@ -106,7 +112,7 @@ const Marketplace = () => {
                 };
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
-                console.log(response['data']['NFTsMap']);
+
                 Object.values(response['data']['NFTsMap']).map((book) => {
                     let postHashHex = book['PostEntryResponse']['PostHashHex'];
                     let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
@@ -171,9 +177,7 @@ const Marketplace = () => {
                         data.push(newBook);
                     }
                 });
-                setBooks(data);
-                console.log(response['data']);
-                console.log(typeof response['data']);
+                setBooks(paginateList(data));
                 setBooksLoaded(true);
                 setLoading(false);
             };
@@ -182,6 +186,27 @@ const Marketplace = () => {
         }
     }, []);
 
+    const paginateList = (list) => {
+        list.sort(function(a, b) {
+            return a.title.localeCompare(b.title);
+        });
+        let data = new Map();
+        let i = 0;
+        let pageNum = 1;
+        list.map((book) => {
+            i += 1;
+            if (data.get(pageNum) === undefined) {
+                data.set(pageNum, [book]);
+            } else {
+                data.set(pageNum, [...data.get(pageNum), book]);
+            }
+            if (i === BOOKS_PER_PAGE) {
+                pageNum += 1;
+                i = 0;
+            }
+        });
+        return data;
+    }
     const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const handlePublish = () => {
@@ -240,18 +265,20 @@ const Marketplace = () => {
                 cards.map((card) => (
                     <Book loading={true} card={card}/>
                 ))}
-                {booksLoaded && books.length > 0 &&
-                    Object.values(books).map((book) => {
-                        console.log(book);
+                {booksLoaded && books.size > 0 &&
+                    Object.values(books.get(page)).map((book) => {
                         return <Book onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
                     })
                 }
-                {booksLoaded && books.length === 0 &&
+                {booksLoaded && books.size === 0 &&
                     <Grid item xs={12}>
                         <NoBooks linkToMarketplace={false} message="Coming Soon!!"/>
                     </Grid>
                 }
             </Grid>
+            <Stack sx={{marginTop: '20px', alignItems: 'center', justifyItems: 'center'}} spacing={2}>
+                <Pagination page={page} onChange={handlePageChange} count={books.size} color="primary" />
+            </Stack>
             </Container>
         </React.Fragment>
     );
