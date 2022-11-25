@@ -108,8 +108,8 @@ const MintingNow = () => {
             //loading books
             const fetchData = async () => {
                 let nftMap = [];
-                const nfts = await fetch("/default/getRareMintNow"); //=> local dev
-                // const nfts = await fetch("https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/getRareMintNow"); // => prod
+                // const nfts = await fetch("/default/getRareMintNow"); //=> local dev
+                const nfts = await fetch("https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/getRareMintNow"); // => prod
                 const nftJSON = await nfts.json();
                 console.log(nftJSON);
                 for (var i = 0; i < nftJSON.length; i++) {

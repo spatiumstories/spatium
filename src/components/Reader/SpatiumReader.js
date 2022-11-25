@@ -21,8 +21,8 @@ import LoginIcon from '@mui/icons-material/Login';
 const SpatiumReader = () => {
     const { book } = useParams();
     const [userKey, setUserKey] = useState(null);
-    // let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
-    let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
+    let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
+    // let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
     const [verifying, setVerifying] = useState(true);
     const [verified, setVerified] = useState(false);
     const [size, setSize] = useState(1)

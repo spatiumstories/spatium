@@ -45,8 +45,9 @@ const Checkout = (props) => {
             body: data,
         };
         let successResponse = true;
-
-        const response = await fetch('http://0.0.0.0:4201/api/buy-book', requestOptions).catch(e => {
+        let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'http://0.0.0.0:4201';
+        const response = await fetch(`${uri}/api/buy-book`, requestOptions).catch(e => {
             successResponse = false;
             console.log(e);
             setBuying(false);
