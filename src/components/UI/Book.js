@@ -21,6 +21,7 @@ const Book = (props) => {
     const loading = props.loading;
     const marketplace = props.marketplace;
 
+
     // useEffect(() => {
     //     if (props.bookData.cover !== undefined) {
     //         if (props.bookData.cover.length > 1) {
@@ -155,8 +156,9 @@ const Book = (props) => {
                         ) : marketplace ? (
                             <CardActions>
                                 {/* <Button onClick={onReadHandler} size="large" variant="contained">Read</Button> */}
-                                {props.bookData.left > 0 && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
-                                {props.bookData.left <= 0 && <Button onClick={onBuyHandler} disabled size="large" variant="contained">Collect for Free</Button>}
+                                {props.bookData.type === 'MOD' && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
+                                {props.bookData.type === 'RARE' && props.bookData.left > 0 && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
+                                {props.bookData.type === 'RARE' && props.bookData.left <= 0 && <Button onClick={onBuyHandler} disabled size="large" variant="contained">Collect for Free</Button>}
                             </CardActions>
                         ) : (
                             <CardActions>
