@@ -66,12 +66,18 @@ const Marketplace = () => {
             },
           };
         const response = await deso.identity.derive(request);
+        const userRequest = {
+            "PublicKeyBase58Check": response['publicKeyBase58Check']
+        };
+        const user = await deso.user.getSingleProfile(userRequest);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
             accessSignature: response['accessSignature'],
             expirationBlock: response['expirationBlock'],
             transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
+            publicKey: response['publicKeyBase58Check'],
+            userName: user['Profile']['Username'],
         });
         return response;
     }
@@ -108,7 +114,7 @@ const Marketplace = () => {
             //loading books
             const fetchData = async () => {
                 const request = {
-                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
+                    "UserPublicKeyBase58Check": "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP"
                 };
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
@@ -152,7 +158,7 @@ const Marketplace = () => {
                         total = book['PostEntryResponse']['NumNFTCopies'];
                         let booksLeft = [];
                         book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5' &&
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP' &&
                                 item['IsForSale']) {
                                     booksLeft.push(item['SerialNumber']);
                                 }

@@ -30,7 +30,7 @@ const QRCodePayment = (props) => {
     useEffect(() => {
         let data = {
             "DestinationTicker": "DESO",
-            "DestinationAddress": user.publicKey
+            "DestinationAddress": props.buyer.publicKey
         }
         const requestOptions = {
             method: 'POST',
@@ -114,7 +114,7 @@ const QRCodePayment = (props) => {
 
         if (successfulPayment) {
             data.append("post_hash_hex", nft);
-            data.append("buyer_pub_key", user.publicKey);
+            data.append("buyer_pub_key", props.buyer.publicKey);
             data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
             data.append("buyer_prv_key", props.buyer.derivedSeedHex);
             data.append("author", props.bookData.publisher);
@@ -123,12 +123,12 @@ const QRCodePayment = (props) => {
             data.append("access_sig", props.buyer.accessSignature);
             data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
-            // let uri = 'https://api.spatiumstories.xyz/api';
-            let uri = 'http://0.0.0.0:4201/api';
+            let uri = 'https://api.spatiumstories.xyz/api';
+            // let uri = 'http://0.0.0.0:4201/api';
             if (props.type === "RARE") {
                 data.append("random_mint", "true");
                 data.append("serial_number", props.serial);
-                data.append("username", user.userName);
+                data.append("username", props.buyer.userName);
                 await fetch(`${uri}/bid-rare-book`, requestOptions)
                 .then(response => response.text())
                 .then(data => {

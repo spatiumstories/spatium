@@ -154,8 +154,9 @@ const Book = (props) => {
                             </CardActions>
                         ) : marketplace ? (
                             <CardActions>
-                                <Button onClick={onReadHandler} size="large" variant="contained">Read</Button>
-                                <Button onClick={onBuyHandler} size="large" variant="outlined">Collect for Free</Button>
+                                {/* <Button onClick={onReadHandler} size="large" variant="contained">Read</Button> */}
+                                {props.bookData.left > 0 && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
+                                {props.bookData.left <= 0 && <Button onClick={onBuyHandler} disabled size="large" variant="contained">Collect for Free</Button>}
                             </CardActions>
                         ) : (
                             <CardActions>

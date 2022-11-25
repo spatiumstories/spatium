@@ -24,8 +24,8 @@ const CheckoutRare = (props) => {
 
         let data = new FormData();
         data.append("post_hash_hex", nft);
-        data.append("username", user.userName);
-        data.append("buyer_pub_key", user.publicKey);
+        data.append("username", props.buyer.userName);
+        data.append("buyer_pub_key", props.buyer.publicKey);
         data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
         data.append("buyer_prv_key", props.buyer.derivedSeedHex);
         data.append("author", props.bookData.publisher);
@@ -41,8 +41,9 @@ const CheckoutRare = (props) => {
         };
 
         let successResponse = true;
-
-        const response = await fetch('http://0.0.0.0:4201/api/bid-rare-book', requestOptions).catch(e => {
+        let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'http://0.0.0.0:4201';
+        const response = await fetch(`${uri}/api/bid-rare-book`, requestOptions).catch(e => {
             successResponse = false;
             console.log(e);
             setBuying(false);

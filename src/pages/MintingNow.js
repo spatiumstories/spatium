@@ -60,12 +60,18 @@ const MintingNow = () => {
         console.log(request);
         const response = await deso.identity.derive(request);
         console.log(response);
+        const userRequest = {
+            "PublicKeyBase58Check": response['publicKeyBase58Check']
+        };
+        const user = await deso.user.getSingleProfile(userRequest);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
             accessSignature: response['accessSignature'],
             expirationBlock: response['expirationBlock'],
             transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
+            publicKey: response['publicKeyBase58Check'],
+            userName: user['Profile']['Username'],
         });
         return response;
     }
@@ -102,7 +108,7 @@ const MintingNow = () => {
             //loading books
             const fetchData = async () => {
                 let nftMap = [];
-                // const nfts = await fetch("/default/getRareMintNow"); => local dev
+                // const nfts = await fetch("/default/getRareMintNow"); //=> local dev
                 const nfts = await fetch("https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/getRareMintNow"); // => prod
                 const nftJSON = await nfts.json();
                 console.log(nftJSON);
@@ -243,7 +249,7 @@ const MintingNow = () => {
                 color="text.primary"
                 gutterBottom
                 >
-                Random RARE Books Minting Now!
+                Random RARE's Minting Now!
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
                 All books here are RARE editions with a randomized minting process. This means if you buy one of these books you will be given a random cover, it could be the rarest one!

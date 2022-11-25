@@ -21,11 +21,13 @@ import LoginIcon from '@mui/icons-material/Login';
 const SpatiumReader = () => {
     const { book } = useParams();
     const [userKey, setUserKey] = useState(null);
-    // let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
-    let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
+    let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
+    // let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
     const [verifying, setVerifying] = useState(true);
+    const [verified, setVerified] = useState(false);
     const [size, setSize] = useState(1)
     const sizes = [80, 100, 130];
+    const user = useSelector(state => state.user);
     const [page, setPage] = useState('')
     const [selections, setSelections] = useState([])
     const [location, setLocation] = useState(null)
@@ -55,6 +57,7 @@ const SpatiumReader = () => {
           console.log(`Comparing ${userKey} to ` + nftResponses[`${i}`]['OwnerPublicKeyBase58Check']);
           if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {
             setVerifying(false);
+            setVerified(true);
             break;
           }
         }
@@ -82,8 +85,25 @@ const SpatiumReader = () => {
       const response = await deso.identity.login(request);
       const profilePic = await deso.user.getSingleProfilePicture(response.key);
       const profile = await deso.user.getSingleProfile({"PublicKeyBase58Check": response.key});
+      // localStorage.setItem("key", response.key);
+      // localStorage.setItem('loggedin', 'true');
+      setUserKey(response.key);
       dispatch(userActions.logIn({"key": response.key, "profilePic": profilePic, "userName": profile.Profile.Username}));
     }
+
+    useEffect(() => {
+        if (user.loggedin === true) {
+            localStorage.setItem("key", user.publicKey);
+            localStorage.setItem("profilePic", user.profilePic);
+            localStorage.setItem("userName", user.userName);
+            localStorage.setItem('loggedin', 'true');
+        } else {
+            localStorage.setItem('loggedin', 'false');
+            localStorage.removeItem("key");
+            localStorage.removeItem("profilePic");
+            localStorage.removeItem("userName");
+        }
+  }, [user]);
 
     useEffect(() => {
     if (renditionRef.current) {
@@ -110,6 +130,10 @@ const SpatiumReader = () => {
       const chapter = tocRef.current.find((item) => item.href === href)
       setPage(`Page ${displayed.page} of ${displayed.total}`)
       setLocation(epubcifi);
+  }
+
+  const onMarketplaceHandler = () => {
+    window.location.href = "https://spatiumstories.com/#/marketplace";
   }
 
   const getReader = () => {
@@ -174,10 +198,18 @@ const SpatiumReader = () => {
           <CircularProgress color="success" />
         </Stack>
       ) : userKey === null ? (
-        <React.Fragment>
+        <Stack sx={{marginTop:'20%', padding: '20px', alignItems: 'center', justifyItems: 'center'}}>
+          <Typography sx={{padding:'20px'}} variant="h4">Please login to read your book</Typography>
           <Button onClick={onLoginHandler} color="secondary" variant="contained" sx={{display: {xs: 'none', md: 'flex'}}}><LoginIcon sx={{paddingRight: '2px'}}/>Login with DeSo</Button>
           <Button onClick={onLoginHandler} color="secondary" variant="contained" sx={{display: {xs: 'flex', md: 'none'}}}>Login</Button>
-        </React.Fragment>
+        </Stack>
+      ) : !verified ? (
+        <Stack sx={{marginTop:'20%', padding: '20px', alignItems: 'center', justifyItems: 'center'}}>
+          <Typography sx={{padding:'20px'}} variant="h4">Looks like you don't own this book :/</Typography>
+          <Typography sx={{padding: '20px'}} variant="h6">Head over to the marketplace to buy one!</Typography>
+          <Button onClick={onMarketplaceHandler} color="primary" variant="contained" sx={{display: {xs: 'none', md: 'flex'}}}>Marketplace</Button>
+          <Typography sx={{padding: '20px'}} variant="p">If you believe this was in error, please contact @Spatium.</Typography>
+        </Stack>
       ) : (
         <div style={{ height: "100vh" }}>
           {getReader()}
