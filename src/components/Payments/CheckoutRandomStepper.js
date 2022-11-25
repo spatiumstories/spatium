@@ -36,7 +36,7 @@ const CheckoutRandomStepper = (props) => {
   function getStepContent(step) {
     switch (step) {
       case 0:
-        return <CheckoutGetReservation setBook={handleBookChange}/>;
+        return <CheckoutGetReservation userName={props.buyer.userName} setBook={handleBookChange}/>;
       case 1:
         return <CheckoutRare buyer={props.buyer} serial={serial} handleAltPayment={handleAltPayment} showSerial={false} bookData={props.bookData} handleOnFailure={props.handleOnFailure} closeFail={props.close} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
       case 2:

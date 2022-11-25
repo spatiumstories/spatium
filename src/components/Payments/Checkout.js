@@ -32,7 +32,7 @@ const Checkout = (props) => {
 
         let data = new FormData();
         data.append("post_hash_hex", nft);
-        data.append("buyer_pub_key", user.publicKey);
+        data.append("buyer_pub_key", props.buyer.publicKey);
         data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
         data.append("buyer_prv_key", props.buyer.derivedSeedHex);
         data.append("author", props.bookData.publisher);
@@ -46,7 +46,7 @@ const Checkout = (props) => {
         };
         let successResponse = true;
 
-        const response = await fetch('https://api.spatiumstories.xyz/api/buy-book', requestOptions).catch(e => {
+        const response = await fetch('http://0.0.0.0:4201/api/buy-book', requestOptions).catch(e => {
             successResponse = false;
             console.log(e);
             setBuying(false);
@@ -67,29 +67,6 @@ const Checkout = (props) => {
 
     }
 
-    const acceptNFT = async (nft) => {
-        console.log(nft);
-        const request = {
-            "UpdaterPublicKeyBase58Check": user.publicKey,
-            "NFTPostHashHex": nft,
-            "SerialNumber": 1,
-            "MinFeeRateNanosPerKB": 1000
-          };
-        let successResponse = true;
-        const response = await deso.nft.acceptNftTransfer(request).catch(e => {
-            successResponse = false;
-            console.log(e);
-            setBuying(false);
-            props.close();
-            props.handleOnFailure();
-        });
-        if (successResponse) {
-            console.log(response);
-            setBuying(false);
-            props.close();
-            props.handleOnSuccess();
-        }
-    };
 
     const handleAltPayment = () => {
         props.handleAltPayment(true);

@@ -24,8 +24,8 @@ const CheckoutRare = (props) => {
 
         let data = new FormData();
         data.append("post_hash_hex", nft);
-        data.append("username", user.userName);
-        data.append("buyer_pub_key", user.publicKey);
+        data.append("username", props.buyer.userName);
+        data.append("buyer_pub_key", props.buyer.publicKey);
         data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
         data.append("buyer_prv_key", props.buyer.derivedSeedHex);
         data.append("author", props.bookData.publisher);

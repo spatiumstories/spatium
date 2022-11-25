@@ -66,12 +66,18 @@ const Marketplace = () => {
             },
           };
         const response = await deso.identity.derive(request);
+        const userRequest = {
+            "PublicKeyBase58Check": response['publicKeyBase58Check']
+        };
+        const user = await deso.user.getSingleProfile(userRequest);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
             accessSignature: response['accessSignature'],
             expirationBlock: response['expirationBlock'],
             transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
+            publicKey: response['publicKeyBase58Check'],
+            userName: user['Profile']['Username'],
         });
         return response;
     }
