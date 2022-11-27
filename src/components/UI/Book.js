@@ -51,7 +51,8 @@ const Book = (props) => {
     }
 
     const onSellHandler = (event) => {
-        window.open(`https://${user.userName}.nftz.zone/nft/${props.bookData.postHashHex}`, '_blank', 'noopener,noreferrer');
+        let nftzUser = user.userName !== "" ? user.userName : "spatiumpublisher";
+        window.open(`https://${nftzUser}.nftz.zone/nft/${props.bookData.postHashHex}`, '_blank', 'noopener,noreferrer');
     }
 
     console.log(props);
@@ -130,6 +131,9 @@ const Book = (props) => {
                             </Typography>
                             <Typography sx={{paddingTop: '20px', paddingBottom: '20px'}}>
                             Published by {props.bookData.publisher}
+                            </Typography>
+                            <Typography variant="h6" sx={{paddingBottom: '20px'}}>
+                            {Array.isArray(props.bookData.subtitle) ? props.bookData.subtitle[coverIndex] : props.bookData.subtitle}
                             </Typography>
                             <Typography>
                             {Array.isArray(props.bookData.description) ? props.bookData.description[coverIndex] : props.bookData.description}

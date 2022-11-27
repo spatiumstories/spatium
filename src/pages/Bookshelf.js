@@ -48,6 +48,7 @@ const Bookshelf = () => {
                         let publisher = "SpatiumPublisher";
                         let description = book['PostEntryResponse']['Body'];
                         let title = "A Spatium Story";
+                        let subtitle = "";
                         let type = "MOD"; //Spatium Publisher public key
 
                         if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
@@ -62,6 +63,9 @@ const Bookshelf = () => {
                         if (book['PostEntryResponse']['PostExtraData']['description'] != null) {
                             description = book['PostEntryResponse']['PostExtraData']['description'];
                         }
+                        if (book['PostEntryResponse']['PostExtraData']['subtitle'] != null) {
+                            subtitle = book['PostEntryResponse']['PostExtraData']['subtitle'];
+                        }
                         if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
                             type = book['PostEntryResponse']['PostExtraData']['type'];
                         }
@@ -71,6 +75,7 @@ const Bookshelf = () => {
                             author: author,
                             publisher: publisher,
                             title: title,
+                            subtitle: subtitle,
                             description: description,
                             type: type,
                             postHashHex: postHashHex,

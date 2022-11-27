@@ -127,6 +127,7 @@ const Marketplace = () => {
                     let publisher_key = "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq";
                     let description = book['PostEntryResponse']['Body'];
                     let title = "A Spatium Story";
+                    let subtitle = "";
                     let type = "MOD"; //Spatium Publisher public key
                     let bookID = null;
                     let total = null;
@@ -146,6 +147,9 @@ const Marketplace = () => {
                     }
                     if (book['PostEntryResponse']['PostExtraData']['description'] != null) {
                         description = book['PostEntryResponse']['PostExtraData']['description'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['subtitle'] != null) {
+                        subtitle = book['PostEntryResponse']['PostExtraData']['subtitle'];
                     }
                     if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
                         type = book['PostEntryResponse']['PostExtraData']['type'];
@@ -173,6 +177,7 @@ const Marketplace = () => {
                             publisher: publisher,
                             publisher_key: publisher_key,
                             title: title,
+                            subtitle: subtitle,
                             description: description,
                             type: type,
                             postHashHex: postHashHex,
