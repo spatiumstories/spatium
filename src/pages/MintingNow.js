@@ -103,11 +103,140 @@ const MintingNow = () => {
     }
 
     useEffect(() => {
-        setBooks([]);
-        setBooksLoaded(true);
+        if (!booksLoaded) {
+            setLoading(true);
+            //loading books
+            const fetchData = async () => {
+                let nftMap = [];
+                // const nfts = await fetch("/default/getRareMintNow"); //=> local dev
+                const nfts = await fetch("https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/getRareMintNow"); // => prod
+                const nftJSON = await nfts.json();
+                console.log(nftJSON);
+                for (var i = 0; i < nftJSON.length; i++) {
+                    let nft = nftJSON[i];
+                    console.log(nft);
+                    const request = {
+                        "PostHashHex": nft
+                    };
+                    const response = await deso.nft.getNftBidsForNftPost(request);
+                    nftMap.push(response['data']);
+                }
+                // First collect all the 
+                let coversMap = new Map();
+                let descriptionMap = new Map();
+                let subtitleMap = new Map();
+                nftMap.map((nft) => {
+                    let bookId = nft['PostEntryResponse']['PostExtraData']['book_id'];
+                    if (coversMap.has(bookId)) {
+                        let arr = coversMap.get(bookId);
+                        let newArr = [...arr, nft['PostEntryResponse']['ImageURLs'][0]];
+                        coversMap.set(bookId, newArr);
+                    } else {
+                        coversMap.set(bookId, [nft['PostEntryResponse']['ImageURLs'][0]]);
+                    }
+
+                    let desc = nft['PostEntryResponse']['PostExtraData']['description'];
+                    if (descriptionMap.has(bookId)) {
+                        let arr = descriptionMap.get(bookId);
+                        let newArr = [...arr, desc];
+                        descriptionMap.set(bookId, newArr);
+                    } else {
+                        descriptionMap.set(bookId, [desc]);
+                    }
+
+                    let subtitle = nft['PostEntryResponse']['PostExtraData']['subtitle'];
+                    if (subtitleMap.has(bookId)) {
+                        let arr = subtitleMap.get(bookId);
+                        let newArr = [...arr, subtitle];
+                        subtitleMap.set(bookId, newArr);
+                    } else {
+                        subtitleMap.set(bookId, [subtitle]);
+                    }
+                });
+                
+                let ids = new Map();
+                console.log(nftMap);
+                nftMap.map((book) => {
+                    let postHashHex = book['PostEntryResponse']['PostHashHex'];
+                    let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
+                    let author = "Spatium Publisher";
+                    let publisher = "SpatiumPublisher";
+                    let publisher_key = "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq";
+                    let description = book['PostEntryResponse']['Body'];
+                    let title = "A Spatium Story";
+                    let subtitle = "";
+                    let type = "MOD"; //Spatium Publisher public key
+                    let bookID = null;
+                    let total = null;
+                    let left = [];
+
+                    if (book['PostEntryResponse']['PostExtraData']['published_by_key'] != null) {
+                        publisher_key = book['PostEntryResponse']['PostExtraData']['published_by_key'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
+                        author = book['PostEntryResponse']['PostExtraData']['author'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['published_by'] != null) {
+                        publisher = book['PostEntryResponse']['PostExtraData']['published_by'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['title'] != null) {
+                        title = book['PostEntryResponse']['PostExtraData']['title'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['description'] != null) {
+                        description = book['PostEntryResponse']['PostExtraData']['description'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['subtitle'] != null) {
+                        subtitle = book['PostEntryResponse']['PostExtraData']['subtitle'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
+                        type = book['PostEntryResponse']['PostExtraData']['type'];
+                    }
+                    if (book['PostEntryResponse']['PostExtraData']['book_id'] != null) {
+                        bookID = book['PostEntryResponse']['PostExtraData']['book_id'];
+                    }
+
+                    if (type === 'RARE') {
+                        total = book['PostEntryResponse']['NumNFTCopies'];
+                        let booksLeft = 0;
+                        book['NFTEntryResponses'].forEach(function (item, index) {
+                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP') {
+                                    booksLeft += 1;
+                                }
+                        });
+                        left = booksLeft;
+                    }
+                    if (bookID !== null) {
+                        var newBook = {
+                            cover: coversMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
+                            body: book['PostEntryResponse']['Body'],
+                            author: author,
+                            publisher: publisher,
+                            publisher_key: publisher_key,
+                            title: title,
+                            subtitle: subtitleMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
+                            description: descriptionMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
+                            type: type,
+                            postHashHex: postHashHex,
+                            price: price,
+                            total: total,
+                            left: left
+                        };
+                        if (ids.has(bookID)) {
+                            let currBook = ids.get(bookID);
+                            newBook.total += currBook.total;
+                            newBook.left += currBook.left;
+                        }
+                        ids.set(bookID, newBook);
+                    }
+                });
+                setBooks(Array.from(ids.values()));
+                setBooksLoaded(true);
+                setLoading(false);
+            };
+            fetchData().catch(console.error);
+
+        }
     }, []);
-
-
 
     const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
