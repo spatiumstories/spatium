@@ -1,19 +1,8 @@
-import Link from '@mui/material/Link';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Copyright from '../Layout/Copyright';
-import { TextField } from '@mui/material';
-import { Button } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import SendIcon from '@mui/icons-material/Send';
-import { useState } from 'react';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import MailchimpSubscribe from 'react-mailchimp-subscribe';
 import SignupForm from './SignupForm';
 
 

@@ -4,8 +4,6 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import FeatureRequestForm from './FeatureRequestForm';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 
 const style = {
   position: 'absolute',

@@ -4,13 +4,11 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import HandymanTwoToneIcon from '@mui/icons-material/HandymanTwoTone';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import Success from './Success';
 import { useSelector } from 'react-redux';
 import { Deso } from 'deso-protocol';
 
@@ -41,6 +39,7 @@ const FeatureRequestForm = (props) => {
     const handleIdeaChange = () => {
         setIdeaErr(false);
     }
+
 
     const handleSubmit = (event) => {
         let deso = new Deso();

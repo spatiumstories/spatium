@@ -1,17 +1,11 @@
 import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Toolbar from '@mui/material/Toolbar';
-import Paper from '@mui/material/Paper';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import CheckoutRareForm from './CheckoutRareForm';
 import CheckoutRare from './CheckoutRare';
 import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
@@ -34,7 +28,7 @@ const CheckoutRareStepper = (props) => {
       case 0:
         return <CheckoutRareForm setSerial={handleSerialChange} serialNumbers={props.bookData.left.sort(function(a, b){return a-b})}/>;
       case 1:
-        return <CheckoutRare buyer={props.buyer} serial={serial} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
+        return <CheckoutRare buyer={props.buyer} serial={serial} showSerial={true} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
       default:
         throw new Error('Unknown step');
     }
