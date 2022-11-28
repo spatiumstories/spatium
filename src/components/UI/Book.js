@@ -22,16 +22,6 @@ const Book = (props) => {
     const marketplace = props.marketplace;
 
 
-    // useEffect(() => {
-    //     if (props.bookData.cover !== undefined) {
-    //         if (props.bookData.cover.length > 1) {
-    //             console.log("hello??");
-    //             setTimeout(() => {
-    //             setCoverIndex((prevState) => (prevState.coverIndex + 1) % props.bookData.cover.length);
-    //             }, 1000);
-    //         }
-    //     }
-    //   }, []);
     useEffect(() => {
         if (props.bookData !== undefined && props.bookData.cover.length > 1) {
             const timerId = setTimeout(() => setCoverIndex(old => (old + 1) % props.bookData.cover.length), 1000);
@@ -44,9 +34,6 @@ const Book = (props) => {
     }
 
     const onReadHandler = (event) => {
-        // window.open(`/reader/`)
-        console.log("read");
-        console.log(event);
         window.open(`#/read/${props.bookData.postHashHex}`);
     }
 
@@ -55,7 +42,6 @@ const Book = (props) => {
         window.open(`https://${nftzUser}.nftz.zone/nft/${props.bookData.postHashHex}`, '_blank', 'noopener,noreferrer');
     }
 
-    console.log(props);
     return (
         <Grid item key={props.card} xs={12} sm={6} md={4}>
             <Card

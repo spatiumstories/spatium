@@ -104,6 +104,7 @@ const CheckoutRandomStepper = (props) => {
          ...props.bookData,
          cover: [response['PostFound']['ImageURLs'][0]],
          description: response['PostFound']['PostExtraData']['description'],
+         subtitle: response['PostFound']['PostExtraData']['subtitle'],
        });
       //  props.bookData.cover = [response['PostFound']['ImageURLs'][0]];
       //  console.log(response['PostFound']['PostExtraData']['description']);
