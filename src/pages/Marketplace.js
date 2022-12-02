@@ -23,6 +23,7 @@ const Marketplace = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
     const [page, setPage] = useState(1);
+    const [enoughFunds, setEnoughFunds] = useState(false);
     const [loading, setLoading] = useState(false);
     const [books, setBooks] = useState(new Map());
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
@@ -30,7 +31,7 @@ const Marketplace = () => {
     const deso = new Deso();
     const [open, setOpen] = useState(false);
     const [altPayment, setAltPayment] = useState(false);
-    const [derivedKeyData, setDerivedKeyData] = useState(null);
+    const [derivedKeyData, setDerivedKeyData] = useState({});
     const BOOKS_PER_PAGE = 6;
 
     const handlePageChange = (e, p) => {
@@ -43,7 +44,7 @@ const Marketplace = () => {
     }
 
     const handleOpen = async (bookData) => {
-        getDerivedKey(bookData);
+        await getDerivedKey(bookData);
         setBookToBuy(bookData);
         setOpen(true);
     }
@@ -78,34 +79,43 @@ const Marketplace = () => {
             transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
             publicKey: response['publicKeyBase58Check'],
             userName: user['Profile']['Username'],
+            balance: user['Profile']['DESOBalanceNanos']
         });
+        if (user['Profile']['DESOBalanceNanos'] >= (bookData.price * 1.025) + 1700) {
+            setEnoughFunds(true);
+        }
         return response;
     }
     const handleClose = () => {
         setOpen(false);
         setAltPayment(false);
+        setEnoughFunds(false);
     }
     const [success, setSuccess] = useState(false);
     const [failure, setFailure] = useState(false);
 
     const handleCloseSuccess = () => {
         setAltPayment(false);
+        setEnoughFunds(false);
         setSuccess(false);
     }
 
     const handleOnSuccess = () => {
         setAltPayment(false);
         setSuccess(true);
+        setEnoughFunds(false);
     }
 
     const handleOnFailure = () => {
         setAltPayment(false);
         setFailure(true);
+        setEnoughFunds(false);
     }
 
     const handleCloseFailure = () => {
         setAltPayment(false);
         setFailure(false);
+        setEnoughFunds(false);
     }
 
     useEffect(() => {
@@ -269,7 +279,7 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal enoughFunds={enoughFunds} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

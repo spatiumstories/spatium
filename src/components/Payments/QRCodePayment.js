@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Deso from 'deso-protocol';
 import QRCode from 'react-qr-code';
@@ -9,6 +9,8 @@ import Timer from '../UI/Timer';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import Button from '@mui/material/Button';
+
 
 
 
@@ -21,6 +23,7 @@ const QRCodePayment = (props) => {
     const [amount, setAmount] = useState(0);
     const [progress, setProgress] = useState(0);
     const deso = new Deso();
+    const runTimer = useRef(true);
 
     const total = (props.bookData.price / 1000000000).toFixed(2);
     const fee = (0.025 * total).toFixed(4);
@@ -59,7 +62,7 @@ const QRCodePayment = (props) => {
         await delay(5000);
         let i = 0;
         let txID = null;
-        while (true) {
+        while (runTimer.current) {
             i += 1;
             await fetch(`https://megaswap.dev/api/v1/new-deposits/${props.currency}/${depositKey}`)
             .then(response => response.text())
@@ -88,8 +91,15 @@ const QRCodePayment = (props) => {
                 return txID;
             }
         }
+        console.log("Timer Stopped");
+        return null;
     }
 
+    useEffect(() => {
+        return () => {
+            runTimer.current = false;
+        }
+    }, []);
     const waitForDeposit = async () => {
         let nft = props.bookData.postHashHex;
         let successfulPayment = true;  
