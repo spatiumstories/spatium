@@ -19,16 +19,17 @@ const Checkout = (props) => {
     const total = (props.bookData.price / 1000000000).toFixed(2);
 
     const onBuyHandler = async () => {
+        if (!props.enoughFunds) {
+            props.handleNotEnoughFunds();
+        } else {
+            await verifiedEnoughDesoPurchase();
+        }
+    }
+
+    const verifiedEnoughDesoPurchase = async () => {
+
         let nft = props.bookData.postHashHex;
         setBuying(true);
-
-        // Mint New NFT
-        // 1. We have a derived key
-        // 2. Pass all info to buy-book api
-        // 3. buy-book will mint new book and either set for sale
-        //      or transfer it
-        // 4. Using the derived key, either accept transfer OR make bid
-        // 5. Then pay author
 
         let data = new FormData();
         data.append("post_hash_hex", nft);
@@ -47,16 +48,17 @@ const Checkout = (props) => {
         let successResponse = true;
         let uri = 'https://api.spatiumstories.xyz';
         // let uri = 'http://0.0.0.0:4201';
-        const response = await fetch(`${uri}/api/buy-book`, requestOptions).catch(e => {
+        const response = await fetch(`${uri}/api/buy-book`, requestOptions)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            props.bookData.postHashHex = data;
+        }).catch(e => {
             successResponse = false;
             console.log(e);
             setBuying(false);
             props.close();
             props.handleOnFailure();
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
         });
 
         if (successResponse) {
@@ -89,12 +91,6 @@ const Checkout = (props) => {
             alignItems: 'center',
             }}
         >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                <ShoppingCartTwoToneIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-                Checkout
-            </Typography>
                 <Grid container sx={{ paddingTop: '20px', width: '100%'}}>
                     <Grid item xs={6} alignItems='flex-start'>
                         <Typography variant="h6">{props.bookData.title} x1</Typography>
