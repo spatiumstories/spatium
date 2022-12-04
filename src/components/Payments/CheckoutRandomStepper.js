@@ -94,6 +94,9 @@ const CheckoutRandomStepper = (props) => {
   };
 
   const handleBack = () => {
+    if (activeStep === 4) {
+      setCurrency(null);
+    }
     if (activeStep === 2 || activeStep === 3) {
       setSteps(normSteps);
     }
@@ -170,6 +173,15 @@ const CheckoutRandomStepper = (props) => {
                   <Button
                     variant="contained"
                     onClick={handleNext}
+                    sx={{ mt: 3, ml: 1 }}
+                  >
+                    Next
+                  </Button>)}
+                  {activeStep === 3 && currency === null && (
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    disabled
                     sx={{ mt: 3, ml: 1 }}
                   >
                     Next

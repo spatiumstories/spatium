@@ -87,15 +87,22 @@ const CheckoutStepper = (props) => {
     if (activeStep === 0) {
       setActiveStep(4);
     } else {
-      setActiveStep(activeStep + 1);
+      setActiveStep((currStep) => currStep + 1);
     }
   };
 
   const handleBack = () => {
+    if (activeStep === 3) {
+      setCurrency(null);
+    }
     if (activeStep === 2 || activeStep === 1) {
       setSteps(normSteps);
     }
-    setActiveStep(0);
+    if (activeStep === 2) {
+      setActiveStep(0);
+    } else {
+      setActiveStep((currStep) => currStep - 1);
+    }
   };
 
   return (
@@ -140,7 +147,7 @@ const CheckoutStepper = (props) => {
                   >
                     Next
                   </Button>)}
-                  {(activeStep !== 4) || (activeStep === 2 && currency === null) && (
+                  {activeStep === 2 && currency === null && (
                   <Button
                     variant="contained"
                     disabled
