@@ -5,56 +5,105 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
+import CheckoutRare from './CheckoutRare';
 import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 import Avatar from '@mui/material/Avatar';
+import { useState } from 'react';
+import CheckoutGetReservation from './CheckoutGetReservation';
+import Book from '../UI/Book';
+import Deso from 'deso-protocol';
+import { Stack } from '@mui/system';
 import QRCodePayment from './QRCodePayment';
 import PaymentOptions from './PaymentOptions';
-import FinalizeAltPayment from './FinalizeAltPayment';
-import LinearProgress from '@mui/material/LinearProgress';
-
-import { useState } from 'react';
+import NotEnoughFunds from './NotEnoughFunds';
+import Checkout from './Checkout';
 
 
 
-const steps = ['Choose Payment Option', 'Review your order', 'QR Code'];
+const normSteps = ['Review your order', 'Showcase Book'];
+const altSteps = ['Review your order', 'Alt Payment Option', 'QR Code', 'Showcase Book'];
+const notEnoughFunds = ['Checking Wallet'];
 
 
 const theme = createTheme();
 
 const CheckoutStepper = (props) => {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [bookBought, setBookBought] = useState({});
   const [currency, setCurrency] = useState(null);
   const [timesUp, setTimesUp] = useState(false);
+  const [steps, setSteps] = useState(normSteps);
 
   function getStepContent(step) {
     switch (step) {
       case 0:
-        return <PaymentOptions setCurrency={handleCurrencyChange}/>;
+        return <Checkout enoughFunds={props.enoughFunds} buyer={props.buyer} handleNotEnoughFunds={handleNotEnoughFunds} handleAltPayment={handleAltPayment} bookData={props.bookData} handleOnFailure={handleOnFailure} closeFail={props.close} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
       case 1:
-        return <FinalizeAltPayment bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>;
+        return <NotEnoughFunds buyer={props.buyer} bookData={props.bookData}/>
       case 2:
-        return <QRCodePayment type={"MOD"} buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={props.close}/>
-        default:
+        return <PaymentOptions setCurrency={handleCurrencyChange}/>;
+      case 3:
+        return <QRCodePayment type={"MOD"} buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
+      case 4:
+        return (
+          <Stack sx={{
+              width: {xs: '100%', sm: '50%'},
+              height: {xs: '50%', sm: '25%'}
+            }}>
+            <Typography sx={{paddingBottom: '10px'}} variant="h5">Here is your book! Enjoy!</Typography>
+            <Book loading={false} bookData={props.bookData} marketplace={false}/>
+          </Stack>
+        );
+      default:
         throw new Error('Unknown step');
     }
   }
-  const handleNext = () => {
-    setActiveStep(activeStep + 1);
-  };
 
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
+  const handleOnFailure = () => {
+    props.handleOnFailure();
+    props.close();
+  }
+
+  const handleNotEnoughFunds = () => {
+    setActiveStep(1);
+    setSteps(notEnoughFunds);
+  }
 
   const handleCurrencyChange = (event) => {
-    console.log(event.target.value);
     setCurrency(event.target.value);
   };
 
+  const handleAltPayment = () => {
+    setSteps(altSteps);
+    setActiveStep(2);
+  }
+
   const handleTimesUp = () => {
     setTimesUp(true);
-  }
+  };
+
+  const handleNext = () => {
+    if (activeStep === 0) {
+      setActiveStep(4);
+    } else {
+      setActiveStep((currStep) => currStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (activeStep === 3) {
+      setCurrency(null);
+    }
+    if (activeStep === 2 || activeStep === 1) {
+      setSteps(normSteps);
+    }
+    if (activeStep === 2) {
+      setActiveStep(0);
+    } else {
+      setActiveStep((currStep) => currStep - 1);
+    }
+  };
 
   return (
     <Box
@@ -63,73 +112,51 @@ const CheckoutStepper = (props) => {
     flexDirection: 'column',
     alignItems: 'center',
     }}
-    >
-        {!timesUp && 
-        <React.Fragment>
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                  <ShoppingCartTwoToneIcon />
-              </Avatar>
-            <Typography component="h1" variant="h4" align="center">
-              Checkout
-            </Typography>
-            <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </React.Fragment>
-        }
+>        {activeStep !== 1 && <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                <ShoppingCartTwoToneIcon />
+            </Avatar>}
+          {activeStep !== 1 && <Typography component="h1" variant="h4" align="center">
+            Checkout
+          </Typography>}
+          <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
           <React.Fragment>
-            {activeStep === steps.length ? (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  Thank you for your order!
-                </Typography>
-              </React.Fragment>
-            ) : (
               <React.Fragment>
                 {getStepContent(activeStep)}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  {activeStep !== 0 && !timesUp && (
+                  {activeStep !== 0 && activeStep !== 4 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
                       Back
                     </Button>
                   )}
-                  {activeStep < steps.length - 1 && currency !== null ? (
+                  {activeStep === 4 && (
+                    <Button onClick={props.close} sx={{ mt: 3, ml: 1 }}>
+                      Close
+                    </Button>
+                  )}
+                  {activeStep === 2 && currency !== null && (
                   <Button
                     variant="contained"
                     onClick={handleNext}
                     sx={{ mt: 3, ml: 1 }}
                   >
                     Next
-                  </Button>) :
-                  activeStep < steps.length - 1 && currency === null ? (
+                  </Button>)}
+                  {activeStep === 2 && currency === null && (
                   <Button
                     variant="contained"
                     disabled
                     sx={{ mt: 3, ml: 1 }}
                   >
                     Next
-                  </Button>) : (
-                    timesUp &&
-                    <Button variant="contained"
-                    sx={{ mt: 3, ml: 1}}
-                    onClick={props.close}
-                    >
-                      Ok!
-                    </Button>
-                  )
-                  }
-                  {activeStep === steps.length - 1 && (
-                    <Box sx={{ width: '100%' }}>
-                      <LinearProgress />
-                    </Box>
-                  )}
+                  </Button>)}
                 </Box>
               </React.Fragment>
-            )}
           </React.Fragment>
       </Box>
   );

@@ -21,6 +21,7 @@ import React from 'react';
 const MintingNow = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
+    const [enoughFunds, setEnoughFunds] = useState(false);
     const [loading, setLoading] = useState(false);
     const [books, setBooks] = useState();
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
@@ -64,6 +65,7 @@ const MintingNow = () => {
             "PublicKeyBase58Check": response['publicKeyBase58Check']
         };
         const user = await deso.user.getSingleProfile(userRequest);
+        console.log(user);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
@@ -72,12 +74,17 @@ const MintingNow = () => {
             transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
             publicKey: response['publicKeyBase58Check'],
             userName: user['Profile']['Username'],
+            balance: user['Profile']['DESOBalanceNanos']
         });
+        if (user['Profile']['DESOBalanceNanos'] >= (bookData.price * 1.025) + 1700) {
+            setEnoughFunds(true);
+        }
         return response;
     }
     const handleClose = () => {
         setOpen(false);
         setAltPayment(false);
+        setEnoughFunds(false);
     }
     const [success, setSuccess] = useState(false);
     const [failure, setFailure] = useState(false);
@@ -85,21 +92,25 @@ const MintingNow = () => {
     const handleCloseSuccess = () => {
         setAltPayment(false);
         setSuccess(false);
+        setEnoughFunds(false);
     }
 
     const handleOnSuccess = () => {
         setAltPayment(false);
         setSuccess(true);
+        setEnoughFunds(false);
     }
 
     const handleOnFailure = () => {
         setAltPayment(false);
         setFailure(true);
+        setEnoughFunds(false);
     }
 
     const handleCloseFailure = () => {
         setAltPayment(false);
         setFailure(false);
+        setEnoughFunds(false);
     }
 
     useEffect(() => {
@@ -288,7 +299,7 @@ const MintingNow = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} randomMint={true} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <CheckoutModal enoughFunds={enoughFunds} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} randomMint={true} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

@@ -7,6 +7,7 @@ import Checkout from './Checkout';
 import CheckoutRareStepper from './CheckoutRareStepper';
 import CheckoutStepper from './CheckoutStepper';
 import CheckoutRandomStepper from './CheckoutRandomStepper';
+import NotEnoughFunds from './NotEnoughFunds';
 
 const style = {
   position: 'absolute',
@@ -43,13 +44,13 @@ const CheckoutModal = (props) => {
         <Fade in={props.open}>
           <Box sx={style}>
             {props.randomMint === true ? (
-              <CheckoutRandomStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
+              <CheckoutRandomStepper enoughFunds={props.enoughFunds} buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
             ) :
-              props.bookToBuy.type === "MOD" && props.altPayment ? (
-              <CheckoutStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : 
-              props.bookToBuy.type === "MOD" ? (
-                <Checkout buyer={props.buyer} handleAltPayment={props.setAltPayment} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
-              <CheckoutRareStepper buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)
+            props.bookToBuy.type === "MOD" ? (
+              <CheckoutStepper enoughFunds={props.enoughFunds} buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
+            ) : (
+                <CheckoutRareStepper enoughFunds={props.enoughFunds} buyer={props.buyer} bookData={props.bookToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
+              )
             }
           </Box>
         </Fade>

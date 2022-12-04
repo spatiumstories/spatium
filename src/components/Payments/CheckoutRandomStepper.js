@@ -16,11 +16,13 @@ import Deso from 'deso-protocol';
 import { Stack } from '@mui/system';
 import QRCodePayment from './QRCodePayment';
 import PaymentOptions from './PaymentOptions';
+import NotEnoughFunds from './NotEnoughFunds';
 
 
 
 const normSteps = ['Get Reservation', 'Review your order', 'Showcase Book'];
 const altSteps = ['Get Reservation', 'Review your order', 'Alt Payment Option', 'QR Code', 'Showcase Book'];
+const notEnoughFunds = ['Checking Wallet'];
 
 
 const theme = createTheme();
@@ -38,12 +40,14 @@ const CheckoutRandomStepper = (props) => {
       case 0:
         return <CheckoutGetReservation userName={props.buyer.userName} setBook={handleBookChange}/>;
       case 1:
-        return <CheckoutRare buyer={props.buyer} serial={serial} handleAltPayment={handleAltPayment} showSerial={false} bookData={props.bookData} handleOnFailure={props.handleOnFailure} closeFail={props.close} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
+        return <CheckoutRare enoughFunds={props.enoughFunds} handleNotEnoughFunds={handleNotEnoughFunds} buyer={props.buyer} serial={serial} handleAltPayment={handleAltPayment} showSerial={false} bookData={props.bookData} handleOnFailure={handleOnFailure} closeFail={props.close} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
       case 2:
-        return <PaymentOptions setCurrency={handleCurrencyChange}/>;
+        return <NotEnoughFunds buyer={props.buyer} bookData={props.bookData}/>
       case 3:
-        return <QRCodePayment type={"RARE"} serial={serial} buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
+        return <PaymentOptions setCurrency={handleCurrencyChange}/>;
       case 4:
+        return <QRCodePayment type={"RARE"} serial={serial} buyer={props.buyer} handleTimesUp={handleTimesUp} currency={currency} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} close={handleNext}/>;
+      case 5:
         return (
           <Stack sx={{
               width: {xs: '100%', sm: '50%'},
@@ -58,13 +62,23 @@ const CheckoutRandomStepper = (props) => {
     }
   }
 
+  const handleOnFailure = () => {
+    props.handleOnFailure();
+    props.close();
+  }
+  
+  const handleNotEnoughFunds = () => {
+    setActiveStep(2);
+    setSteps(notEnoughFunds);
+  }
+
   const handleCurrencyChange = (event) => {
     setCurrency(event.target.value);
   };
 
   const handleAltPayment = () => {
     setSteps(altSteps);
-    setActiveStep(2);
+    setActiveStep(3);
   }
 
   const handleTimesUp = () => {
@@ -73,17 +87,24 @@ const CheckoutRandomStepper = (props) => {
 
   const handleNext = () => {
     if (activeStep === 1) {
-      setActiveStep(4);
+      setActiveStep(5);
     } else {
       setActiveStep(activeStep + 1);
     }
   };
 
   const handleBack = () => {
-    if (activeStep === 2) {
+    if (activeStep === 4) {
+      setCurrency(null);
+    }
+    if (activeStep === 2 || activeStep === 3) {
       setSteps(normSteps);
     }
-    setActiveStep(activeStep - 1);
+    if (activeStep === 3) {
+      setActiveStep(1);
+    } else {
+      setActiveStep(activeStep - 1);
+    }
   };
 
   const handleBookChange = (serial, postHashHex) => {
@@ -138,17 +159,17 @@ const CheckoutRandomStepper = (props) => {
               <React.Fragment>
                 {getStepContent(activeStep)}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  {activeStep !== 0 && activeStep !== 4 && (
+                  {activeStep !== 0 && activeStep !== 5 && activeStep !== 1 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
                       Back
                     </Button>
                   )}
-                  {activeStep === 4 && (
+                  {activeStep === 5 && (
                     <Button onClick={props.close} sx={{ mt: 3, ml: 1 }}>
                       Close
                     </Button>
                   )}
-                  {activeStep === 2 && currency !== null && (
+                  {activeStep === 3 && currency !== null && (
                   <Button
                     variant="contained"
                     onClick={handleNext}
@@ -156,9 +177,10 @@ const CheckoutRandomStepper = (props) => {
                   >
                     Next
                   </Button>)}
-                  {(activeStep !== 4 && serial === null) || (activeStep === 2 && currency === null) && (
+                  {activeStep === 3 && currency === null && (
                   <Button
                     variant="contained"
+                    onClick={handleNext}
                     disabled
                     sx={{ mt: 3, ml: 1 }}
                   >
