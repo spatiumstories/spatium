@@ -6,6 +6,13 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 
 const CheckoutRareForm = (props) => {
+
+  const createLabel = (serial) => {
+    let price = (serial[1] / 1000000000).toFixed(2);
+    let gap = "-";
+    return `#${serial[0]}${gap.repeat(10)}${price} Deso`;
+  }
+
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -19,7 +26,7 @@ const CheckoutRareForm = (props) => {
             name="radio-buttons-group"
         >
             {props.serialNumbers.map(serial => (
-                <FormControlLabel key={serial} value={serial} control={<Radio onChange={props.setSerial}/>} label={serial} />
+                <FormControlLabel key={serial[0]} value={serial[0]} control={<Radio onChange={props.setSerial}/>} label={createLabel(serial)} />
             ))}
         </RadioGroup>
         </Grid>

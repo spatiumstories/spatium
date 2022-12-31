@@ -132,13 +132,13 @@ const Book = (props) => {
                                         <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
 
                                     ) : Array.isArray(props.bookData.left) ? (
-                                        <Button onClick={onBuyHandler} disabled size="large" variant="contained">Buy</Button>
+                                        <Button onClick={onBuyHandler} disabled size="large" variant="contained">None Available</Button>
 
                                     ): props.bookData.left > 0 ? (
                                         <Button onClick={onBuyHandler} size="large" variant="contained">Buy</Button>
 
                                     ): (
-                                        <Button onClick={onBuyHandler} disabled size="large" variant="contained">Buy</Button>
+                                        <Button onClick={onBuyHandler} disabled size="large" variant="contained">None Available</Button>
                                     )
                                 }
                                 <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            
@@ -148,7 +148,7 @@ const Book = (props) => {
                                 {/* <Button onClick={onReadHandler} size="large" variant="contained">Read</Button> */}
                                 {props.bookData.type === 'MOD' && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
                                 {props.bookData.type === 'RARE' && props.bookData.left > 0 && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
-                                {props.bookData.type === 'RARE' && props.bookData.left <= 0 && <Button onClick={onBuyHandler} disabled size="large" variant="contained">Collect for Free</Button>}
+                                {props.bookData.type === 'RARE' && props.bookData.left <= 0 && <Button onClick={onBuyHandler} disabled size="large" variant="contained">None Available</Button>}
                             </CardActions>
                         ) : (
                             <CardActions>

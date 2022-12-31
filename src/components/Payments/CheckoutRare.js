@@ -17,7 +17,7 @@ const CheckoutRare = (props) => {
     const price = (props.bookData.price / 1000000000).toFixed(2);
 
     const onBuyHandler = async () => {
-        if (!props.enoughFunds) {
+        if (!props.enoughFunds || props.buyer.balance < props.bookData.price) {
             props.handleNotEnoughFunds();
         } else {
             await verifiedEnoughDesoPurchase();
@@ -49,8 +49,8 @@ const CheckoutRare = (props) => {
         };
 
         let successResponse = true;
-        let uri = 'https://api.spatiumstories.xyz';
-        // let uri = 'http://0.0.0.0:4201';
+        // let uri = 'https://api.spatiumstories.xyz';
+        let uri = 'http://0.0.0.0:4201';
 
         const response = await fetch(`${uri}/api/bid-rare-book`, requestOptions).then(response => response.text()).then(data => {
             console.log(data);
