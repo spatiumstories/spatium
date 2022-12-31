@@ -32,7 +32,7 @@ const CheckoutRareStepper = (props) => {
   function getStepContent(step) {
     switch (step) {
       case 0:
-        return <CheckoutRareForm setSerial={handleSerialChange} serialNumbers={props.bookData.left.sort(function(a, b){return a-b})}/>;
+        return <CheckoutRareForm setSerial={handleSerialChange} serialNumbers={props.bookData.left.sort(function(a, b){return a[0]-b[0]})}/>;
       case 1:
         return <CheckoutRare enoughFunds={props.enoughFunds} handleNotEnoughFunds={handleNotEnoughFunds} buyer={props.buyer} serial={serial} showSerial={true} bookData={props.bookData} handleOnSuccess={props.handleOnSuccess} handleOnFailure={handleOnFailure} close={handleNext}/>;
       case 2:
@@ -79,6 +79,11 @@ const CheckoutRareStepper = (props) => {
 
   const handleSerialChange = (event) => {
     setSerial(event.target.value);
+    props.bookData.left.forEach(book => {
+      if (book[0] === event.target.value) {
+        props.bookData.price = book[1];
+      }
+    });
   };
 
   return (

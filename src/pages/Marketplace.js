@@ -50,10 +50,20 @@ const Marketplace = () => {
     }
 
     const getDerivedKey = async (bookData) => {
+        // Get price to approve (if RARE, get highest price for convenience)
+        let price = bookData.price;
+        console.log(bookData);
+        if (bookData.type === 'RARE') {
+            bookData.left.forEach(book => {
+                if (book[1] > price) {
+                    price = book[1];
+                }
+            });
+        }
         const request = {
             "publicKey": "",
             "transactionSpendingLimitResponse": {
-              "GlobalDESOLimit": (bookData.price * 1.25) + 1700,
+              "GlobalDESOLimit": (price * 1.25) + 1700,
               "TransactionCountLimitMap": {
                 "AUTHORIZE_DERIVED_KEY": 2
               },
@@ -117,86 +127,51 @@ const Marketplace = () => {
         setFailure(false);
         setEnoughFunds(false);
     }
-
     useEffect(() => {
         if (!booksLoaded) {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                const request = {
-                    "UserPublicKeyBase58Check": "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP"
-                };
-                const response = await deso.nft.getNftsForUser(request);
+                const response = await fetch('http://0.0.0.0:4201/api/marketplace');
+                const books = await response.json();
                 let data = [];
-
-                Object.values(response['data']['NFTsMap']).map((book) => {
-                    let postHashHex = book['PostEntryResponse']['PostHashHex'];
-                    let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
-                    let author = "Spatium Publisher";
-                    let publisher = "SpatiumPublisher";
-                    let publisher_key = "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq";
-                    let description = book['PostEntryResponse']['Body'];
-                    let title = "A Spatium Story";
-                    let subtitle = "";
-                    let type = "MOD"; //Spatium Publisher public key
-                    let bookID = null;
-                    let total = null;
-                    let left = [];
-
-                    if (book['PostEntryResponse']['PostExtraData']['published_by_key'] != null) {
-                        publisher_key = book['PostEntryResponse']['PostExtraData']['published_by_key'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
-                        author = book['PostEntryResponse']['PostExtraData']['author'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['published_by'] != null) {
-                        publisher = book['PostEntryResponse']['PostExtraData']['published_by'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['title'] != null) {
-                        title = book['PostEntryResponse']['PostExtraData']['title'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['description'] != null) {
-                        description = book['PostEntryResponse']['PostExtraData']['description'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['subtitle'] != null) {
-                        subtitle = book['PostEntryResponse']['PostExtraData']['subtitle'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
-                        type = book['PostEntryResponse']['PostExtraData']['type'];
-                    }
-                    if (book['PostEntryResponse']['PostExtraData']['book_id'] != null) {
-                        bookID = book['PostEntryResponse']['PostExtraData']['book_id'];
-                    }
-
-                    if (type === 'RARE') {
-                        total = book['PostEntryResponse']['NumNFTCopies'];
-                        let booksLeft = [];
-                        book['NFTEntryResponses'].forEach(function (item, index) {
-                            if (item['OwnerPublicKeyBase58Check'] === 'BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP' &&
-                                item['IsForSale']) {
-                                    booksLeft.push(item['SerialNumber']);
-                                }
-                        });
-                        left = booksLeft;
-                    }
-                    if (bookID !== null) {
-                        var newBook = {
-                            cover: [book['PostEntryResponse']['ImageURLs'][0]],
-                            body: book['PostEntryResponse']['Body'],
-                            author: author,
-                            publisher: publisher,
-                            publisher_key: publisher_key,
-                            title: title,
-                            subtitle: subtitle,
-                            description: description,
-                            type: type,
-                            postHashHex: postHashHex,
-                            price: price,
-                            total: total,
-                            left: left
-                        };
-                        data.push(newBook);
-                    }
+                Object.values(books['mod_books']).map((book) => {
+                    var newBook = {
+                        cover: book['covers'],
+                        body: book['body'],
+                        author: book['author'],
+                        publisher: book['publisher'],
+                        publisher_key: book['publisher_key'],
+                        title: book['title'],
+                        subtitle: book['subtitle'],
+                        description: book['description'],
+                        type: book['book_type'],
+                        postHashHex: book['post_hash_hex'],
+                        price: book['price'],
+                        total: 1,
+                        left: 0
+                    };
+                    data.push(newBook);
+                });
+                Object.values(books['rare_books']).map((book) => {
+                    console.log(book);
+                    var newBook = {
+                        cover: book['covers'],
+                        body: book['body'],
+                        author: book['author'],
+                        publisher: book['publisher'],
+                        publisher_key: book['publisher_key'],
+                        title: book['title'],
+                        subtitle: book['subtitle'],
+                        description: book['description'],
+                        type: book['book_type'],
+                        postHashHex: book['post_hash_hex'],
+                        price: book['price'],
+                        total: book['total'],
+                        left: book['left'] ? Object.entries(book['left']) : 0
+                    };
+                    console.log(newBook);
+                    data.push(newBook);
                 });
                 setBooks(paginateList(data));
                 setBooksLoaded(true);

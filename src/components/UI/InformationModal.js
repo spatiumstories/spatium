@@ -1,9 +1,12 @@
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import FeatureRequestForm from './FeatureRequestForm';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import HelpIcon from '@mui/icons-material/Help';
 
 
 const style = {
@@ -18,7 +21,7 @@ const style = {
   p: 4,
 };
 
-const RoadmapModal = (props) => {
+const InformationModal = (props) => {
 
   return (
     <div>
@@ -35,7 +38,18 @@ const RoadmapModal = (props) => {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            <FeatureRequestForm handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
+              <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+              }}>
+                <Typography component="h1" variant="h5">{props.title}</Typography>
+                <Avatar sx={{m: 1}}>
+                    <HelpIcon/>
+                </Avatar>
+                {props.children}
+                <Button onClick={props.handleClose}>Ok</Button>
+              </Box>
           </Box>
         </Fade>
       </Modal>
@@ -43,4 +57,4 @@ const RoadmapModal = (props) => {
   );
 };
 
-export default RoadmapModal;
+export default InformationModal;
