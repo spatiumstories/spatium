@@ -110,7 +110,8 @@ const FinalConfirm = (props) => {
             method: 'POST',
             body: data,
         };
-        let uri = 'http://0.0.0.0:4201';
+        // let uri = 'http://0.0.0.0:4201';
+        let uri = 'https://api.spatiumstories.xyz';
         const response = await fetch(`${uri}/api/publish-book`, requestOptions)
         .then(response => response.text())
         .then(data => {
@@ -173,6 +174,7 @@ const FinalConfirm = (props) => {
         }
         <ImportantModal title={"Last Check!"} open={confirm} cancel={handleConfirmClose} publish={handlePublish}>
             <Typography>{confirmText}</Typography>
+            <Typography>By clicking Publish, you are agreeing to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions">Terms and Conditions</a></Typography>
         </ImportantModal>
       </React.Fragment>
     );

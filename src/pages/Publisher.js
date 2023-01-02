@@ -27,7 +27,7 @@ const Publisher = () => {
     useEffect(() => {
         const verify = async () => {
           console.log("Verifying!!");
-          const postHashHex = "951ed5591406b187b02de48fb0d7b5daa5c879587af722e011ee92c5f0af4c95";
+          const postHashHex = "61e5e2c68393b94d8be0bea87f093b80de67db261d3d3f21e81f2052940831eb";
   
           const request = {
             "PostHashHex": postHashHex
