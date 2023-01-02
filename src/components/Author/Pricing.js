@@ -110,10 +110,7 @@ const Pricing = (props) => {
         </Typography>
         <Typography variant="h5" align="center" color="text.secondary" component="p">
         All these different tiers are our author NFTs. Holding one of these unlocks the
-        ability to publish your own books on Spatium Stories. The Free tier you can only publish
-        through the SpatiumPublisher account. Paid tiers unlock many more features including
-        publishing from your own personal account or project account, promotional tools, and
-        profit sharing.
+        ability to publish your own books on Spatium Stories.
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '50px'}}>
             <Typography align="center">Monthly</Typography>
