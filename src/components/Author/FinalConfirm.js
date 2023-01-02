@@ -174,7 +174,7 @@ const FinalConfirm = (props) => {
         }
         <ImportantModal title={"Last Check!"} open={confirm} cancel={handleConfirmClose} publish={handlePublish}>
             <Typography>{confirmText}</Typography>
-            <Typography>By clicking Publish, you are agreeing to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions">Terms and Conditions</a></Typography>
+            <Typography sx={{padddingTop: '5px'}}>By clicking Publish, you are agreeing to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms and Conditions</a></Typography>
         </ImportantModal>
       </React.Fragment>
     );
