@@ -13,11 +13,6 @@ import LoginIcon from '@mui/icons-material/Login';
 
 
 
-
-
-
-
-
 const SpatiumReader = () => {
     const { book } = useParams();
     const [userKey, setUserKey] = useState(null);

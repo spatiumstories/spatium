@@ -17,7 +17,7 @@ const CheckoutRare = (props) => {
     const price = (props.bookData.price / 1000000000).toFixed(2);
 
     const onBuyHandler = async () => {
-        if (!props.enoughFunds) {
+        if (!props.enoughFunds || props.buyer.balance < props.bookData.price) {
             props.handleNotEnoughFunds();
         } else {
             await verifiedEnoughDesoPurchase();
