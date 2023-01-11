@@ -164,6 +164,7 @@ const Book = (props) => {
                                 ) : (
                                     <Typography variant="h5" sx={{paddingLeft: '10px'}}>${(convertToUSD(props.bookData.price / 1000000000)).toFixed(2)}</Typography>                            
                                 )}
+                                <Button onClick={onMoreDetailsHandler} size="large">More Details</Button>
                             </CardActions>
                         ) : marketplace ? (
                             <CardActions>
