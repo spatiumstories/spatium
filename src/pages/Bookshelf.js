@@ -42,7 +42,6 @@ const Bookshelf = () => {
                 let data = [];
                 Object.values(response['data']['NFTsMap']).map((book) => {
                     if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP") {
-                        console.log(book['PostEntryResponse']);
                         let postHashHex = book['PostEntryResponse']['PostHashHex'];
                         let author = "Spatium Publisher";
                         let publisher = "SpatiumPublisher";

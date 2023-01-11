@@ -32,7 +32,6 @@ const FinalConfirm = (props) => {
     }
 
     const handleConfirmOpen = () => {
-        console.log(props.book.description);
         setConfirm(true);
     }
 
@@ -116,7 +115,6 @@ const FinalConfirm = (props) => {
         const response = await fetch(`${uri}/api/publish-book`, requestOptions)
         .then(response => response.text())
         .then(data => {
-            console.log(data);
             setPublishing(false);
             setPublished(true);
         }).catch(e => {

@@ -11,7 +11,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
 
 const Checkout = (props) => {
-    console.log(props.bookData);
     const user = useSelector(state => state.user);
     const [buying, setBuying] = useState(false);
     const deso = new Deso();

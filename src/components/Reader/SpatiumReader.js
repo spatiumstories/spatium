@@ -38,9 +38,7 @@ const SpatiumReader = () => {
 
     useEffect(() => {
       const verify = async () => {
-        console.log("Verifying!!");
         const postHashHex = book;
-        console.log(book);
 
         const request = {
           "PostHashHex": postHashHex
@@ -49,7 +47,6 @@ const SpatiumReader = () => {
         let nftResponses = response['data']['NFTEntryResponses'];
         let length = nftResponses['length'];
         for (var i = 0; i < length; i++) {
-          console.log(`Comparing ${userKey} to ` + nftResponses[`${i}`]['OwnerPublicKeyBase58Check']);
           if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {
             setVerifying(false);
             setVerified(true);
@@ -119,8 +116,6 @@ const SpatiumReader = () => {
 
   const locationChanged = (epubcifi) => {
     // if (renditionRef.current && tocRef.current) {
-      console.log(renditionRef);
-      console.log(tocRef);
       const { displayed, href } = renditionRef.current.location.start
       const chapter = tocRef.current.find((item) => item.href === href)
       setPage(`Page ${displayed.page} of ${displayed.total}`)

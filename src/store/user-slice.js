@@ -16,7 +16,6 @@ const userSlice = createSlice({
             state.userName = action.payload.userName;
         },
         logOut(state, action) {
-            console.log("logging out...");
             state.loggedin = false;
             state.publicKey = "";
             state.profilePic = "";

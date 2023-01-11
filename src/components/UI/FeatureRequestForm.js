@@ -45,11 +45,6 @@ const FeatureRequestForm = (props) => {
         let deso = new Deso();
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-          email: data.get('email'),
-          idea: data.get('feature'),
-          subscribe: data.get('subscribe'),
-        });
         let valid = validate(data.get('email'), data.get('feature'));
         if (valid) {
             let email = {

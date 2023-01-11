@@ -70,7 +70,6 @@ const Marketplace = () => {
     const getDerivedKey = async (bookData) => {
         // Get price to approve (if RARE, get highest price for convenience)
         let price = bookData.price;
-        console.log(bookData);
         if (bookData.type === 'RARE') {
             bookData.left.forEach(book => {
                 if (book[1] > price) {
@@ -189,7 +188,6 @@ const Marketplace = () => {
                         total: book['total'],
                         left: book['left'] ? Object.entries(book['left']) : 0
                     };
-                    console.log(newBook);
                     data.push(newBook);
                 });
                 setBooks(paginateList(data));

@@ -159,7 +159,6 @@ const NewBookForm = (props) => {
             }
         });        
         setCurrBook(oldBook => {
-            console.log(event.target.value);
             return {
                 ...oldBook,
                 description: event.target.value,

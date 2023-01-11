@@ -15,7 +15,6 @@ import Button from '@mui/material/Button';
 
 
 const QRCodePayment = (props) => {
-    console.log(props.bookData);
     const user = useSelector(state => state.user);
     const [timesUp, setTimesUp] = useState(false);
     const [depositConfirmed, setDepositConfirmed] = useState(false);
@@ -69,9 +68,7 @@ const QRCodePayment = (props) => {
             .then(data => {
                 let json = JSON.parse(data);
                 try {
-                    console.log(json['Deposits']);
                     if (json['Deposits'].length > 0) {
-                        console.log(json['Deposits'][0]['DepositTxId']);
                         txID = json['Deposits'][0]['DepositTxId'];
                     }
                 } catch (e) {

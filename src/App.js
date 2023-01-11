@@ -52,7 +52,6 @@ const App = () => {
   const [light, setLight] = useState(true);
   let theme = light ? themeLight : themeDark;
   let location = useLocation();
-  console.log(location.pathname);
   theme = responsiveFontSizes(theme);
   return (
     <ThemeProvider theme={theme}>
