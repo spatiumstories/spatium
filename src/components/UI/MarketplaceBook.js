@@ -14,7 +14,7 @@ import mod from '../../assets/mod.png';
 import rare from '../../assets/rare.png';
 
 
-const Book = (props) => {
+const MarketplaceBook = (props) => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
     const [coverIndex, setCoverIndex] = useState(0);
@@ -61,9 +61,10 @@ const Book = (props) => {
     }
 
     return (
-        <Grid item key={props.card} xs={12} sm={6} md={4}>
+        <React.Fragment>
+        <Grid item key={props.card} xs={12} sm={4} md={4}>
             <Card
-                sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                sx={{display: 'flex', flexDirection: 'column' }}
             >
                 <CardHeader
                     avatar={
@@ -126,23 +127,6 @@ const Book = (props) => {
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
-                        <CardContent sx={{ flexGrow: 1 }}>
-                            <Typography gutterBottom variant="h5" component="h2">
-                            {props.bookData.title}
-                            </Typography>
-                            <Typography>
-                            Written by {props.bookData.author}
-                            </Typography>
-                            <Typography sx={{paddingTop: '20px', paddingBottom: '20px'}}>
-                            Published by {props.bookData.publisher}
-                            </Typography>
-                            <Typography variant="h6" sx={{paddingBottom: '20px'}}>
-                            {Array.isArray(props.bookData.subtitle) ? props.bookData.subtitle[coverIndex] : props.bookData.subtitle}
-                            </Typography>
-                            <Typography style={{whiteSpace: 'pre-wrap'}}>
-                            {Array.isArray(props.bookData.description) ? props.bookData.description[coverIndex] : props.bookData.description}
-                            </Typography>
-                        </CardContent>
                         {marketplace && props.bookData.price > 0 ? (
                             <CardActions>
                                 {
@@ -165,25 +149,37 @@ const Book = (props) => {
                                     <Typography variant="h5" sx={{paddingLeft: '10px'}}>${(convertToUSD(props.bookData.price / 1000000000)).toFixed(2)}</Typography>                            
                                 )}
                             </CardActions>
-                        ) : marketplace ? (
+                        ) : (
                             <CardActions>
                                 {/* <Button onClick={onReadHandler} size="large" variant="contained">Read</Button> */}
                                 {props.bookData.type === 'MOD' && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
                                 {props.bookData.type === 'RARE' && props.bookData.left > 0 && <Button onClick={onBuyHandler} size="large" variant="contained">Collect for Free</Button>}
                                 {props.bookData.type === 'RARE' && props.bookData.left <= 0 && <Button onClick={onBuyHandler} disabled size="large" variant="contained">None Available</Button>}
-                                <Button onClick={onMoreDetailsHandler} size="large">More Details</Button>
-                            </CardActions>
-                        ) : (
-                            <CardActions>
-                                <Button onClick={onReadHandler} size="medium" variant="contained">Read</Button>
-                                <Button onClick={onSellHandler} size="medium" variant="outlined">Sell on NFTz</Button>
                             </CardActions>
                         )}
                     </React.Fragment>
                 )}
             </Card>
         </Grid>
+        <Grid item xs={12} sm={6}>
+            <Typography gutterBottom variant="h5" component="h2">
+            {props.bookData.title}
+            </Typography>
+            <Typography>
+            Written by {props.bookData.author}
+            </Typography>
+            <Typography sx={{paddingTop: '20px', paddingBottom: '20px'}}>
+            Published by {props.bookData.publisher}
+            </Typography>
+            <Typography variant="h6" sx={{paddingBottom: '20px'}}>
+            {Array.isArray(props.bookData.subtitle) ? props.bookData.subtitle[coverIndex] : props.bookData.subtitle}
+            </Typography>
+            <Typography style={{whiteSpace: 'pre-wrap'}}>
+                {Array.isArray(props.bookData.description) ? props.bookData.description[coverIndex] : props.bookData.description}
+            </Typography>
+        </Grid>
+        </React.Fragment>
     );
 };
 
-export default Book;
+export default MarketplaceBook;

@@ -128,7 +128,7 @@ const SpatiumReader = () => {
   }
 
   const onMarketplaceHandler = () => {
-    window.location.href = "https://spatiumstories.com/#/marketplace";
+    window.location.href = `https://spatiumstories.com/#/marketplace/${book}`;
   }
 
   const getReader = () => {

@@ -77,7 +77,7 @@ const TestBook = (props) => {
                             <Typography variant="h6" sx={{paddingBottom: '20px'}}>
                             {Array.isArray(props.bookData.subtitle) ? props.bookData.subtitle[coverIndex] : props.bookData.subtitle}
                             </Typography>
-                            <Typography>
+                            <Typography style={{whiteSpace: 'pre-wrap'}}>
                             {Array.isArray(props.bookData.description) ? props.bookData.description[coverIndex] : props.bookData.description}
                             </Typography>
                         </CardContent>

@@ -32,6 +32,7 @@ const FinalConfirm = (props) => {
     }
 
     const handleConfirmOpen = () => {
+        console.log(props.book.description);
         setConfirm(true);
     }
 
@@ -111,9 +112,8 @@ const FinalConfirm = (props) => {
             body: data,
         };
         // let uri = 'http://0.0.0.0:4201';
-        // let uri = 'https://api.spatiumstories.xyz';
-        let uri = "https://u49wjogs90.execute-api.us-east-1.amazonaws.com/prod"
-        const response = await fetch(`${uri}/publish-book`, requestOptions)
+        let uri = 'https://api.spatiumstories.xyz';
+        const response = await fetch(`${uri}/api/publish-book`, requestOptions)
         .then(response => response.text())
         .then(data => {
             console.log(data);

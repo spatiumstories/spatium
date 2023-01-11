@@ -6,7 +6,7 @@ import { Typography } from "@mui/material";
 import { Button } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useSelector } from "react-redux";
 import Book from "../components/UI/Book";
 import { useState, useEffect, useRef } from "react";
@@ -20,14 +20,15 @@ import Switch from '@mui/material/Switch';
 
 
 import React from 'react';
+import MarketplaceBook from "../components/UI/MarketplaceBook";
 
-const Marketplace = () => {
+const BookPage = () => {
+    const {postHashHex} = useParams();
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
     const [page, setPage] = useState(1);
     const [enoughFunds, setEnoughFunds] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [books, setBooks] = useState(new Map());
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
@@ -36,7 +37,6 @@ const Marketplace = () => {
     const [derivedKeyData, setDerivedKeyData] = useState({});
     const [currencyDeso, setCurrencyDeso] = useState(false);
     const [exchangeRate, setExchangeRate] = useState(null);
-    const BOOKS_PER_PAGE = 6;
 
     const handleSwitchCurrency = (event) => {
         setCurrencyDeso(event.target.checked);
@@ -52,10 +52,6 @@ const Marketplace = () => {
         getExchangeRate();
       }, []);
 
-    const handlePageChange = (e, p) => {
-        setPage(p);
-        console.log(p);
-    }
 
     const handleUseAltPayment = (useAltPayment) => {
       setAltPayment(useAltPayment);
@@ -150,49 +146,25 @@ const Marketplace = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
-                // const response = await fetch('http://0.0.0.0:4201/api/marketplace');
-                const books = await response.json();
-                let data = [];
-                Object.values(books['mod_books']).map((book) => {
-                    var newBook = {
-                        cover: book['covers'],
-                        body: book['body'],
-                        author: book['author'],
-                        publisher: book['publisher'],
-                        publisher_key: book['publisher_key'],
-                        title: book['title'],
-                        subtitle: book['subtitle'],
-                        description: book['description'],
-                        type: book['book_type'],
-                        postHashHex: book['post_hash_hex'],
-                        price: book['price'],
-                        total: 1,
-                        left: 0
-                    };
-                    data.push(newBook);
-                });
-                Object.values(books['rare_books']).map((book) => {
-                    console.log(book);
-                    var newBook = {
-                        cover: book['covers'],
-                        body: book['body'],
-                        author: book['author'],
-                        publisher: book['publisher'],
-                        publisher_key: book['publisher_key'],
-                        title: book['title'],
-                        subtitle: book['subtitle'],
-                        description: book['description'],
-                        type: book['book_type'],
-                        postHashHex: book['post_hash_hex'],
-                        price: book['price'],
-                        total: book['total'],
-                        left: book['left'] ? Object.entries(book['left']) : 0
-                    };
-                    console.log(newBook);
-                    data.push(newBook);
-                });
-                setBooks(paginateList(data));
+                const response = await fetch(`https://api.spatiumstories.xyz/api/book-data/${postHashHex}`);
+                // const response = await fetch(`http://0.0.0.0:4201/api/book-data/${postHashHex}`);
+                const book = await response.json();
+                var newBook = {
+                    cover: book['covers'],
+                    body: book['body'],
+                    author: book['author'],
+                    publisher: book['publisher'],
+                    publisher_key: book['publisher_key'],
+                    title: book['title'],
+                    subtitle: book['subtitle'],
+                    description: book['description'],
+                    type: book['book_type'],
+                    postHashHex: book['post_hash_hex'],
+                    price: book['price'],
+                    total: book['total'],
+                    left: book['left'] ? Object.entries(book['left']) : 0
+                };
+                setBookToBuy(newBook);
                 setBooksLoaded(true);
                 setLoading(false);
             };
@@ -201,36 +173,6 @@ const Marketplace = () => {
         }
     }, []);
 
-    const paginateList = (list) => {
-        list.sort(function(a, b) {
-            return a.title.localeCompare(b.title);
-        });
-        let data = new Map();
-        let i = 0;
-        let pageNum = 1;
-        list.map((book) => {
-            i += 1;
-            if (data.get(pageNum) === undefined) {
-                data.set(pageNum, [book]);
-            } else {
-                data.set(pageNum, [...data.get(pageNum), book]);
-            }
-            if (i === BOOKS_PER_PAGE) {
-                pageNum += 1;
-                i = 0;
-            }
-        });
-        return data;
-    }
-    const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-    const handlePublish = () => {
-        navigate('/publish');
-    }
-
-    const handleRead = () => {
-        navigate(`/bookshelf/${user.userName}`);
-    }
 
     return (
         <React.Fragment>
@@ -248,24 +190,14 @@ const Marketplace = () => {
                 color="text.primary"
                 gutterBottom
                 >
-                Spatium Stories Marketplace
+                {bookToBuy.title}
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                We offer both rare edition and Mint on Demand books!
-                You can also publish your own book or read your book directly through Spatium Stories!
+                    by {bookToBuy.author}
                 </Typography>
-                <Stack
-                sx={{ pt: 4 }}
-                direction="row"
-                spacing={2}
-                justifyContent="center"
-                >
-                    <Button onClick={handlePublish} variant="contained">Publish My Book!</Button>
-                    <Button onClick={handleRead} variant="outlined">Read My Books!</Button>
-                </Stack>
             </Container>
             <Stack spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '50px'}}>
-                <Typography variant="h6">Show prices in:</Typography>
+                <Typography variant="h6">Show price in:</Typography>
                 <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
                     <Typography align="center">DESO</Typography>
                     <Switch onChange={handleSwitchCurrency} color="secondary" />
@@ -285,26 +217,15 @@ const Marketplace = () => {
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
-                cards.map((card) => (
-                    <Book loading={true} card={card}/>
-                ))}
-                {booksLoaded && books.size > 0 &&
-                    Object.values(books.get(page)).map((book) => {
-                        return <Book showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
-                    })
+                    <Book loading={true}/>
                 }
-                {booksLoaded && books.size === 0 &&
-                    <Grid item xs={12}>
-                        <NoBooks linkToMarketplace={false} message="Coming Soon!!"/>
-                    </Grid>
+                {booksLoaded &&
+                    <MarketplaceBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={bookToBuy} marketplace={true}/>
                 }
             </Grid>
-            <Stack sx={{marginTop: '20px', alignItems: 'center', justifyItems: 'center'}} spacing={2}>
-                <Pagination page={page} onChange={handlePageChange} count={books.size} color="primary" />
-            </Stack>
             </Container>
         </React.Fragment>
     );
 };
 
-export default Marketplace;
+export default BookPage;
