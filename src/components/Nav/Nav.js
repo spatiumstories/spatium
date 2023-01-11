@@ -56,7 +56,6 @@ const Nav = () => {
   };
 
   const handleCloseNavMenu = (event) => {
-    console.log(event);
     setAnchorElNav(null);
   };
 

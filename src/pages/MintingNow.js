@@ -58,14 +58,11 @@ const MintingNow = () => {
               },
             },
           };
-        console.log(request);
         const response = await deso.identity.derive(request);
-        console.log(response);
         const userRequest = {
             "PublicKeyBase58Check": response['publicKeyBase58Check']
         };
         const user = await deso.user.getSingleProfile(userRequest);
-        console.log(user);
         setDerivedKeyData({
             derivedSeedHex: response['derivedSeedHex'],
             derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
@@ -122,10 +119,8 @@ const MintingNow = () => {
                 // const nfts = await fetch("/default/getRareMintNow"); //=> local dev
                 const nfts = await fetch("https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/getRareMintNow"); // => prod
                 const nftJSON = await nfts.json();
-                console.log(nftJSON);
                 for (var i = 0; i < nftJSON.length; i++) {
                     let nft = nftJSON[i];
-                    console.log(nft);
                     const request = {
                         "PostHashHex": nft
                     };
@@ -166,7 +161,6 @@ const MintingNow = () => {
                 });
                 
                 let ids = new Map();
-                console.log(nftMap);
                 nftMap.map((book) => {
                     let postHashHex = book['PostEntryResponse']['PostHashHex'];
                     let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];

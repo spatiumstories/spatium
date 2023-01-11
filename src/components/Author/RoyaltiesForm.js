@@ -303,7 +303,7 @@ const RoyaltiesForm = (props) => {
                     <MenuItem value={"spatium"}>Spatium Publisher</MenuItem>
                 </Select>
             </FormControl>
-          </Grid>
+        </Grid>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             {props.activeStep !== 0 && (
                 <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>

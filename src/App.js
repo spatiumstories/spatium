@@ -12,6 +12,7 @@ import Marketplace from "./pages/Marketplace";
 import Roadmap from "./pages/Roadmap";
 import SpatiumReader from "./components/Reader/SpatiumReader";
 import MintingNow from "./pages/MintingNow";
+import BookPage from "./pages/BookPage";
 
 
 const themeLight = createTheme({
@@ -51,7 +52,6 @@ const App = () => {
   const [light, setLight] = useState(true);
   let theme = light ? themeLight : themeDark;
   let location = useLocation();
-  console.log(location.pathname);
   theme = responsiveFontSizes(theme);
   return (
     <ThemeProvider theme={theme}>
@@ -66,6 +66,7 @@ const App = () => {
           <Route path='/bookshelf/:id' element={<Bookshelf/>}/>
           <Route path='/r2m2' element={<MintingNow/>}/>
           <Route path='/read/:book' element={<SpatiumReader/>}/>
+          <Route path='/marketplace/:postHashHex' element={<BookPage/>}/>
         </Routes>
       </body>
       {!location.pathname.includes('/read') && <Footer/>}
