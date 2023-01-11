@@ -49,12 +49,8 @@ const Review = (props) => {
             if (currency === "deso") {
                 return amount;
             }
-            console.log(amount);
             let amountInCents = amount * 100;
-            console.log(amountInCents);
             let amountInDeso = amountInCents / (props.exchangeRate === null ? 1 : props.exchangeRate);
-            console.log(props.exchangeRate);
-            console.log(amountInDeso);
             return amountInDeso.toFixed(2);
     }
 

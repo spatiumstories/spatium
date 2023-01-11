@@ -9,7 +9,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Deso from 'deso-protocol';
 
 const CheckoutRare = (props) => {
-    console.log(props.bookData);
     const user = useSelector(state => state.user);
     const [buying, setBuying] = useState(false);
     const deso = new Deso();
@@ -56,13 +55,11 @@ const CheckoutRare = (props) => {
             console.log(data);
         }).catch(e => {
             successResponse = false;
-            console.log(e);
             setBuying(false);
             props.handleOnFailure();
         });
 
         if (successResponse) {
-            console.log(response);
             setBuying(false);
             props.close();
             props.handleOnSuccess();
