@@ -14,6 +14,7 @@ import NoBooks from "../components/UI/NoBooks";
 import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
+import Switch from '@mui/material/Switch';
 
 
 import React from 'react';
@@ -30,10 +31,26 @@ const MintingNow = () => {
     const [open, setOpen] = useState(false);
     const [altPayment, setAltPayment] = useState(false);
     const [derivedKeyData, setDerivedKeyData] = useState(null);
+    const [currencyDeso, setCurrencyDeso] = useState(false);
+    const [exchangeRate, setExchangeRate] = useState(null);
 
     const handleUseAltPayment = (useAltPayment) => {
       setAltPayment(useAltPayment);
     }
+
+    const handleSwitchCurrency = (event) => {
+        setCurrencyDeso(event.target.checked);
+    }
+
+    useEffect(() => {
+        const getExchangeRate = async () => {
+            let deso = new Deso();
+            const exchangeRate = await deso.metaData.getExchangeRate();
+            setExchangeRate(exchangeRate['USDCentsPerDeSoExchangeRate']);
+        }
+    
+        getExchangeRate();
+    }, []);
 
     const handleOpen = async (bookData) => {
         await getDerivedKey(bookData);
@@ -284,6 +301,14 @@ const MintingNow = () => {
                     <Button onClick={handleRead} variant="outlined">Read My Books!</Button>
                 </Stack>
             </Container>
+            <Stack spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '50px'}}>
+                <Typography variant="h6">Show prices in:</Typography>
+                <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
+                    <Typography align="center">DESO</Typography>
+                    <Switch onChange={handleSwitchCurrency} color="secondary" />
+                    <Typography align="center">USD</Typography>
+                </Stack>
+            </Stack>
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
             <Success open={success} handleClose={handleCloseSuccess} message="Thank you for your purchase! Happy reading!"/>
@@ -302,7 +327,7 @@ const MintingNow = () => {
                 ))}
                 {booksLoaded && books.length > 0 &&
                     Object.values(books).map((book) => {
-                        return <Book onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
+                        return <Book showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
                     })
                 }
                 {booksLoaded && books.length === 0 &&
