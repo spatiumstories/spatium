@@ -44,7 +44,7 @@ const SpatiumReader = () => {
           "PostHashHex": postHashHex
         };
         const response = await deso.nft.getNftEntriesForPostHash(request);
-        let nftResponses = response['data']['NFTEntryResponses'];
+        let nftResponses = response['NFTEntryResponses'];
         let length = nftResponses['length'];
         for (var i = 0; i < length; i++) {
           if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {
