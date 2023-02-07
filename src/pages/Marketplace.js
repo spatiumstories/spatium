@@ -149,8 +149,8 @@ const Marketplace = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                // const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
-                const response = await fetch('http://0.0.0.0:4201/api/marketplace');
+                const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
+                // const response = await fetch('http://0.0.0.0:4201/api/marketplace');
                 const books = await response.json();
                 let data = [];
                 Object.values(books['mod_books']).map((book) => {

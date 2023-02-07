@@ -111,8 +111,8 @@ const FinalConfirm = (props) => {
             method: 'POST',
             body: data,
         };
-        let uri = 'http://0.0.0.0:4201';
-        // let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'http://0.0.0.0:4201';
+        let uri = 'https://api.spatiumstories.xyz';
         const response = await fetch(`${uri}/api/publish-book`, requestOptions)
         .then(response => response.text())
         .then(data => {
