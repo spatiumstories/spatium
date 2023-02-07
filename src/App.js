@@ -13,6 +13,7 @@ import Roadmap from "./pages/Roadmap";
 import SpatiumReader from "./components/Reader/SpatiumReader";
 import MintingNow from "./pages/MintingNow";
 import BookPage from "./pages/BookPage";
+import Auth from "./components/Nav/Auth";
 
 
 const themeLight = createTheme({
@@ -67,6 +68,7 @@ const App = () => {
           <Route path='/r2m2' element={<MintingNow/>}/>
           <Route path='/read/:book' element={<SpatiumReader/>}/>
           <Route path='/marketplace/:postHashHex' element={<BookPage/>}/>
+          {/* <Route path='/auth' element={<Auth/>}/> */}
         </Routes>
       </body>
       {!location.pathname.includes('/read') && <Footer/>}

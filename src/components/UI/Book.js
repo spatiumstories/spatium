@@ -109,8 +109,8 @@ const Book = (props) => {
                     <CardMedia
                         component="img"
                         sx={{
-                        // 16:9
-                        //   `pt: '56.25%',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
                         }}
                         image={props.bookData.cover[coverIndex]}
                         alt="random"
@@ -136,12 +136,12 @@ const Book = (props) => {
                             <Typography sx={{paddingTop: '20px', paddingBottom: '20px'}}>
                             Published by {props.bookData.publisher}
                             </Typography>
-                            <Typography variant="h6" sx={{paddingBottom: '20px'}}>
+                            <Typography variant="h6">
                             {Array.isArray(props.bookData.subtitle) ? props.bookData.subtitle[coverIndex] : props.bookData.subtitle}
                             </Typography>
-                            <Typography style={{whiteSpace: 'pre-wrap'}}>
+                            {/* <Typography style={{whiteSpace: 'pre-wrap'}}>
                             {Array.isArray(props.bookData.description) ? props.bookData.description[coverIndex] : props.bookData.description}
-                            </Typography>
+                            </Typography> */}
                         </CardContent>
                         {marketplace && props.bookData.price > 0 ? (
                             <CardActions>

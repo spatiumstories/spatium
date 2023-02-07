@@ -106,12 +106,13 @@ const FinalConfirm = (props) => {
         data.append("buy_now", props.details.forSale && props.book.type === "rare");
         data.append("genre", getGenreList(props.details.fictionType, props.details.genre));
         data.append("dragon_protected", props.details.dragon);
+        data.append("language", props.details.language);
         const requestOptions = {
             method: 'POST',
             body: data,
         };
-        // let uri = 'http://0.0.0.0:4201';
-        let uri = 'https://api.spatiumstories.xyz';
+        let uri = 'http://0.0.0.0:4201';
+        // let uri = 'https://api.spatiumstories.xyz';
         const response = await fetch(`${uri}/api/publish-book`, requestOptions)
         .then(response => response.text())
         .then(data => {

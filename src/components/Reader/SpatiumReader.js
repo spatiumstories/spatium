@@ -16,8 +16,8 @@ import LoginIcon from '@mui/icons-material/Login';
 const SpatiumReader = () => {
     const { book } = useParams();
     const [userKey, setUserKey] = useState(null);
-    let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
-    // let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
+    // let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
+    let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
     const [verifying, setVerifying] = useState(true);
     const [verified, setVerified] = useState(false);
     const [size, setSize] = useState(1)
@@ -44,7 +44,7 @@ const SpatiumReader = () => {
           "PostHashHex": postHashHex
         };
         const response = await deso.nft.getNftEntriesForPostHash(request);
-        let nftResponses = response['data']['NFTEntryResponses'];
+        let nftResponses = response['NFTEntryResponses'];
         let length = nftResponses['length'];
         for (var i = 0; i < length; i++) {
           if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {

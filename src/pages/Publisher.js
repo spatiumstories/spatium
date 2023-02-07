@@ -26,13 +26,14 @@ const Publisher = () => {
 
     useEffect(() => {
         const verify = async () => {
+          console.log("verifying!!");
           const postHashHex = "61e5e2c68393b94d8be0bea87f093b80de67db261d3d3f21e81f2052940831eb";
   
           const request = {
             "PostHashHex": postHashHex
           };
           deso.nft.getNftEntriesForPostHash(request).then(response => {
-            let nftResponses = response['data']['NFTEntryResponses'];
+            let nftResponses = response['NFTEntryResponses'];
             let length = nftResponses['length'];
             for (var i = 0; i < length; i++) {
               if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {
