@@ -22,10 +22,26 @@ import Select from '@mui/material/Select';
 import HelpIcon from '@mui/icons-material/Help';
 import InformationModal from '../UI/InformationModal';
 
+import languages from 'languages';
 
+const getLanguages = () => {
+    const langCodes = languages.getAllLanguageCode();
+    let langMap = new Map();
+    langCodes.forEach(langCode => {
+        langMap.set(languages.getLanguageInfo(langCode)['name'], langCode);
+    });
+    // langMap.sort((a, b) => a[1] - b[1]);
+    langMap = new Map([...langMap.entries()].sort());
+    console.log(langMap);
+    return langMap;
+}
+
+const langMap = getLanguages();
 const dragonText = "The dragon protocol protects your IP. By using the dragon (default) your book file is encrypted before being uploaded to the blockchain. The keys to decrypt your book file are only shared between you and Spatium Stories. We ensure anyone who buys your book can read it, but cannot have access to the actual file. By turning this off, you are allowing your book to be 100% decentralized, but your book file is free for anyone to download and copy."
 const secondText = "Secondary sales royalties is the percentage you get to keep as the author on any secondary sales of your book. If you set 5% and your RARE book resells for $500 then you automatically receive $25 of that sale. Typical range is 5-10%"
 const mintingText = "Do you want to mint these NFT books under your own account or project or under SpatiumPublisher? Your payment and royalties stay the same, it's just a matter of how you want it to show up on the Deso blockchain. For instance, if you are a new author, we suggest SpatiumPublisher to help build an audience and get your first sale."
+
+
 
 const RoyaltiesForm = (props) => {
     const [dragonOpen, setDragonOpen] = useState(false);
@@ -71,6 +87,7 @@ const RoyaltiesForm = (props) => {
         format: "",
         fictionType: "",
         mintingAccount: "spatium",
+        language: "EN",
     });
 
     const handleBack = () => {
@@ -113,6 +130,16 @@ const RoyaltiesForm = (props) => {
             setCurrDetails(props.details);
         }
     }, []);
+
+    const handleLanguageChange = (event) => {
+        console.log(event.target.value.toUpperCase());
+        setCurrDetails(oldDetails => {
+            return {
+                ...oldDetails,
+                language: event.target.value.toUpperCase(),
+            };
+        });
+    }
 
     const handleMintingAccountChange = (event) => {
         setCurrDetails(oldDetails => {
@@ -201,7 +228,6 @@ const RoyaltiesForm = (props) => {
         });
     }
 
-
     return (
         <React.Fragment>
         <Typography variant="h6" gutterBottom>
@@ -285,6 +311,25 @@ const RoyaltiesForm = (props) => {
           <Grid item xs={12} sm={6}>
               <GenrePicker fiction={currDetails.fictionType === "fiction"} genres={currDetails.genre} onChange={handleGenreChange}/>
           </Grid>}
+        </Grid>
+        <Grid item xs={12} sm={6}>
+            <FormControl sx={{m: 1, width: '100%'}}>
+                <InputLabel id="language">
+                    Language
+                </InputLabel>
+                <Select
+                    labelId="language"
+                    onChange={handleLanguageChange}
+                    value={currDetails.language.toLowerCase()}
+                    id="language"
+                    input={<OutlinedInput id="language" label="Language"/>}
+                >
+                    {[...langMap.entries()].map((entry) => {
+                        return <MenuItem value={entry[1]}>{entry[0]}</MenuItem>
+                    })}
+
+                </Select>
+            </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
             <FormControl sx={{m: 1, width: '100%'}} required>

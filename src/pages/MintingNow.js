@@ -142,7 +142,7 @@ const MintingNow = () => {
                         "PostHashHex": nft
                     };
                     const response = await deso.nft.getNftBidsForNftPost(request);
-                    nftMap.push(response['data']);
+                    nftMap.push(response);
                 }
                 // First collect all the 
                 let coversMap = new Map();
