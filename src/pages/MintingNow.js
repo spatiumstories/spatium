@@ -139,17 +139,22 @@ const MintingNow = () => {
                 for (var i = 0; i < nftJSON.length; i++) {
                     let nft = nftJSON[i];
                     const request = {
-                        "PostHashHex": nft
+                        "PostHashHex": nft['post_hash_hex']
                     };
                     const response = await deso.nft.getNftBidsForNftPost(request);
-                    nftMap.push(response);
+                    nftMap.push({
+                        "nft": response, 
+                        "bookId": nft["promotion_id"]
+                    });
                 }
                 // First collect all the 
                 let coversMap = new Map();
                 let descriptionMap = new Map();
                 let subtitleMap = new Map();
-                nftMap.map((nft) => {
-                    let bookId = nft['PostEntryResponse']['PostExtraData']['book_id'];
+                nftMap.map((nftData) => {
+                    let nft = nftData.nft;
+                    let bookId = nftData.bookId;
+                    console.log(nft);
                     if (coversMap.has(bookId)) {
                         let arr = coversMap.get(bookId);
                         let newArr = [...arr, nft['PostEntryResponse']['ImageURLs'][0]];
@@ -178,7 +183,9 @@ const MintingNow = () => {
                 });
                 
                 let ids = new Map();
-                nftMap.map((book) => {
+                nftMap.map((nftData) => {
+                    let book = nftData.nft;
+                    let bookID = nftData.bookId;
                     let postHashHex = book['PostEntryResponse']['PostHashHex'];
                     let price = book['NFTEntryResponses']['0']['MinBidAmountNanos'];
                     let author = "Spatium Publisher";
@@ -188,7 +195,6 @@ const MintingNow = () => {
                     let title = "A Spatium Story";
                     let subtitle = "";
                     let type = "MOD"; //Spatium Publisher public key
-                    let bookID = null;
                     let total = null;
                     let left = [];
 
@@ -213,9 +219,6 @@ const MintingNow = () => {
                     if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
                         type = book['PostEntryResponse']['PostExtraData']['type'];
                     }
-                    if (book['PostEntryResponse']['PostExtraData']['book_id'] != null) {
-                        bookID = book['PostEntryResponse']['PostExtraData']['book_id'];
-                    }
 
                     if (type === 'RARE') {
                         total = book['PostEntryResponse']['NumNFTCopies'];
@@ -229,14 +232,14 @@ const MintingNow = () => {
                     }
                     if (bookID !== null) {
                         var newBook = {
-                            cover: coversMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
+                            cover: coversMap.get(bookID),
                             body: book['PostEntryResponse']['Body'],
                             author: author,
                             publisher: publisher,
                             publisher_key: publisher_key,
                             title: title,
-                            subtitle: subtitleMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
-                            description: descriptionMap.get(book['PostEntryResponse']['PostExtraData']['book_id']),
+                            subtitle: subtitleMap.get(bookID),
+                            description: descriptionMap.get(bookID),
                             type: type,
                             postHashHex: postHashHex,
                             price: price,
