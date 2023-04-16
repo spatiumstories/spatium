@@ -20,19 +20,100 @@ import React from 'react';
 const Marketplace = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
+    const [page, setPage] = useState(1);
+    const [enoughFunds, setEnoughFunds] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [books, setBooks] = useState();
+    const [books, setBooks] = useState(new Map());
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
     const [open, setOpen] = useState(false);
+    const [altPayment, setAltPayment] = useState(false);
+    const [derivedKeyData, setDerivedKeyData] = useState({});
+    const [currencyDeso, setCurrencyDeso] = useState(false);
+    const [exchangeRate, setExchangeRate] = useState(null);
+    const BOOKS_PER_PAGE = 6;
 
+    const handleSwitchCurrency = (event) => {
+        setCurrencyDeso(event.target.checked);
+    }
 
-    const handleOpen = (bookData) => {
+    useEffect(() => {
+        const getExchangeRate = async () => {
+            let deso = new Deso();
+            const exchangeRate = await deso.metaData.getExchangeRate();
+            setExchangeRate(exchangeRate['USDCentsPerDeSoExchangeRate']);
+        }
+    
+        getExchangeRate();
+      }, []);
+
+    const handlePageChange = (e, p) => {
+        setPage(p);
+        console.log(p);
+    }
+
+    const handleUseAltPayment = (useAltPayment) => {
+      setAltPayment(useAltPayment);
+    }
+
+    const handleOpen = async (bookData) => {
+        await getDerivedKey(bookData);
         setBookToBuy(bookData);
         setOpen(true);
     }
-    const handleClose = () => setOpen(false);
+
+    const getDerivedKey = async (bookData) => {
+        // Get price to approve (if RARE, get highest price for convenience)
+        let price = bookData.price;
+        if (bookData.type === 'RARE') {
+            bookData.left.forEach(book => {
+                if (book[1] > price) {
+                    price = book[1];
+                }
+            });
+        }
+        const request = {
+            "publicKey": "",
+            "transactionSpendingLimitResponse": {
+              "GlobalDESOLimit": Math.round(price * 1.25) + 1700,
+              "TransactionCountLimitMap": {
+                "AUTHORIZE_DERIVED_KEY": 2
+              },
+              "NFTOperationLimitMap": {
+                "": {
+                  "0": {
+                    "any": 1
+                  }
+                }
+              },
+            },
+          };
+        const response = await deso.identity.derive(request);
+        const userRequest = {
+            "PublicKeyBase58Check": response['publicKeyBase58Check']
+        };
+        const user = await deso.user.getSingleProfile(userRequest);
+        setDerivedKeyData({
+            derivedSeedHex: response['derivedSeedHex'],
+            derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
+            accessSignature: response['accessSignature'],
+            expirationBlock: response['expirationBlock'],
+            transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
+            publicKey: response['publicKeyBase58Check'],
+            userName: user['Profile']['Username'],
+            balance: user['Profile']['DESOBalanceNanos']
+        });
+        if (user['Profile']['DESOBalanceNanos'] >= (bookData.price * 1.025) + 1700) {
+            setEnoughFunds(true);
+        }
+        return response;
+    }
+    const handleClose = () => {
+        setOpen(false);
+        setAltPayment(false);
+        setEnoughFunds(false);
+    }
     const [success, setSuccess] = useState(false);
 
     const handleCloseSuccess = () => {
@@ -48,10 +129,10 @@ const Marketplace = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                const request = {
-                    "UserPublicKeyBase58Check": "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5"
-                };
-                const response = await deso.nft.getNftsForUser(request);
+                // const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
+                const response = await fetch('http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/marketplace');
+                // const response = await fetch('http://0.0.0.0:4201/api/marketplace');
+                const books = await response.json();
                 let data = [];
                 console.log(response['data']['NFTsMap']);
                 Object.values(response['data']['NFTsMap']).map((book) => {

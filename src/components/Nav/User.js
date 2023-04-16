@@ -82,7 +82,7 @@ const User = (props) => {
         console.log(event.target);
         let setting = event.target.id;
         if (setting === "Profile") {
-            window.open(`https://diamondapp.com/u/${user.userName}`);
+            navigate('/profile');
         } else if (setting === "Bookshelf") {
             navigate(`/bookshelf/${user.userName}`);
         } else if (setting === "Publish") {
