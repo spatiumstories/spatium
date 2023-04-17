@@ -1,27 +1,27 @@
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import Checkout from './Checkout';
-import CheckoutRareStepper from './CheckoutRareStepper';
-import CheckoutRare from './CheckoutRare';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import HelpIcon from '@mui/icons-material/Help';
+
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: {xs: '100%', sm: '50%'},
+  width: 400,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
 
-const CheckoutModal = (props) => {
+const InformationModal = (props) => {
 
   return (
     <div>
@@ -38,9 +38,18 @@ const CheckoutModal = (props) => {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            {props.bookToBuy.type === "MOD" ? (
-              <Checkout bookData={props.bookToBuy} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>) : (
-            <CheckoutRareStepper bookData={props.bookToBuy} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>)}
+              <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+              }}>
+                <Typography component="h1" variant="h5">{props.title}</Typography>
+                <Avatar sx={{m: 1}}>
+                    <HelpIcon/>
+                </Avatar>
+                {props.children}
+                <Button onClick={props.handleClose}>Ok</Button>
+              </Box>
           </Box>
         </Fade>
       </Modal>
@@ -48,4 +57,4 @@ const CheckoutModal = (props) => {
   );
 };
 
-export default CheckoutModal;
+export default InformationModal;

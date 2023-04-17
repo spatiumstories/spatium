@@ -7,11 +7,7 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import image from '../../assets/S.png';
 import { makeStyles } from '@mui/styles';
 import { NavLink } from 'react-router-dom';
@@ -49,7 +45,7 @@ const useStyles = makeStyles({
     }
 });
 
-const pages = [['Home', '/'], ['Marketplace', '/marketplace'], ['Publish', '/publish'], ['Road Map', '/roadmap']];
+const pages = [['Home', '/'], ['Marketplace', '/marketplace'], ['R2M2', 'r2m2'], ['Publish', '/publish'], ['Road Map', '/roadmap']];
 
 const Nav = () => {
   const navigate = useNavigate();
@@ -60,7 +56,6 @@ const Nav = () => {
   };
 
   const handleCloseNavMenu = (event) => {
-    console.log(event);
     setAnchorElNav(null);
   };
 
@@ -134,8 +129,9 @@ const Nav = () => {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            <NavLink to='/' className={navData => navData.isActive ? classes.linkActive : classes.link}>Home</NavLink>
+            <NavLink exact to='/' className={classes.link}>Home</NavLink>
             <NavLink to='/marketplace' className={navData => navData.isActive ? classes.linkActive : classes.link}>Marketplace</NavLink>
+            <NavLink to='/r2m2' className={navData => navData.isActive ? classes.linkActive : classes.link}>R2M2</NavLink>
             <NavLink to='/publish' className={navData => navData.isActive ? classes.linkActive : classes.link}>Publish</NavLink>
             <NavLink to='/roadmap' className={navData => navData.isActive ? classes.linkActive : classes.link}>Road Map</NavLink>
           </Box>

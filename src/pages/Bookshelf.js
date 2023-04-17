@@ -11,6 +11,8 @@ import Book from "../components/UI/Book";
 import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
+import Pagination from '@mui/material/Pagination';
+
 
 
 import React from 'react';
@@ -18,9 +20,16 @@ import React from 'react';
 const Bookshelf = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
-    const [books, setBooks] = useState();
+    const [page, setPage] = useState(1);
+    const [books, setBooks] = useState(new Map());
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
+    const BOOKS_PER_PAGE = 6;
+
+    const handlePageChange = (e, p) => {
+        setPage(p);
+        console.log(p);
+    }
 
     useEffect(() => {
         if (!booksLoaded) {
@@ -31,14 +40,15 @@ const Bookshelf = () => {
                 };
                 const response = await deso.nft.getNftsForUser(request);
                 let data = [];
-                Object.values(response['data']['NFTsMap']).map((book) => {
-                    if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLiyXEUuURc9cHYgTnJmT3R9BvMfbQPEgWozofsbzbfFwFbcG7D5") {
-                        console.log(book['PostEntryResponse']);
+                console.log(response);
+                Object.values(response['NFTsMap']).map((book) => {
+                    if (book['PostEntryResponse']['PosterPublicKeyBase58Check'] === "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP") {
                         let postHashHex = book['PostEntryResponse']['PostHashHex'];
                         let author = "Spatium Publisher";
                         let publisher = "SpatiumPublisher";
                         let description = book['PostEntryResponse']['Body'];
                         let title = "A Spatium Story";
+                        let subtitle = "";
                         let type = "MOD"; //Spatium Publisher public key
 
                         if (book['PostEntryResponse']['PostExtraData']['author'] != null) {
@@ -53,15 +63,19 @@ const Bookshelf = () => {
                         if (book['PostEntryResponse']['PostExtraData']['description'] != null) {
                             description = book['PostEntryResponse']['PostExtraData']['description'];
                         }
+                        if (book['PostEntryResponse']['PostExtraData']['subtitle'] != null) {
+                            subtitle = book['PostEntryResponse']['PostExtraData']['subtitle'];
+                        }
                         if (book['PostEntryResponse']['PostExtraData']['type'] != null) {
                             type = book['PostEntryResponse']['PostExtraData']['type'];
                         }
                         var newBook = {
-                            cover: book['PostEntryResponse']['ImageURLs'][0],
+                            cover: [book['PostEntryResponse']['ImageURLs'][0]],
                             body: book['PostEntryResponse']['Body'],
                             author: author,
                             publisher: publisher,
                             title: title,
+                            subtitle: subtitle,
                             description: description,
                             type: type,
                             postHashHex: postHashHex,
@@ -69,7 +83,7 @@ const Bookshelf = () => {
                         data.push(newBook);
                     }
                 });
-                setBooks(data);
+                setBooks(paginateList(data));
                 setBooksLoaded(true);
             };
             fetchData().catch(console.error);
@@ -85,6 +99,27 @@ const Bookshelf = () => {
 
     const handleMarketplace = () => {
         navigate('/marketplace');
+    }
+    const paginateList = (list) => {
+        list.sort(function(a, b) {
+            return a.title.localeCompare(b.title);
+        });
+        let data = new Map();
+        let i = 0;
+        let pageNum = 1;
+        list.map((book) => {
+            i += 1;
+            if (data.get(pageNum) === undefined) {
+                data.set(pageNum, [book]);
+            } else {
+                data.set(pageNum, [...data.get(pageNum), book]);
+            }
+            if (i === BOOKS_PER_PAGE) {
+                pageNum += 1;
+                i = 0;
+            }
+        });
+        return data;
     }
 
     return (
@@ -126,18 +161,21 @@ const Bookshelf = () => {
                 cards.map((card) => (
                     <Book loading={true} card={card}/>
                 ))}
-                {booksLoaded && books.length > 0 &&
-                    Object.values(books).map((book) => {
+                {booksLoaded && books.size > 0 &&
+                    Object.values(books.get(page)).map((book) => {
                         console.log(book);
                         return <Book loading={false} bookData={book} marketplace={false}/>;
                     })
                 }
-                {booksLoaded && books.length === 0 &&
+                {booksLoaded && books.size === 0 &&
                     <Grid item xs={12}>
                         <NoBooks linkToMarketplace={true} message="Go buy your first book now!" handleMarketplace={handleMarketplace}/>
                     </Grid>
                 }
             </Grid>
+            <Stack sx={{marginTop: '20px', alignItems: 'center', justifyItems: 'center'}} spacing={2}>
+                <Pagination page={page} onChange={handlePageChange} count={books.size} color="primary" />
+            </Stack>
             </Container>
         </React.Fragment>
     );

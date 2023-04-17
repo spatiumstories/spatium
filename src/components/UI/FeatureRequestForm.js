@@ -4,15 +4,13 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import HandymanTwoToneIcon from '@mui/icons-material/HandymanTwoTone';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import Success from './Success';
-import emailjs from '@emailjs/browser';
 import { useSelector } from 'react-redux';
+import { Deso } from 'deso-protocol';
 
 const FeatureRequestForm = (props) => {
     const user = useSelector(state => state.user);
@@ -42,14 +40,11 @@ const FeatureRequestForm = (props) => {
         setIdeaErr(false);
     }
 
+
     const handleSubmit = (event) => {
+        let deso = new Deso();
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-          email: data.get('email'),
-          idea: data.get('feature'),
-          subscribe: data.get('subscribe'),
-        });
         let valid = validate(data.get('email'), data.get('feature'));
         if (valid) {
             let email = {
@@ -58,7 +53,13 @@ const FeatureRequestForm = (props) => {
                 subscribe: data.get('subscribe') === 'true' ? 'yes' : 'no',
                 user: user.userName
             };
-            emailjs.send('service_zwwc6z5', 'template_0yllygi', email, 'KF6mBGbiQtVex61xQ')
+            let message = `New Idea!\n From: ${email.user}\n Email: ${email.email}\n Idea: ${email.idea}\n Please subscribe? ${email.subscribe}`;
+            const request = {
+                "RecipientPublicKeyBase58Check": "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq",
+                "SenderPublicKeyBase58Check": user.publicKey,
+                "MessageText": message
+            };
+            deso.social.sendMessage(request)
             .then((result) => {
                 console.log(result.text);
             }, (error) => {

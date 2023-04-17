@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useRef, useState, useEffect } from "react"
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
@@ -11,13 +11,6 @@ import { userActions } from '../store/user-slice';
 import Deso from 'deso-protocol';
 
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  }));
 
 const Publisher = () => {
     const [authorized, setAuthorized] = useState(false);
@@ -101,26 +94,24 @@ const Publisher = () => {
 
 
     return (
-        <Stack sx={{
-            width: '100%',
-            alignItems: 'center',
-            paddingTop: '20px',
-            paddingBottom: '20px'
-        }}
-        spacing={4}
-        >
-        <Item>
-            <Typography variant="h3">The future of web3 publishing is here!</Typography>
-        </Item>
-        <Box component="img"src={image} alt="Logo" sx={{
-            display: 'flex',
-            maxWidth: {xs: '100%', md: '40%'},
-        }}/>
-
-        <Item>
-            <Typography variant="h3">Well...not quite here yet, but very very soon!</Typography>
-        </Item>
-        </Stack>
+        <React.Fragment>
+            {verifying ? (
+                <Stack sx={{height: "100vh", paddingTop: '30vh', alignItems: 'center', justifyItems: 'center'}}>
+                    <Typography variant="h4">Verifying Author Tier :)</Typography>
+                    <CircularProgress color="success" />
+                </Stack>
+            ) : userKey === null ? (
+                <Stack sx={{height: "100vh", paddingTop: '30vh', alignItems: 'center', justifyItems: 'center'}}>
+                    <Typography sx={{padding:'20px'}} variant="h4">Please login to publish your story!</Typography>
+                    <Button onClick={onLoginHandler} color="secondary" variant="contained" sx={{display: {xs: 'none', md: 'flex'}}}><LoginIcon sx={{paddingRight: '2px'}}/>Login with DeSo</Button>
+                    <Button onClick={onLoginHandler} color="secondary" variant="contained" sx={{display: {xs: 'flex', md: 'none'}}}>Login</Button>
+                </Stack>
+            ): !authorized ? (
+                <Pricing authorOpen={true} />
+            ) : (
+                <PublishNewBook/>
+            )}
+        </React.Fragment>
     );
 };
 

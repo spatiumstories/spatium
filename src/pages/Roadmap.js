@@ -27,42 +27,49 @@ import { useState } from 'react';
 const authorToolsData = [
     "Publish Your Book - Q4 2022",
     "Mint on Demand or Rarely Minted Options - Q4 2022",
-    "Engagement tools for you and your fans - Q1 2023",
+    "Community tools for you and your fans - Q1 2023",
+    "Other file formats (like audio books)",
+    "Author verification tools",
     "Character NFT Creation Tool",
     "Random Book Cover Generation Tool for Rare Mints",
     "Multichain Mints",
-    "Audio book generation tools"
 ];
 
 const decentralizeData = [
-    "Move our Dragon encryption to a Solana smart contract - Q4 2022",
+    "Dragon encryption for authors - Q4 2022",
     "Dev tools to expand the Spatium Stories ecosystem",
     "A fully decentralized e-reader device",
     "Book Staking",
-    
+    "Spatium Stories DAO",
 ];
 
 const readerData = [
-    "Discounts for Spatium coin holders - Q3 2022",
+    "Discounts for Spatium coin holders - Q4 2022",
+    "Offer mutliple crypto currency options - Q4 2022",
     "Review system stored on chain - Q1 2023",
     "Reader app on iOS and Android - Q1 2023",
-    "Keep track of where you left off - Q1 2023",
+    "Book location stored on chain - Q1 2023",
+    "Book clubs! - Q1 2023",
+    "Highlight and notes stored on chain",
+    "Readers for other types of 'books'",
     "PrintaMint",
 ];
 
 const funData = [
     "Character NFTs",
-    "Solana NFT Book support",
     "Other chain support",
     "Spatium Originals series",
 ];
 
 const crazyData = [
-    "Expand the payment system",
+    "Offer credit card payments",
+    "Web2 native sign on options",
     "Library App",
     "Partnerships",
     "Writing competitions",
-    "Build, build, and launch the first Publisher DAO",
+    "Character NFTs",
+    "Other chain support",
+    "Spatium Originals series",
 ];
 
 const Roadmap = () => {
@@ -104,7 +111,7 @@ const Roadmap = () => {
             <RoadmapItem type="author" title="Author Tools" data={authorToolsData}/>
             <RoadmapItem type="dec" title="Total Decentralization" data={decentralizeData}/>
             <RoadmapItem type="reader" title="More Reader Features" data={readerData}/>
-            <RoadmapItem type="fun" title="The Fun Stuff" data={funData}/>
+            {/* <RoadmapItem type="fun" title="The Fun Stuff" data={funData}/> */}
             <RoadmapItem type="crazy" title="The Crazy Stuff" data={crazyData}/>
         </Grid>
         <Stack

@@ -15,6 +15,8 @@ import LoginIcon from '@mui/icons-material/Login';
 import Deso from 'deso-protocol';
 import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
+import { Web3Auth } from '@web3auth/modal';
+import { CHAIN_NAMESPACES } from '@web3auth/base';
 
 const settings = ['Profile', 'Bookshelf', 'Publish', 'Logout'];
 
@@ -42,7 +44,7 @@ const User = (props) => {
     const user = useSelector(state => state.user);
     const dispatch = useDispatch();
     const deso = new Deso();
-    const request = 3;
+    const request = 2;
 
     useEffect(() => {
         if (!pageLoaded) {
@@ -75,6 +77,28 @@ const User = (props) => {
         dispatch(userActions.logIn({"key": response.key, "profilePic": profilePic, "userName": profile.Profile.Username}));
     }
 
+    const onLoginHandlerWeb3Auth = async () => {
+        // const web3auth = new Web3Auth({
+        //     clientId: "BLEzg-1sTxGWpZW4ygaXl8AKvcp99FhI67AhE0lRWSwb43sIGJc1KTO2gdBAhxEmMrXXj9L48t18oY3Eu0YjolI", // Get your Client ID from Web3Auth Dashboard
+        //     web3AuthNetwork: "test",
+        //     chainConfig: {
+        //       chainNamespace: CHAIN_NAMESPACES.EIP155,
+        //       chainId: "0x89",
+        //       rpcTarget: "https://rpc.ankr.com/eth", // This is the mainnet RPC we have added, please pass on your own endpoint while creating an app
+        //     },
+        //     uiConfig: {
+        //       theme: "dark",
+        //       loginMethodsOrder: ["facebook", "google"],
+        //       appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
+        //     },
+        //     defaultLanguage: "en",
+        //     modalZIndex: "99998",
+        //   });
+        // const response = await web3auth.loginModal();
+        // console.log(response);
+        navigate('/auth');
+    }
+
 
     // ['Profile', 'My Bookshelf', 'Publish', 'Logout'];
     const handleSettingClick = (event) => {
@@ -88,6 +112,7 @@ const User = (props) => {
         } else if (setting === "Publish") {
             navigate('/publish');
         } else if (setting === "Logout") {
+            deso.identity.logout(user.publicKey);
             dispatch(userActions.logOut());
             navigate('/');
         }
