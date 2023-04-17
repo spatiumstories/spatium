@@ -5,10 +5,15 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import image from '../assets/hour.png';
-import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { userActions } from '../store/user-slice';
 import Deso from 'deso-protocol';
+import CircularProgress from "@mui/material";
+import Button from "@mui/material";
+import Pricing from "../components/Author/Pricing";
+import PublishNewBook from "../components/Author/PublishNewBook";
+import LoginIcon from '@mui/icons-material/Login';
+
 
 
 
