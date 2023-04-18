@@ -15,6 +15,7 @@ import MintingNow from "./pages/MintingNow";
 import BookPage from "./pages/BookPage";
 import Auth from "./components/Nav/Auth";
 import Profile from "./pages/Profile";
+import EditBookPage from "./pages/EditBookPage";
 
 
 const themeLight = createTheme({
@@ -70,6 +71,7 @@ const App = () => {
           <Route path='/read/:book' element={<SpatiumReader/>}/>
           <Route path='/marketplace/:postHashHex' element={<BookPage/>}/>
           <Route path='/profile' element={<Profile/>}/>
+          <Route path='/edit/:postHashHex' element={<EditBookPage/>}/>
           {/* <Route path='/auth' element={<Auth/>}/> */}
         </Routes>
       </body>

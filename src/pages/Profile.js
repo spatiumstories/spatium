@@ -13,6 +13,7 @@ import Book from "../components/UI/Book";
 import { useState, useEffect, useRef } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
+import AuthorBook from "../components/UI/AuthorBook";
 import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
@@ -39,6 +40,19 @@ const Profile = (props) => {
         setPage(p);
         console.log(p);
     }
+    const handleSwitchCurrency = (event) => {
+        setCurrencyDeso(event.target.checked);
+    }
+
+    useEffect(() => {
+        const getExchangeRate = async () => {
+            let deso = new Deso();
+            const exchangeRate = await deso.metaData.getExchangeRate();
+            setExchangeRate(exchangeRate['USDCentsPerDeSoExchangeRate']);
+        }
+    
+        getExchangeRate();
+    }, []);
 
     useEffect(() => {
         if (!booksLoaded) {
@@ -46,7 +60,7 @@ const Profile = (props) => {
             //loading books
             const fetchData = async () => {
                 // const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
-                const response = await fetch('http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/marketplace');
+                const response = await fetch(`https://api.spatiumstories.xyz/api/author-books/${user.publicKey}`);
                 // const response = await fetch('http://0.0.0.0:4201/api/marketplace');
                 const books = await response.json();
                 let data = [];
@@ -133,11 +147,10 @@ const Profile = (props) => {
                 color="text.primary"
                 gutterBottom
                 >
-                Spatium Stories Marketplace
+                {user.userName}'s Published Stories
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                We offer both rare edition and Mint on Demand books!
-                You can also publish your own book or read your book directly through Spatium Stories!
+                Manage your books, change prices, create promotions, create book clubs, and so much more to come!
                 </Typography>
                 <Stack
                 sx={{ pt: 4 }}
@@ -145,25 +158,33 @@ const Profile = (props) => {
                 spacing={2}
                 justifyContent="center"
                 >
-                    <Button variant="contained">Publish My Book!</Button>
-                    <Button variant="outlined">Read My Books!</Button>
+                    <Button variant="contained">Create a Promotion!</Button>
+                    <Button disabled variant="contained">Create a Book Club! (Coming Soon)</Button>
                 </Stack>
             </Container>
+            <Stack spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '50px'}}>
+                <Typography variant="h6">Show prices in:</Typography>
+                <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
+                    <Typography align="center">DESO</Typography>
+                    <Switch onChange={handleSwitchCurrency} color="secondary" />
+                    <Typography align="center">USD</Typography>
+                </Stack>
+            </Stack>
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
             <Grid container spacing={4}>
                 {!booksLoaded &&
                 cards.map((card) => (
-                    <Book loading={true} card={card}/>
+                    <AuthorBook loading={true} card={card}/>
                 ))}
                 {booksLoaded && books.size > 0 &&
                     Object.values(books.get(page)).map((book) => {
-                        return <Book showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={null} loading={false} bookData={book} marketplace={false}/>;
+                        return <AuthorBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={book}/>;
                     })
                 }
                 {booksLoaded && books.size === 0 &&
                     <Grid item xs={12}>
-                        <NoBooks linkToMarketplace={false} message="Coming Soon!!"/>
+                        <NoBooks linkToMarketplace={false} message="Mint One Today!"/>
                     </Grid>
                 }
             </Grid>

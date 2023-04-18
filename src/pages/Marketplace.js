@@ -39,16 +39,6 @@ const Marketplace = () => {
     const BOOKS_PER_PAGE = 6;
 
 
-    useEffect(() => {
-        const getExchangeRate = async () => {
-            let deso = new Deso();
-            const exchangeRate = await deso.metaData.getExchangeRate();
-            setExchangeRate(exchangeRate['USDCentsPerDeSoExchangeRate']);
-        }
-    
-        getExchangeRate();
-      }, []);
-
 
     const handleSwitchCurrency = (event) => {
         setCurrencyDeso(event.target.checked);
