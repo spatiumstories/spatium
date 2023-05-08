@@ -18,6 +18,7 @@ import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 import Switch from '@mui/material/Switch';
+import EditBookModal from "../components/Author/EditBookModal";
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -34,7 +35,26 @@ const Profile = (props) => {
     const [derivedKeyData, setDerivedKeyData] = useState({});
     const [currencyDeso, setCurrencyDeso] = useState(false);
     const [exchangeRate, setExchangeRate] = useState(null);
+    const [success, setSuccess] = useState(false);
+    const [failure, setFailure] = useState(false);
     const BOOKS_PER_PAGE = 6;
+
+    const handleOnSuccess = () => {
+        setSuccess(true);
+    }
+
+    const handleCloseSuccess = () => {
+        setSuccess(false);
+    }
+
+    const handleOnFailure = () => {
+        setFailure(true);
+    }
+
+    const handleCloseFailure = () => {
+        setFailure(false);
+    }
+
 
     const handlePageChange = (e, p) => {
         setPage(p);
@@ -42,6 +62,15 @@ const Profile = (props) => {
     }
     const handleSwitchCurrency = (event) => {
         setCurrencyDeso(event.target.checked);
+    }
+
+    const handleOpen = async (bookData) => {
+        setBookToBuy(bookData);
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
     }
 
     useEffect(() => {
@@ -172,6 +201,15 @@ const Profile = (props) => {
             </Stack>
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
+            <Success open={success} handleClose={handleCloseSuccess} message="Thank you for your purchase! Happy reading!"/>
+            <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...could not process payment"/>
+            <Stack
+                alignItems="center"
+                spacing={2}
+                sx={{paddingTop:'50px'}}
+            >
+                <EditBookModal showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+            </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
                 cards.map((card) => (
@@ -179,7 +217,7 @@ const Profile = (props) => {
                 ))}
                 {booksLoaded && books.size > 0 &&
                     Object.values(books.get(page)).map((book) => {
-                        return <AuthorBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={book}/>;
+                        return <AuthorBook onEdit={handleOpen} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={book}/>;
                     })
                 }
                 {booksLoaded && books.size === 0 &&

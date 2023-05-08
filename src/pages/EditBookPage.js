@@ -16,6 +16,7 @@ import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 import Switch from '@mui/material/Switch';
+import EditBookForm from "../components/Author/EditBookForm";
 
 
 
@@ -137,7 +138,7 @@ const EditBookPage = () => {
                     pb: 6,
                 }}
             >
-            <Container maxWidth="sm">
+            <Container maxWidth="md">
                 <Typography
                 component="h1"
                 variant="h2"
@@ -163,19 +164,19 @@ const EditBookPage = () => {
             <Container sx={{ py: 8 }} maxWidth="lg">
             <Success open={success} handleClose={handleCloseSuccess} message="Success!"/>
             <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...something went wrong"/>
-            <Stack
-                alignItems="center"
-                spacing={2}
-                sx={{paddingTop:'50px'}}
-            >
-                <CheckoutModal enoughFunds={enoughFunds} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
-            </Stack>
-            <Grid container spacing={4}>
+            <Grid container>
                 {!booksLoaded &&
                     <Book loading={true}/>
                 }
                 {booksLoaded &&
-                    <AuthorBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={bookToBuy} marketplace={true}/>
+                    <React.Fragment>
+                        <Grid item xs={12} sm={10}>
+                            <AuthorBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={bookToBuy} marketplace={true}/>
+                        </Grid>
+                        <Grid item xs={12} sm={2}>
+                            <EditBookForm showDesoPrice={!currencyDeso} exchangeRate={exchangeRate}  bookData={bookToBuy}/>
+                        </Grid>
+                    </React.Fragment>
                 }
             </Grid>
             </Container>

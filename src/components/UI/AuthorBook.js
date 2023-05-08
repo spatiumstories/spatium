@@ -29,7 +29,7 @@ const AuthorBook = (props) => {
         }
     }, [coverIndex]);
 
-    const onEdit = () => {
+    const onEdit2 = () => {
         let url = `/edit/${props.bookData.postHashHex}`;
         navigate(url, {
             state: {
@@ -39,6 +39,10 @@ const AuthorBook = (props) => {
                 exchangeRate: props.exchangeRate,
             }
         });
+    }
+
+    const onEdit = () => {
+        props.onEdit(props.bookData);
     }
 
     const convertToUSD = (price) => {
@@ -128,7 +132,7 @@ const AuthorBook = (props) => {
                             </Typography>
                         </CardContent>
                         <CardActions>
-                            <Button onClick={onEdit} size="large" variant="contained">Configure Price</Button>
+                            <Button onClick={onEdit} size="large" variant="contained">Edit</Button>
                             {props.showDesoPrice ? (
                                 <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            
                             ) : (
