@@ -208,7 +208,7 @@ const Profile = (props) => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <EditBookModal showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <EditBookModal onCurrencyChange={handleSwitchCurrency} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

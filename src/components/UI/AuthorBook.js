@@ -29,17 +29,6 @@ const AuthorBook = (props) => {
         }
     }, [coverIndex]);
 
-    const onEdit2 = () => {
-        let url = `/edit/${props.bookData.postHashHex}`;
-        navigate(url, {
-            state: {
-                onBuy: props.onBuy,
-                bookData: props.bookData,
-                showDesoPrice: props.showDesoPrice,
-                exchangeRate: props.exchangeRate,
-            }
-        });
-    }
 
     const onEdit = () => {
         props.onEdit(props.bookData);

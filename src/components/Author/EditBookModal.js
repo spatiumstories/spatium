@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import EditBookForm from './EditBookForm';
+import EditBookStepper from './EditBookStepper';
 
 const style = {
   position: 'absolute',
@@ -39,7 +40,7 @@ const EditBookModal = (props) => {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            <EditBookForm showDesoPrice={props.showDesoPrice} exchangeRate={props.exchangeRate} bookData={props.bookData} handleClose={props.handleClose} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess}/>
+            <EditBookStepper onCurrencyChange={props.onCurrencyChange} showDesoPrice={props.showDesoPrice} exchangeRate={props.exchangeRate} bookData={props.bookData} handleClose={props.handleClose} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess}/>
           </Box>
         </Fade>
       </Modal>

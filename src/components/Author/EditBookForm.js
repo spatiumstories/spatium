@@ -21,60 +21,46 @@ import Select from '@mui/material/Select';
 import InformationModal from '../UI/InformationModal';
 import HelpIcon from '@mui/icons-material/Help';
 
+const peggedText = "Pegging your price means the price of your book will be pegged to the $USD value, rather than the $DESO value. This helps ensure your book price stays consistant rather than volatile with the price of $DESO."
+const forSaleText = "For now, you can only adjust whether a RARE book is set for sale or not. If you want to remove a MOD book from sale, please message @Spatium directly on any Deso app."
 const EditBookForm = (props) => {
-    const [err, setErr] = useState({
-        price: false,
-        pegged: false,
-        forSale: false,
-    });
+    const [peggedOpen, setPeggedOpen] = useState(false);
+    const [forSaleOpen, setForSaleOpen] = useState(false);
+
+
+    const handleForSaleClose = () => {
+        setForSaleOpen(false);
+    }
+    const handleForSaleOpen = () => {
+        setForSaleOpen(true);
+    }
+
+    const handlePeggedClose = () => {
+        setPeggedOpen(false);
+    }
+
+    const handlePeggedOpen = () => {
+        setPeggedOpen(true);
+    }
+
 
     const [currBook, setCurrBook] = useState({
         price: "",
         pegged: "",
         forSale: "",
+        currency: "usd"
     });
 
-    const validateInput = () => {
-        let errCheck = {
-            price: false,
-            pegged: false,
-            forSale: false,
-        };
-        let valid = true;
-        if (currBook.price === "") {
-            errCheck.price = true;
-            valid = false;
-        }
-
-        if (currBook.pegged === "") {
-            errCheck.pegged = true;
-            valid = false;
-        }
-        if (currBook.forSale === "") {
-            errCheck.forSale = true;
-            valid = false;
-        }
-
-        if (valid) {
-            props.handleBookChange(currBook);
-            props.handleNext();
-        } else {
-            setErr(errCheck);
-        }
+    const handleSwitchPayment = (event) => {
+        setCurrBook(oldBook => {
+            return {
+                ...oldBook,
+                currency: event.target.checked ? "deso" : "usd",
+            };
+        });
     }
-    useEffect(() => {
-        if (props.bookData !== null) {
-            setCurrBook(props.bookData);
-        }
-    }, []);
 
     const handlePriceChange = (event) => {
-        setErr(oldErr => {
-            return {
-                ...oldErr,
-                price: false,
-            }
-        });
         setCurrBook(oldBook => {
             return {
                 ...oldBook,
@@ -84,12 +70,7 @@ const EditBookForm = (props) => {
     }
 
     const handlePeggedChange = (event) => {
-        setErr(oldErr => {
-            return {
-                ...oldErr,
-                pegged: false,
-            }
-        });
+
         setCurrBook(oldBook => {
             return {
                 ...oldBook,
@@ -99,13 +80,7 @@ const EditBookForm = (props) => {
     }
 
 
-    const handleForSaleChange = (event) => {
-        setErr(oldErr => {
-            return {
-                ...oldErr,
-                forSale: false,
-            }
-        });        
+    const handleForSaleChange = (event) => {      
         setCurrBook(oldBook => {
             return {
                 ...oldBook,
@@ -114,19 +89,31 @@ const EditBookForm = (props) => {
         });
     }
 
+    const handleSubmit = () => {
+        props.setDetails(currBook);
+        props.handleNext();
+    }
+
     return (
         <React.Fragment>
         <Grid container>
-          <Grid item xs={12}>
+        <Grid item xs={12} sm={4}>
+            <Stack direction="row" spacing={0.25} alignItems="center" justifyContent="center">
+                <Typography align="center">USD</Typography>
+                {currBook.currency === "deso" && <Switch defaultChecked onChange={handleSwitchPayment} color="secondary" />}
+                {currBook.currency === "usd" && <Switch onChange={handleSwitchPayment} color="secondary" />}
+                <Typography align="center">DESO</Typography>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} sm={8}>
             <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
             <OutlinedInput
                 id="outlined-adornment-amount"
-                startAdornment={<InputAdornment position="start">{props.showDesoPrice ? '$DESO' : '$'}</InputAdornment>}
+                startAdornment={<InputAdornment position="start">{currBook.currency === 'deso' ? '$DESO' : '$'}</InputAdornment>}
                 label="Amount"
                 value={currBook.amount}
                 onChange={handlePriceChange}
-                error={err.amount}
                 type="number"
             />
             </FormControl>
@@ -135,17 +122,38 @@ const EditBookForm = (props) => {
             <Stack direction="row" spacing={0.25} alignItems="center" justifyContent="center">
                 {currBook.pegged && <Switch defaultChecked onChange={handlePeggedChange} color="secondary" />}
                 {!currBook.pegged && <Switch onChange={handlePeggedChange} color="secondary" />}
-                <Typography align="center">Peg to this Price?</Typography>
+                <InputLabel id="minting-type">
+                    Peg Price <HelpIcon sx={{cursor: "pointer"}}onClick={handlePeggedOpen}/>
+                </InputLabel>
             </Stack>
           </Grid>
           <Grid item xs={12}>
             <Stack direction="row" spacing={0.25} alignItems="center" justifyContent="center">
-                {currBook.forSale && <Switch defaultChecked onChange={handleForSaleChange} color="secondary" />}
-                {!currBook.forSale && <Switch onChange={handleForSaleChange} color="secondary" />}
-                <Typography align="center">Set For Sale</Typography>
+                {props.bookData.type === "RARE" && currBook.forSale && <Switch defaultChecked onChange={handleForSaleChange} color="secondary" />}
+                {props.bookData.type === "RARE" && !currBook.forSale && <Switch onChange={handleForSaleChange} color="secondary" />}
+                {props.bookData.type === "MOD" && <Switch defaultChecked disabled/>}
+                <InputLabel id="minting-type">
+                    Set For Sale <HelpIcon sx={{cursor: "pointer"}} onClick={handleForSaleOpen}/>
+                </InputLabel>            
             </Stack>
           </Grid>
         </Grid>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+
+            <Button
+                variant="contained"
+                onClick={handleSubmit}
+                sx={{ mt: 3, ml: 1 }}
+            >
+                Submit
+            </Button>
+        </Box>
+        <InformationModal title={"Pegged Prices"} open={peggedOpen} handleClose={handlePeggedClose}>
+            <Typography>{peggedText}</Typography>
+        </InformationModal>
+        <InformationModal title={"For Sale"} open={forSaleOpen} handleClose={handleForSaleClose}>
+            <Typography>{forSaleText}</Typography>
+        </InformationModal>
 
       </React.Fragment>
     );
