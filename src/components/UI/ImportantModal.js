@@ -59,7 +59,7 @@ const ImportantModal = (props) => {
                 {props.children}
                 <Stack direction="row" spacing={2}>
                     <Button onClick={handleCancel}>Cancel</Button>
-                    <Button variant="contained" onClick={handlePublish}>Publish!</Button>
+                    <Button variant="contained" onClick={handlePublish}>{props.buttonText}!</Button>
                 </Stack>
               </Box>
           </Box>

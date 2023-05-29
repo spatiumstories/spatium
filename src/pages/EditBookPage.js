@@ -77,6 +77,7 @@ const EditBookPage = () => {
         setEnoughFunds(false);
         setSuccess(false);
     }
+    
 
     const handleOnSuccess = () => {
         setAltPayment(false);

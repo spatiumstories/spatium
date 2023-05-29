@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid';
-import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
+import { Card, CardMedia, CardContent, CardActions, Tooltip, Radio, Checkbox } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Button } from "@mui/material";
 import { useNavigate } from 'react-router';
@@ -12,7 +12,43 @@ import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import mod from '../../assets/mod.png';
 import rare from '../../assets/rare.png';
+import { makeStyles } from '@mui/styles';
 
+const useStyles = makeStyles({
+    root: {
+      maxWidth: 310,
+      transition: "transform 0.15s ease-in-out",
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      cursor: 'pointer'
+    },
+    cardHovered: {
+      transform: "scale3d(1.05, 1.05, 1)"
+    },
+    rootNoPromo: {
+        maxWidth: 310,
+        transition: "transform 0.15s ease-in-out",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    selected: {
+        maxWidth: 310,
+        transition: "transform 0.15s ease-in-out",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: 'pointer',
+        transform: "scale3d(1.01, 1.01, 1)",
+        backgroundColor: "black",
+        shadow: "5",
+    },
+    selectedBackground: {
+        backgroundColor: "#89CFF0"
+    },
+    noBackground: {}
+  });
 
 const AuthorBook = (props) => {
     const navigate = useNavigate();
@@ -40,12 +76,76 @@ const AuthorBook = (props) => {
         return amount;
     }
 
+      const classes = useStyles();
+      const [className, setClassName] = useState(classes.rootNoPromo);
+      const [background, setBackground] = useState(classes.noBackground);
+      const [state, setState] = useState({
+        raised:false,
+        shadow:1,
+      });
+
+    useEffect (() => {
+        if (props.promotion) {
+            setClassName(classes.root);
+        } else {
+            setClassName(classes.rootNoPromo);
+        }
+    }, [props.promotion])
+
+    const handlePromotionSelection = () => {
+        if (props.promotion) {
+            if (props.bookData.selected) {
+                props.handleSelectionRemove(props.bookData);
+            } else {
+                props.handleSelectionAdd(props.bookData);
+            }
+            props.bookData.selected = ~props.bookData.selected;
+            handleSelectionChange(true, props.bookData.selected);
+        }
+    }
+
+    const handleSelectionChange = (promo, sel) => {
+        if (promo && sel) {
+            setClassName(classes.selected);
+            setBackground(classes.selectedBackground);
+        } else {
+            setClassName(classes.root);
+            setBackground(classes.noBackground);
+        }
+    }
+
+    useEffect(() => {
+        if (props.promotion) {
+            handleSelectionChange(true, props.bookData.selected);
+        } else {
+            handleSelectionChange(false, false);
+        }
+    }, [props.bookData, props.promotion]);
+
+    const handleMouseOver = () => {
+        if (props.promotion) {
+            setState({ raised: true, shadow: 3 });
+        }
+    }
+
+    const handleMouseLeave = () => {
+        if (props.promotion) {
+            setState({ raised: false, shadow: 1 });
+        }
+    }
+
     return (
         <Grid item key={props.card} xs={12} sm={6} md={4}>
-            <Card
-                sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+            <Card 
+                className={className} 
+                classes={{root: state.raised ? classes.cardHovered : ""}}
+                onMouseOver={handleMouseOver} 
+                onMouseOut={handleMouseLeave} 
+                raised={state.raised} zdepth={state.shadow}
+                onClick={handlePromotionSelection}
             >
                 <CardHeader
+                    className={background}
                     avatar={
                     loading ? (
                         <Skeleton animation="wave" variant="circular" width={40} height={40} />
@@ -87,6 +187,7 @@ const AuthorBook = (props) => {
                     <Skeleton sx={{ height: 190 }} animation="wave" variant="rectangular" />
                 ) : (
                     <CardMedia
+                        className={background}
                         component="img"
                         sx={{
                             maxWidth: '100%',
@@ -106,7 +207,7 @@ const AuthorBook = (props) => {
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
-                        <CardContent sx={{ flexGrow: 1 }}>
+                        <CardContent className={background} sx={{ flexGrow: 1 }}>
                             <Typography gutterBottom variant="h5" component="h2">
                             {props.bookData.title}
                             </Typography>
@@ -120,8 +221,17 @@ const AuthorBook = (props) => {
                             {Array.isArray(props.bookData.subtitle) ? props.bookData.subtitle[coverIndex] : props.bookData.subtitle}
                             </Typography>
                         </CardContent>
-                        <CardActions>
-                            <Button onClick={onEdit} size="large" variant="contained">Edit</Button>
+                        <CardActions className={background}>
+                            {!props.promotion && <Button onClick={onEdit} size="large" variant="contained">Edit</Button>}
+                            {props.promotion && 
+                                // <Tooltip title="Add" arrow>
+                                // </Tooltip>
+                                <Tooltip title="Cannot edit book in an ongoing promotion" placement="bottom">
+                                    <span>
+                                        <Button disabled onClick={onEdit} size="large" variant="contained">Edit</Button>
+                                    </span>
+                                </Tooltip>
+                            }
                             {props.showDesoPrice ? (
                                 <Typography variant="h5" sx={{paddingLeft: '10px'}}>{(props.bookData.price / 1000000000).toFixed(2)} DeSo</Typography>                            
                             ) : (

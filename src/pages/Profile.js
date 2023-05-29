@@ -19,6 +19,7 @@ import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 import Switch from '@mui/material/Switch';
 import EditBookModal from "../components/Author/EditBookModal";
+import PromotionModal from "../components/Author/PromotionModal";
 
 const Profile = (props) => {
     const navigate = useNavigate();
@@ -27,6 +28,9 @@ const Profile = (props) => {
     const [enoughFunds, setEnoughFunds] = useState(false);
     const [loading, setLoading] = useState(false);
     const [books, setBooks] = useState(new Map());
+    const [rareBooks, setRareBooks] = useState(new Map());
+    const [currBooks, setCurrBooks] = useState(books);
+    const [selectedBooks, setSelectedBooks] = useState([]);
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
@@ -37,7 +41,17 @@ const Profile = (props) => {
     const [exchangeRate, setExchangeRate] = useState(null);
     const [success, setSuccess] = useState(false);
     const [failure, setFailure] = useState(false);
+    const [promotion, setPromotion] = useState(false);
+    const [promotionOpen, setPromotionOpen] = useState(false);
     const BOOKS_PER_PAGE = 6;
+
+    const handlePromotionOpen = () => {
+        setPromotionOpen(true);
+    }
+
+    const handlePromotionClose = () => {
+        setPromotionOpen(false);
+    }
 
     const handleOnSuccess = () => {
         setSuccess(true);
@@ -72,6 +86,38 @@ const Profile = (props) => {
     const handleClose = () => {
         setOpen(false);
     }
+
+    const handleCreatePromotion = () => {
+        setPromotion(true);
+        setCurrBooks(rareBooks);
+    }
+
+    const handleCancelPromotion = () => {
+        setPromotion(false);
+        setCurrBooks(books);
+    }
+
+    const handleSubmitPromotion = () => {
+        console.log("submitting");
+        selectedBooks.forEach(book => console.log(book));
+        handlePromotionOpen();
+    }
+
+    const handleSelectionAdd = (book) => {
+        setSelectedBooks(prevBooks => [...prevBooks, book]);
+    }
+
+    const handleSelectionRemove = (bookToRemove) => {
+        setSelectedBooks(prevBooks => prevBooks.filter((book) => book.postHashHex !== bookToRemove.postHashHex));
+    }
+
+    useEffect(() => {
+        console.log("Selected: " + selectedBooks.length + " books");
+    }, [selectedBooks]);
+
+    useEffect(() => {
+        setCurrBooks(books);
+    }, [books]);
 
     useEffect(() => {
         const getExchangeRate = async () => {
@@ -114,6 +160,7 @@ const Profile = (props) => {
                 Object.values(books['rare_books']).map((book) => {
                     console.log(book);
                     var newBook = {
+                        selected: false,
                         cover: book['covers'],
                         body: book['body'],
                         author: book['author'],
@@ -131,6 +178,7 @@ const Profile = (props) => {
                     data.push(newBook);
                 });
                 setBooks(paginateList(data));
+                setRareBooks(paginateRareList(data));
                 setBooksLoaded(true);
                 setLoading(false);
             };
@@ -138,6 +186,31 @@ const Profile = (props) => {
 
         }
     }, []);
+
+    const paginateRareList = (list) => {
+        list.sort(function(a, b) {
+            return a.title.localeCompare(b.title);
+        });
+        let data = new Map();
+        let i = 0;
+        let pageNum = 1;
+        list.map((book) => {
+            if (book.type === "RARE") {
+                i += 1;
+                if (data.get(pageNum) === undefined) {
+                    data.set(pageNum, [book]);
+                } else {
+                    data.set(pageNum, [...data.get(pageNum), book]);
+                }
+                if (i === BOOKS_PER_PAGE) {
+                    pageNum += 1;
+                    i = 0;
+                }
+            }
+        });
+        return data;
+    }
+
     const paginateList = (list) => {
         list.sort(function(a, b) {
             return a.title.localeCompare(b.title);
@@ -187,17 +260,29 @@ const Profile = (props) => {
                 spacing={2}
                 justifyContent="center"
                 >
-                    <Button variant="contained">Create a Promotion!</Button>
-                    <Button disabled variant="contained">Create a Book Club! (Coming Soon)</Button>
+                    {!promotion && <Button variant="contained" onClick={handleCreatePromotion}>Create a Promotion!</Button>}
+                    {!promotion && <Button disabled variant="contained">Create a Book Club! (Coming Soon)</Button>}
+                    {promotion && <Button variant="contained" onClick={handleSubmitPromotion} sx={{backgroundColor: "green"}}>Create!</Button>}
+                    {promotion && <Button variant="contained" onClick={handleCancelPromotion}>Cancel</Button>}
                 </Stack>
             </Container>
             <Stack spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '50px'}}>
-                <Typography variant="h6">Show prices in:</Typography>
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
-                    <Typography align="center">DESO</Typography>
-                    <Switch onChange={handleSwitchCurrency} color="secondary" />
-                    <Typography align="center">USD</Typography>
-                </Stack>
+                {
+                !promotion ? (
+                    <React.Fragment>
+                        <Typography variant="h6">Show prices in:</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
+                            <Typography align="center">DESO</Typography>
+                            <Switch onChange={handleSwitchCurrency} color="secondary" />
+                            <Typography align="center">USD</Typography>
+                        </Stack>
+                    </React.Fragment>
+                ) : (
+                    <React.Fragment>
+                        <Typography variant="h5">{selectedBooks.length} books selected</Typography>
+                    </React.Fragment>
+                )
+                }
             </Stack>
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
@@ -209,25 +294,26 @@ const Profile = (props) => {
                 sx={{paddingTop:'50px'}}
             >
                 <EditBookModal onCurrencyChange={handleSwitchCurrency} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <PromotionModal loading={false} books={selectedBooks} open={promotionOpen} handleClose={handlePromotionClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
                 cards.map((card) => (
                     <AuthorBook loading={true} card={card}/>
                 ))}
-                {booksLoaded && books.size > 0 &&
-                    Object.values(books.get(page)).map((book) => {
-                        return <AuthorBook onEdit={handleOpen} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={book}/>;
+                {booksLoaded && currBooks.size > 0 &&
+                    Object.values(currBooks.get(page)).map((book) => {
+                        return <AuthorBook promotion={promotion} onEdit={handleOpen} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={book} handleSelectionAdd={handleSelectionAdd} handleSelectionRemove={handleSelectionRemove}/>;
                     })
                 }
-                {booksLoaded && books.size === 0 &&
+                {booksLoaded && currBooks.size === 0 &&
                     <Grid item xs={12}>
                         <NoBooks linkToMarketplace={false} message="Mint One Today!"/>
                     </Grid>
                 }
             </Grid>
             <Stack sx={{marginTop: '20px', alignItems: 'center', justifyItems: 'center'}} spacing={2}>
-                <Pagination page={page} onChange={handlePageChange} count={books.size} color="primary" />
+                <Pagination page={page} onChange={handlePageChange} count={currBooks.size} color="primary" />
             </Stack>
             </Container>
         </React.Fragment>

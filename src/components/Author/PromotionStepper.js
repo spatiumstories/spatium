@@ -20,16 +20,14 @@ import { Stack } from '@mui/system';
 import Book from '../UI/Book';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import Deso from 'deso-protocol';
-import EditBookForm from './EditBookForm';
-import EditBookConfirm from './EditBookConfirm';
+import PromotionConfirm from './PromotionConfirm';
 
-const steps = ['Book Details', 'Confirmation'];
+const steps = ['Confirmation', 'Done'];
 
 
 const theme = createTheme();
 
-const EditBookStepper = (props) => {
+const PromotionStepper = (props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [newDetails, setNewDetails] = useState(null);
 
@@ -44,9 +42,7 @@ const EditBookStepper = (props) => {
   const getStepContent = (step) => {
     switch (step) {
       case 0:
-        return <EditBookForm setDetails={handleDetailsChange} details={newDetails} showDesoPrice={props.showDesoPrice} exchangeRate={props.exchangeRate} bookData={props.bookData} handleClose={props.handleClose} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} handleNext={handleNext}/>;
-      case 1:
-          return <EditBookConfirm details={newDetails} exchangeRate={props.exchangeRate} book={props.bookData}/>;
+          return <PromotionConfirm books={props.books}/>;
       default:
         throw new Error('Unknown step');
     }
@@ -57,7 +53,7 @@ const EditBookStepper = (props) => {
       <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>
         <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
           <Typography component="h1" variant="h4" align="center">
-            Editing Your Book!
+            Creating Promotion!
           </Typography>
           <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
             {steps.map((label) => (
@@ -71,7 +67,7 @@ const EditBookStepper = (props) => {
                 width: {xs: '100%', sm: '50%'},
                 height: {xs: '50%', sm: '25%'}
             }}>
-                <Typography sx={{paddingBottom: '10px'}} variant="h5">Congrats! Your Book is Published!</Typography>
+                <Typography sx={{paddingBottom: '10px'}} variant="h5">Congrats! Your Book Promotion is Created!</Typography>
                 <Book loading={false} bookData={props.bookData} marketplace={false}/>
             </Stack>
           ) : (
@@ -85,4 +81,4 @@ const EditBookStepper = (props) => {
   );
 }
 
-export default EditBookStepper;
+export default PromotionStepper;

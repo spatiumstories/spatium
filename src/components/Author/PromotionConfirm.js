@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux';
 
 const confirmText = "You sure you want to make these changes?";
 
-const EditBookConfirm = (props) => {
+const PromotionConfirm = (props) => {
     const [confirm, setConfirm] = useState(false);
     const [editing, setEditing] = useState(false);
     const [edited, setEdited] = useState(false);
@@ -29,7 +29,7 @@ const EditBookConfirm = (props) => {
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     const handleMarketplace = () => {
-        navigate('/marketplace');
+        navigate('/r2m2');
     }
 
     const handleConfirmOpen = () => {
@@ -48,9 +48,7 @@ const EditBookConfirm = (props) => {
     }
 
     const editBook = async () => {
-        console.log(props.details);
-        let price = getPrice(props.details.currency, props.details.price);
-        console.log(price / 1e9);
+        console.log(props.books);
         await delay(5000);
         setEdited(true);
         setEditing(false);
@@ -76,25 +74,28 @@ const EditBookConfirm = (props) => {
                 <Typography variant="h4" gutterBottom>
                     Absolutely sure you're ready?
                 </Typography>
+                <Typography variant="h6">
+                    You selected {props.books.length} books
+                </Typography>
                 <img width="100%" height="100%" src={press}/>
                 <Button onClick={handleConfirmOpen} variant="contained" component="label">
-                    Edit My Book!
+                    Create My Promotion!
                 </Button>
             </Stack>
         </React.Fragment>
             ): editing ?
             (
                 <Stack alignItems="center" justifyItems="center" spacing={2}>
-                    <Typography variant="h6">Making your NFT Book Changes!</Typography>
+                    <Typography variant="h6">Making your NFT Book Promotion!</Typography>
                     <Typography variant="p" align="center" sx={{paddingTop: '10px', paddingBottom: '10px'}}>This will take a second. Please be patient :)</Typography>
                     <CircularProgress color="success" />
                 </Stack>            
             ) : (
                 <Stack alignItems="center" justifyItems="center" spacing={2}>
                     <Typography variant="h6">Congratulations!!!</Typography>
-                    <Typography variant="p" align="center" sx={{paddingTop: '10px', paddingBottom: '10px'}}>Your book has been published!! Check it out on the marketplace!</Typography>
+                    <Typography variant="p" align="center" sx={{paddingTop: '10px', paddingBottom: '10px'}}>Your book promotion has been published!! Check it out on the R2M2 marketplace!</Typography>
                     <Button onClick={handleMarketplace} variant="contained" component="label">
-                        Marketplace
+                        R2M2
                     </Button>
                     <iframe src="https://giphy.com/embed/IwAZ6dvvvaTtdI8SD5" width="480" height="400" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/theoffice-the-office-tv-michaels-birthday-IwAZ6dvvvaTtdI8SD5">via GIPHY</a></p>
                 </Stack>
@@ -102,12 +103,12 @@ const EditBookConfirm = (props) => {
         
         
         }
-        <ImportantModal buttonText={"Edit"} title={"Last Check!"} open={confirm} cancel={handleConfirmClose} publish={handleEditing}>
+        <ImportantModal buttonText={"Create"} title={"Last Check!"} open={confirm} cancel={handleConfirmClose} publish={handleEditing}>
             <Typography>{confirmText}</Typography>
-            <Typography sx={{padddingTop: '5px'}}>By clicking Edit, you are agreeing to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms and Conditions</a></Typography>
+            <Typography sx={{padddingTop: '5px'}}>By clicking Create, you are agreeing to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms and Conditions</a></Typography>
         </ImportantModal>
       </React.Fragment>
     );
 };
 
-export default EditBookConfirm;
+export default PromotionConfirm;
