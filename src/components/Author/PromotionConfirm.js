@@ -14,10 +14,13 @@ import ImportantModal from '../UI/ImportantModal';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
+import Deso from 'deso-protocol';
 
 
 
 const confirmText = "You sure you want to make these changes?";
+const SPATIUM_PUBLISHER_PUBLIC_KEY = "BC1YLjC6xgSaoesmZmBgAWFxuxVTAaaAySQbiuSnCfb5eBBiWs4QgfP";
+
 
 const PromotionConfirm = (props) => {
     const [confirm, setConfirm] = useState(false);
@@ -44,14 +47,94 @@ const PromotionConfirm = (props) => {
         setEditing(true);
         setConfirm(false);
         // Need to add in calls to make book changes here
-        editBook();
+        createPromotion();
     }
 
-    const editBook = async () => {
+    const createPromotion = async () => {
         console.log(props.books);
-        await delay(5000);
-        setEdited(true);
-        setEditing(false);
+        let price = getPrice(props.details.currency, props.details.price);
+        console.log(price);
+        let bookToSerialMap = new Map();
+        props.books.array.forEach(async (book) => {
+            let serials = await getSerials(book.postHashHex);
+            bookToSerialMap.set(book.postHashHex, serials);
+        });
+        props.books.array.forEach(async (book) => {
+            editBook()
+        });
+        sendPromotion(bookToSerialMap);
+    }
+
+    const getSerials = async (postHashHex) => {
+        const deso = new Deso();
+        let nftEntryResponses = await deso.nft.getNftEntriesForPostHash({"PostHashHex": postHashHex});
+        let serials = [];
+        nftEntryResponses.array.forEach(nft => {
+            if (nft["OwnerPublicKeyBase58Check"] === SPATIUM_PUBLISHER_PUBLIC_KEY) {
+                serials.push(nft["SerialNumber"]);
+            }
+        });
+        return serials;
+    }
+
+    const editBook = async (postHashHex, serials) => {
+        let price = getPrice(props.details.currency, props.details.price);
+        console.log(price / 1e9);
+        let data = new FormData();
+        //post_hash_hex
+        data.append("post_hash_hex", postHashHex);
+        //price
+        data.append("price", price);
+        //serials
+        data.append("serials", serials.join(","));
+        //for_sale
+        data.append("for_sale", false);
+
+        const requestOptions = {
+            method: 'POST',
+            body: data,
+        };
+        // let uri = 'http://0.0.0.0:4201';
+        // let uri = 'https://api.spatiumstories.xyz';
+        let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+        await fetch(`${uri}/api/change-price`, requestOptions)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+        }).catch(e => {
+            console.log(e);
+        });
+    }
+
+    const sendPromotion = async (serialMap) => {
+        let uri = "https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/rareMint";
+        let data = {
+            "nfts": mapToJson(serialMap)
+        };
+        console.log(data);
+        const requestOptions = {
+            method: "POST",
+            body: data,
+        };
+
+        await fetch(uri, requestOptions)
+        .then(response => response.text())
+        .then(data => {
+            setEdited(true);
+            setEditing(false);
+        }).catch(e => {
+            console.log(e);
+        });
+    }
+
+    function mapToJson(map) {
+        const json = {};
+      
+        for (const [key, value] of map.entries()) {
+          json[key] = Array.from(value);
+        }
+      
+        return JSON.stringify(json);
     }
 
 
@@ -78,6 +161,11 @@ const PromotionConfirm = (props) => {
                     You selected {props.books.length} books
                 </Typography>
                 <img width="100%" height="100%" src={press}/>
+                {props.activeStep !== 0 && (
+                    <Button onClick={props.handleBack} sx={{ mt: 3, ml: 1 }}>
+                    Back
+                    </Button>
+                )}
                 <Button onClick={handleConfirmOpen} variant="contained" component="label">
                     Create My Promotion!
                 </Button>

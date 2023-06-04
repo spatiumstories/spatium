@@ -40,7 +40,7 @@ const PromotionModal = (props) => {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            <PromotionStepper books={props.books} handleClose={props.handleClose} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess}/>
+            <PromotionStepper exchangeRate={props.exchangeRate} books={props.books} handleClose={props.handleClose} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess}/>
           </Box>
         </Fade>
       </Modal>

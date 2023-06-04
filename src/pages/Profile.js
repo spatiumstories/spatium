@@ -294,7 +294,7 @@ const Profile = (props) => {
                 sx={{paddingTop:'50px'}}
             >
                 <EditBookModal onCurrencyChange={handleSwitchCurrency} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
-                <PromotionModal loading={false} books={selectedBooks} open={promotionOpen} handleClose={handlePromotionClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <PromotionModal loading={false} books={selectedBooks} open={promotionOpen} exchangeRate={exchangeRate} handleClose={handlePromotionClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&

@@ -21,8 +21,9 @@ import Book from '../UI/Book';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import PromotionConfirm from './PromotionConfirm';
+import PromotionForm from './PromotionForm';
 
-const steps = ['Confirmation', 'Done'];
+const steps = ['Set Price', 'Confirmation'];
 
 
 const theme = createTheme();
@@ -39,10 +40,16 @@ const PromotionStepper = (props) => {
     setNewDetails(details);
   }
 
+  const handleBack = () => {
+    setActiveStep(activeStep - 1);
+  }
+
   const getStepContent = (step) => {
     switch (step) {
       case 0:
-          return <PromotionConfirm books={props.books}/>;
+        return <PromotionForm setDetails={handleDetailsChange} details={newDetails} exchangeRate={props.exchangeRate} handleNext={handleNext} handleClose={props.handleClose} />
+      case 1:
+          return <PromotionConfirm activeStep={activeStep} handleBack={handleBack} exchangeRate={props.exchangeRate} details={newDetails} books={props.books}/>;
       default:
         throw new Error('Unknown step');
     }
