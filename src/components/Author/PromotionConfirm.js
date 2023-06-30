@@ -54,26 +54,40 @@ const PromotionConfirm = (props) => {
         console.log(props.books);
         let price = getPrice(props.details.currency, props.details.price);
         console.log(price);
+        let bookToSerialMap = await createSerialMap(props.books);
+        console.log(bookToSerialMap);
+        await editBooks(props.books, bookToSerialMap);
+        console.log("sending promotion");
+        // sendPromotion(bookToSerialMap);
+    }
+
+    const editBooks = async (books, serialMap) => {
+        const promises = books.map(async (book) => {
+            editBook(book.postHashHex, serialMap.get(book.postHashHex));
+        });
+        await Promise.all(promises);
+    }
+
+    const createSerialMap = async (books) => {
         let bookToSerialMap = new Map();
-        props.books.array.forEach(async (book) => {
+        const promises = books.map(async (book) => {
             let serials = await getSerials(book.postHashHex);
             bookToSerialMap.set(book.postHashHex, serials);
         });
-        props.books.array.forEach(async (book) => {
-            editBook()
-        });
-        sendPromotion(bookToSerialMap);
+        await Promise.all(promises);
+        return bookToSerialMap;
     }
 
     const getSerials = async (postHashHex) => {
         const deso = new Deso();
         let nftEntryResponses = await deso.nft.getNftEntriesForPostHash({"PostHashHex": postHashHex});
         let serials = [];
-        nftEntryResponses.array.forEach(nft => {
+        nftEntryResponses["NFTEntryResponses"].forEach(nft => {
             if (nft["OwnerPublicKeyBase58Check"] === SPATIUM_PUBLISHER_PUBLIC_KEY) {
                 serials.push(nft["SerialNumber"]);
             }
         });
+        console.log(serials);
         return serials;
     }
 
@@ -95,22 +109,20 @@ const PromotionConfirm = (props) => {
             body: data,
         };
         // let uri = 'http://0.0.0.0:4201';
-        // let uri = 'https://api.spatiumstories.xyz';
-        let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
-        await fetch(`${uri}/api/change-price`, requestOptions)
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-        }).catch(e => {
-            console.log(e);
-        });
+        let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+        try {
+            const response = await fetch(`${uri}/api/change-price`, requestOptions);
+            const responseData = await response.text();
+            console.log(responseData);
+          } catch (error) {
+            console.log(error);
+          }
     }
 
     const sendPromotion = async (serialMap) => {
         let uri = "https://tkvr4urfac.execute-api.us-east-1.amazonaws.com/default/rareMint";
-        let data = {
-            "nfts": mapToJson(serialMap)
-        };
+        let data = mapToJson(serialMap);
         console.log(data);
         const requestOptions = {
             method: "POST",
@@ -128,13 +140,16 @@ const PromotionConfirm = (props) => {
     }
 
     function mapToJson(map) {
-        const json = {};
+        const nfts = [];
       
         for (const [key, value] of map.entries()) {
-          json[key] = Array.from(value);
+            nfts.push({
+                "post_hash_hex": key,
+                "serials": value,
+            });
         }
       
-        return JSON.stringify(json);
+        return JSON.stringify({"nfts": nfts});
     }
 
 
