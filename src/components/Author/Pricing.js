@@ -166,7 +166,6 @@ const Pricing = (props) => {
       setEnoughFunds(false);
   }
 
-
   const convertPrice = (price) => {
     let usdPrice = price
     usdPrice = yearly ? usdPrice * 10 : usdPrice;
@@ -196,7 +195,6 @@ const Pricing = (props) => {
         },
       };
     const response = await deso.identity.derive(request);
-    console.log(response);
     const userRequest = {
         "PublicKeyBase58Check": response['publicKeyBase58Check']
     };
