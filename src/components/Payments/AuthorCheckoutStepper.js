@@ -51,8 +51,8 @@ const AuthorCheckoutStepper = (props) => {
               width: {xs: '100%', sm: '50%'},
               height: {xs: '50%', sm: '25%'}
             }}>
-            <Typography sx={{paddingBottom: '10px'}} variant="h5">Here is your book! Enjoy!</Typography>
-            <Book loading={false} bookData={props.bookData} marketplace={false}/>
+            <Typography sx={{paddingBottom: '10px'}} variant="h5">Congratulations! You are an official Spatium author!</Typography>
+            <Typography sx={{paddingTop: '10px'}} variant="p">Refresh this page to publish your story!</Typography>
           </Stack>
         );
       default:

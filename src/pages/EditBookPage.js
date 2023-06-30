@@ -16,13 +16,15 @@ import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 import Switch from '@mui/material/Switch';
+import EditBookForm from "../components/Author/EditBookForm";
 
 
 
 import React from 'react';
 import MarketplaceBook from "../components/UI/MarketplaceBook";
+import AuthorBook from "../components/UI/AuthorBook";
 
-const BookPage = () => {
+const EditBookPage = () => {
     const {postHashHex} = useParams();
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
@@ -58,57 +60,10 @@ const BookPage = () => {
     }
 
     const handleOpen = async (bookData) => {
-        await getDerivedKey(bookData);
         setBookToBuy(bookData);
         setOpen(true);
     }
 
-    const getDerivedKey = async (bookData) => {
-        // Get price to approve (if RARE, get highest price for convenience)
-        let price = bookData.price;
-        if (bookData.type === 'RARE') {
-            bookData.left.forEach(book => {
-                if (book[1] > price) {
-                    price = book[1];
-                }
-            });
-        }
-        const request = {
-            "publicKey": "",
-            "transactionSpendingLimitResponse": {
-              "GlobalDESOLimit": (price * 1.25) + 1700,
-              "TransactionCountLimitMap": {
-                "AUTHORIZE_DERIVED_KEY": 2
-              },
-              "NFTOperationLimitMap": {
-                "": {
-                  "0": {
-                    "any": 1
-                  }
-                }
-              },
-            },
-          };
-        const response = await deso.identity.derive(request);
-        const userRequest = {
-            "PublicKeyBase58Check": response['publicKeyBase58Check']
-        };
-        const user = await deso.user.getSingleProfile(userRequest);
-        setDerivedKeyData({
-            derivedSeedHex: response['derivedSeedHex'],
-            derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
-            accessSignature: response['accessSignature'],
-            expirationBlock: response['expirationBlock'],
-            transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
-            publicKey: response['publicKeyBase58Check'],
-            userName: user['Profile']['Username'],
-            balance: user['Profile']['DESOBalanceNanos']
-        });
-        if (user['Profile']['DESOBalanceNanos'] >= (bookData.price * 1.025) + 1700) {
-            setEnoughFunds(true);
-        }
-        return response;
-    }
     const handleClose = () => {
         setOpen(false);
         setAltPayment(false);
@@ -122,6 +77,7 @@ const BookPage = () => {
         setEnoughFunds(false);
         setSuccess(false);
     }
+    
 
     const handleOnSuccess = () => {
         setAltPayment(false);
@@ -145,8 +101,8 @@ const BookPage = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                // const response = await fetch(`https://api.spatiumstories.xyz/api/book-data/${postHashHex}`);
-                const response = await fetch(`http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/book-data/${postHashHex}`);
+                const response = await fetch(`https://api.spatiumstories.xyz/api/book-data/${postHashHex}`);
+                // const response = await fetch(`http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/book-data/${postHashHex}`);
                 // const response = await fetch(`http://0.0.0.0:4201/api/book-data/${postHashHex}`);
                 const book = await response.json();
                 var newBook = {
@@ -162,7 +118,8 @@ const BookPage = () => {
                     postHashHex: book['post_hash_hex'],
                     price: book['price'],
                     total: book['total'],
-                    left: book['left'] ? Object.entries(book['left']) : 0
+                    left: book['left'] ? Object.entries(book['left']) : 0,
+                    pegged: book['pegged']
                 };
                 setBookToBuy(newBook);
                 setBooksLoaded(true);
@@ -182,7 +139,7 @@ const BookPage = () => {
                     pb: 6,
                 }}
             >
-            <Container maxWidth="sm">
+            <Container maxWidth="md">
                 <Typography
                 component="h1"
                 variant="h2"
@@ -206,21 +163,21 @@ const BookPage = () => {
             </Stack>
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
-            <Success open={success} handleClose={handleCloseSuccess} message="Thank you for your purchase! Happy reading!"/>
-            <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...could not process payment"/>
-            <Stack
-                alignItems="center"
-                spacing={2}
-                sx={{paddingTop:'50px'}}
-            >
-                <CheckoutModal enoughFunds={enoughFunds} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
-            </Stack>
-            <Grid container spacing={4}>
+            <Success open={success} handleClose={handleCloseSuccess} message="Success!"/>
+            <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...something went wrong"/>
+            <Grid container>
                 {!booksLoaded &&
                     <Book loading={true}/>
                 }
                 {booksLoaded &&
-                    <MarketplaceBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={bookToBuy} marketplace={true}/>
+                    <React.Fragment>
+                        <Grid item xs={12} sm={10}>
+                            <AuthorBook showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={bookToBuy} marketplace={true}/>
+                        </Grid>
+                        <Grid item xs={12} sm={2}>
+                            <EditBookForm showDesoPrice={!currencyDeso} exchangeRate={exchangeRate}  bookData={bookToBuy}/>
+                        </Grid>
+                    </React.Fragment>
                 }
             </Grid>
             </Container>
@@ -228,4 +185,4 @@ const BookPage = () => {
     );
 };
 
-export default BookPage;
+export default EditBookPage;

@@ -112,7 +112,9 @@ const FinalConfirm = (props) => {
             body: data,
         };
         // let uri = 'http://0.0.0.0:4201';
-        let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'https://api.spatiumstories.xyz';
+        let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+
         const response = await fetch(`${uri}/api/publish-book`, requestOptions)
         .then(response => response.text())
         .then(data => {
@@ -172,7 +174,7 @@ const FinalConfirm = (props) => {
         
         
         }
-        <ImportantModal title={"Last Check!"} open={confirm} cancel={handleConfirmClose} publish={handlePublish}>
+        <ImportantModal buttonText={"Publish"} title={"Last Check!"} open={confirm} cancel={handleConfirmClose} publish={handlePublish}>
             <Typography>{confirmText}</Typography>
             <Typography sx={{padddingTop: '5px'}}>By clicking Publish, you are agreeing to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms and Conditions</a></Typography>
         </ImportantModal>

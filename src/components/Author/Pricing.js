@@ -23,16 +23,18 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import CheckIcon from '@mui/icons-material/Check';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InformationModal from '../UI/InformationModal';
 import RoadmapModal from '../UI/RoadmapModal';
 import Deso from "deso-protocol";
-import Success from '../components/UI/Success';
-import Failure from "../components/UI/Failure";
+import Success from '../UI/Success';
+import Failure from "../UI/Failure";
 import AuthorCheckoutModal from '../Payments/AuthorCheckoutModal';
+import AuthorTier from '../UI/AuthorTier';
 
 const tiers = [
   {
+    authorType: 1,
     title: 'Free',
     price: 0,
     description: [
@@ -45,6 +47,7 @@ const tiers = [
     buttonVariant: 'contained',
   },
   {
+    authorType: 2,
     title: 'Authorpreneur',
     // subheader: 'Most popular',
     price: 8,
@@ -59,6 +62,7 @@ const tiers = [
     buttonVariant: 'contained',
   },
   {
+    authorType: 3,
     title: 'Publisher',
     price: 35,
     description: [
@@ -123,9 +127,15 @@ const Pricing = (props) => {
     getExchangeRate();
   }, []);
 
-  const handleOpenCheckout = async (nftData) => {
-    await getDerivedKey(nftData);
-    setNftToBuy(nftData);
+  const handleOpenCheckout = async (nftToBuy) => {
+    console.log(nftToBuy);
+    let convertedNFT = {
+      convertedPrice: convertPrice(nftToBuy.price),
+      ...nftToBuy,
+    }
+    console.log(convertedNFT);
+    await getDerivedKey(convertedNFT);
+    setNftToBuy(convertedNFT);
     setOpenCheckout(true);
   }
 
@@ -156,13 +166,22 @@ const Pricing = (props) => {
       setEnoughFunds(false);
   }
 
+  const convertPrice = (price) => {
+    let usdPrice = price
+    usdPrice = yearly ? usdPrice * 10 : usdPrice;
+    usdPrice = usdPrice * 100; // in cents
+    let desoToUsdCents =  1 / exchangeRate;
+    return Math.round(desoToUsdCents * usdPrice * 1e9);
+  }
+
   const getDerivedKey = async (nftData) => {
     // Get price to approve (if RARE, get highest price for convenience)
-    let price = nftData.price;
+    let price = nftData.convertedPrice;
+    console.log(price);
     const request = {
         "publicKey": "",
         "transactionSpendingLimitResponse": {
-          "GlobalDESOLimit": (price * 1.25) + 1700,
+          "GlobalDESOLimit": Math.round(price * 1.25) + 1700,
           "TransactionCountLimitMap": {
             "AUTHORIZE_DERIVED_KEY": 2
           },
@@ -190,7 +209,7 @@ const Pricing = (props) => {
         userName: user['Profile']['Username'],
         balance: user['Profile']['DESOBalanceNanos']
     });
-    if (user['Profile']['DESOBalanceNanos'] >= (bookData.price * 1.025) + 1700) {
+    if (user['Profile']['DESOBalanceNanos'] >= Math.round(price * 1.025) + 1700) {
         setEnoughFunds(true);
     }
     return response;
@@ -231,72 +250,12 @@ const Pricing = (props) => {
       {/* End hero unit */}
       <Container maxWidth="lg" component="main" sx={{paddingBottom: 10}}>
         <Grid container spacing={5}>
+        <AuthorCheckoutModal yearly={yearly} enoughFunds={enoughFunds} exchangeRate={exchangeRate} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} nftToBuy={nftToBuy} open={openCheckout} handleClose={handleCloseCheckout} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+        <Success open={success} handleClose={handleCloseSuccess} message="Thank you for your purchase! Welcome to the future of publishing!"/>
+        <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...could not process payment"/>
           {tiers.map((tier) => (
             // Enterprise card is full width at sm breakpoint
-            <Grid
-              item
-              key={tier.title}
-              xs={12}
-              md={4}
-            >
-              <Card sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-                <CardHeader
-                  title={tier.title}
-                  subheader={tier.subheader}
-                  titleTypographyProps={{ align: 'center' }}
-                  action={tier.title === 'Pro' ? <StarIcon /> : null}
-                  subheaderTypographyProps={{
-                    align: 'center',
-                  }}
-                  sx={{
-                    backgroundColor: (theme) =>
-                      theme.palette.mode === 'light'
-                        ? theme.palette.grey[200]
-                        : theme.palette.grey[700],
-                  }}
-                />
-                <CardContent sx={{flexGrow: 1}}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'baseline',
-                      mb: 2,
-                    }}
-                  >
-                    <Typography component="h2" variant="h3" color="text.primary">
-                      ${!yearly ? tier.price : tier.price * 10}
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary">
-                      {!yearly ? '/mo' : '/yr'}
-                    </Typography>
-                  </Box>
-                  <List>
-                    {tier.description.map((line) => (
-                      <ListItem>
-                        <ListItemAvatar>
-                            <Avatar>
-                                <CheckIcon />
-                            </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={line}/>
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-                <CardActions>
-                  <Stack direction="column" spacing={1} alignItems="center" justifyContent="center" sx={{width: '100%', paddingTop: '50px'}}>
-                    <Typography sx={{cursor: 'pointer'}} onClick={handleOpen} variant='p'>*Click here for more info on royalties</Typography>
-                    <AuthorCheckoutModal yearly={yearly} enoughFunds={enoughFunds} exchangeRate={exchangeRate} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} nftToBuy={nftToBuy} open={openCheckout} handleClose={handleCloseCheckout} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
-                    <Success open={success} handleClose={handleCloseSuccess} message="Thank you for your purchase! Welcome to the future of publishing!"/>
-                    <Failure open={failure} handleClose={handleCloseFailure} message="Uh oh...could not process payment"/>
-                    <Button fullWidth variant={tier.buttonVariant} value={tier} onClick={handleOpenCheckout}>
-                        {tier.buttonText}
-                    </Button>
-                  </Stack>
-                </CardActions>
-              </Card>
-            </Grid>
+            <AuthorTier tier={tier} handleOpen={handleOpen} yearly={yearly} handleOpenCheckout={handleOpenCheckout}/>
           ))}
         </Grid>
       </Container>

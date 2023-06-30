@@ -15,7 +15,7 @@ const AuthorCheckout = (props) => {
     const [buying, setBuying] = useState(false);
     const deso = new Deso();
 
-    const total = (props.nftToBuy.price / 1000000000).toFixed(2);
+    const total = (props.nftToBuy.convertedPrice / 1e9).toFixed(2);
 
     const onBuyHandler = async () => {
         if (!props.enoughFunds) {
@@ -27,7 +27,7 @@ const AuthorCheckout = (props) => {
 
     const verifiedEnoughDesoPurchase = async () => {
 
-        let nft = props.nftToBuy.postHashHex;
+        let author_type = props.nftToBuy.authorType;
         setBuying(true);
 
         let data = new FormData();
@@ -36,13 +36,13 @@ const AuthorCheckout = (props) => {
 
 
 
-        data.append("author_type", nft);
+        data.append("author_type", author_type);
         data.append("subscription_type", props.yearly ? "YEARLY" : "MONTHLY");
         data.append("buyer_pub_key", props.buyer.publicKey);
         data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
         data.append("buyer_prv_key", props.buyer.derivedSeedHex);
         data.append("author", props.nftToBuy.publisher);
-        data.append("nanos", props.nftToBuy.price);
+        data.append("nanos", props.nftToBuy.convertedPrice);
         data.append("expiration_block", props.buyer.expirationBlock);
         data.append("access_sig", props.buyer.accessSignature);
         data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
@@ -51,13 +51,13 @@ const AuthorCheckout = (props) => {
             body: data,
         };
         let successResponse = true;
-        let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'https://api.spatiumstories.xyz';
         // let uri = 'http://0.0.0.0:4201';
-        const response = await fetch(`${uri}/api/buy-book`, requestOptions)
+        let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+        const response = await fetch(`${uri}/api/buy-author-nft`, requestOptions)
         .then(response => response.text())
         .then(data => {
             console.log(data);
-            props.nftToBuy.postHashHex = data;
         }).catch(e => {
             successResponse = false;
             console.log(e);
@@ -82,7 +82,7 @@ const AuthorCheckout = (props) => {
 
     const getButtonText = (paid) => {
         if (!paid) {
-            return ("Get Your FREE Book!");
+            return ("Start Publishing for FREE!");
         } else {
             return ("Complete Purchase!");
         }
@@ -110,7 +110,7 @@ const AuthorCheckout = (props) => {
                         <Typography variant="h5">{total} DeSo</Typography>
                     </Grid>
                 </Grid>
-                <Typography sx={{paddingTop: '10px'}} variant="p">By completing your purchase, you agree to our <a href="https://diamondapp.com/u/Spatium/blog/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use.</a></Typography>
+                <Typography sx={{paddingTop: '10px'}} variant="p">By completing your purchase, you agree to our <a href="https://diamondapp.com/u/Spatium/blog/spatium-stories-author-terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms of Use.</a></Typography>
                 <LoadingButton
                     loading={buying}
                     onClick={onBuyHandler}

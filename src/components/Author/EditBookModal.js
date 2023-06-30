@@ -3,8 +3,8 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import AuthorCheckoutStepper from './AuthorCheckoutStepper';
-import { useState, useEffect } from 'react';
+import EditBookForm from './EditBookForm';
+import EditBookStepper from './EditBookStepper';
 
 const style = {
   position: 'absolute',
@@ -20,7 +20,7 @@ const style = {
   overflow: 'scroll',
 };
 
-const AuthorCheckoutModal = (props) => {
+const EditBookModal = (props) => {
 
   return (
     <div>
@@ -40,7 +40,7 @@ const AuthorCheckoutModal = (props) => {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-          <AuthorCheckoutStepper exchangeRate={props.exchangeRate} yearly={props.yearly} enoughFunds={props.enoughFunds} buyer={props.buyer} nftToBuy={props.nftToBuy} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess} close={props.handleClose}/>
+            <EditBookStepper onCurrencyChange={props.onCurrencyChange} showDesoPrice={props.showDesoPrice} exchangeRate={props.exchangeRate} bookData={props.bookData} handleClose={props.handleClose} handleOnFailure={props.handleOnFailure} handleOnSuccess={props.handleOnSuccess}/>
           </Box>
         </Fade>
       </Modal>
@@ -48,4 +48,4 @@ const AuthorCheckoutModal = (props) => {
   );
 };
 
-export default AuthorCheckoutModal;
+export default EditBookModal;

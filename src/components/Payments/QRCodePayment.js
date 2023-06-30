@@ -130,8 +130,10 @@ const QRCodePayment = (props) => {
             data.append("access_sig", props.buyer.accessSignature);
             data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
-            let uri = 'https://api.spatiumstories.xyz/api';
+            // let uri = 'https://api.spatiumstories.xyz/api';
             // let uri = 'http://0.0.0.0:4201/api';
+            let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+
             if (props.type === "RARE") {
                 data.append("random_mint", "true");
                 data.append("serial_number", props.serial);

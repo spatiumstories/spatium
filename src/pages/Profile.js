@@ -1,3 +1,4 @@
+import React from "react";
 import { Container } from "@mui/system";
 import Grid from '@mui/material/Grid';
 import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
@@ -12,22 +13,24 @@ import Book from "../components/UI/Book";
 import { useState, useEffect, useRef } from "react";
 import Deso from "deso-protocol";
 import NoBooks from "../components/UI/NoBooks";
+import AuthorBook from "../components/UI/AuthorBook";
 import CheckoutModal from '../components/Payments/CheckoutModal';
 import Success from '../components/UI/Success';
 import Failure from "../components/UI/Failure";
 import Switch from '@mui/material/Switch';
+import EditBookModal from "../components/Author/EditBookModal";
+import PromotionModal from "../components/Author/PromotionModal";
 
-
-
-import React from 'react';
-
-const Marketplace = () => {
+const Profile = (props) => {
     const navigate = useNavigate();
     const user = useSelector(state => state.user);
     const [page, setPage] = useState(1);
     const [enoughFunds, setEnoughFunds] = useState(false);
     const [loading, setLoading] = useState(false);
     const [books, setBooks] = useState(new Map());
+    const [rareBooks, setRareBooks] = useState(new Map());
+    const [currBooks, setCurrBooks] = useState(books);
+    const [selectedBooks, setSelectedBooks] = useState([]);
     const [bookToBuy, setBookToBuy] = useState({type: 'none'});
     const [booksLoaded, setBooksLoaded] = useState(false);
     const deso = new Deso();
@@ -36,13 +39,85 @@ const Marketplace = () => {
     const [derivedKeyData, setDerivedKeyData] = useState({});
     const [currencyDeso, setCurrencyDeso] = useState(false);
     const [exchangeRate, setExchangeRate] = useState(null);
+    const [success, setSuccess] = useState(false);
+    const [failure, setFailure] = useState(false);
+    const [promotion, setPromotion] = useState(false);
+    const [promotionOpen, setPromotionOpen] = useState(false);
     const BOOKS_PER_PAGE = 6;
 
+    const handlePromotionOpen = () => {
+        setPromotionOpen(true);
+    }
+
+    const handlePromotionClose = () => {
+        setPromotionOpen(false);
+    }
+
+    const handleOnSuccess = () => {
+        setSuccess(true);
+    }
+
+    const handleCloseSuccess = () => {
+        setSuccess(false);
+    }
+
+    const handleOnFailure = () => {
+        setFailure(true);
+    }
+
+    const handleCloseFailure = () => {
+        setFailure(false);
+    }
 
 
+    const handlePageChange = (e, p) => {
+        setPage(p);
+        console.log(p);
+    }
     const handleSwitchCurrency = (event) => {
         setCurrencyDeso(event.target.checked);
     }
+
+    const handleOpen = async (bookData) => {
+        setBookToBuy(bookData);
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
+    const handleCreatePromotion = () => {
+        setPromotion(true);
+        setCurrBooks(rareBooks);
+    }
+
+    const handleCancelPromotion = () => {
+        setPromotion(false);
+        setCurrBooks(books);
+    }
+
+    const handleSubmitPromotion = () => {
+        console.log("submitting");
+        selectedBooks.forEach(book => console.log(book));
+        handlePromotionOpen();
+    }
+
+    const handleSelectionAdd = (book) => {
+        setSelectedBooks(prevBooks => [...prevBooks, book]);
+    }
+
+    const handleSelectionRemove = (bookToRemove) => {
+        setSelectedBooks(prevBooks => prevBooks.filter((book) => book.postHashHex !== bookToRemove.postHashHex));
+    }
+
+    useEffect(() => {
+        console.log("Selected: " + selectedBooks.length + " books");
+    }, [selectedBooks]);
+
+    useEffect(() => {
+        setCurrBooks(books);
+    }, [books]);
 
     useEffect(() => {
         const getExchangeRate = async () => {
@@ -52,107 +127,15 @@ const Marketplace = () => {
         }
     
         getExchangeRate();
-      }, []);
+    }, []);
 
-    const handlePageChange = (e, p) => {
-        setPage(p);
-        console.log(p);
-    }
-
-    const handleUseAltPayment = (useAltPayment) => {
-      setAltPayment(useAltPayment);
-    }
-
-    const handleOpen = async (bookData) => {
-        await getDerivedKey(bookData);
-        setBookToBuy(bookData);
-        setOpen(true);
-    }
-
-    const getDerivedKey = async (bookData) => {
-        // Get price to approve (if RARE, get highest price for convenience)
-        let price = bookData.price;
-        if (bookData.type === 'RARE') {
-            bookData.left.forEach(book => {
-                if (book[1] > price) {
-                    price = book[1];
-                }
-            });
-        }
-        const request = {
-            "publicKey": "",
-            "transactionSpendingLimitResponse": {
-              "GlobalDESOLimit": Math.round(price * 1.25) + 1700,
-              "TransactionCountLimitMap": {
-                "AUTHORIZE_DERIVED_KEY": 2
-              },
-              "NFTOperationLimitMap": {
-                "": {
-                  "0": {
-                    "any": 1
-                  }
-                }
-              },
-            },
-          };
-        const response = await deso.identity.derive(request);
-        const userRequest = {
-            "PublicKeyBase58Check": response['publicKeyBase58Check']
-        };
-        const user = await deso.user.getSingleProfile(userRequest);
-        setDerivedKeyData({
-            derivedSeedHex: response['derivedSeedHex'],
-            derivedPublicKeyBase58Check: response['derivedPublicKeyBase58Check'],
-            accessSignature: response['accessSignature'],
-            expirationBlock: response['expirationBlock'],
-            transactionSpendingLimitHex: response['transactionSpendingLimitHex'],
-            publicKey: response['publicKeyBase58Check'],
-            userName: user['Profile']['Username'],
-            balance: user['Profile']['DESOBalanceNanos']
-        });
-        if (user['Profile']['DESOBalanceNanos'] >= (bookData.price * 1.025) + 1700) {
-            setEnoughFunds(true);
-        }
-        return response;
-    }
-    const handleClose = () => {
-        setOpen(false);
-        setAltPayment(false);
-        setEnoughFunds(false);
-    }
-    const [success, setSuccess] = useState(false);
-    const [failure, setFailure] = useState(false);
-
-    const handleCloseSuccess = () => {
-        setAltPayment(false);
-        setEnoughFunds(false);
-        setSuccess(false);
-    }
-
-    const handleOnSuccess = () => {
-        setAltPayment(false);
-        setSuccess(true);
-        setEnoughFunds(false);
-    }
-
-    const handleOnFailure = () => {
-        setAltPayment(false);
-        setFailure(true);
-        setEnoughFunds(false);
-    }
-
-    const handleCloseFailure = () => {
-        setAltPayment(false);
-        setFailure(false);
-        setEnoughFunds(false);
-    }
     useEffect(() => {
         if (!booksLoaded) {
             setLoading(true);
             //loading books
             const fetchData = async () => {
                 // const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
-                const response = await fetch('http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/marketplace');
+                const response = await fetch(`https://api.spatiumstories.xyz/api/author-books/${user.publicKey}`);
                 // const response = await fetch('http://0.0.0.0:4201/api/marketplace');
                 const books = await response.json();
                 let data = [];
@@ -177,6 +160,7 @@ const Marketplace = () => {
                 Object.values(books['rare_books']).map((book) => {
                     console.log(book);
                     var newBook = {
+                        selected: false,
                         cover: book['covers'],
                         body: book['body'],
                         author: book['author'],
@@ -194,6 +178,7 @@ const Marketplace = () => {
                     data.push(newBook);
                 });
                 setBooks(paginateList(data));
+                setRareBooks(paginateRareList(data));
                 setBooksLoaded(true);
                 setLoading(false);
             };
@@ -201,6 +186,30 @@ const Marketplace = () => {
 
         }
     }, []);
+
+    const paginateRareList = (list) => {
+        list.sort(function(a, b) {
+            return a.title.localeCompare(b.title);
+        });
+        let data = new Map();
+        let i = 0;
+        let pageNum = 1;
+        list.map((book) => {
+            if (book.type === "RARE") {
+                i += 1;
+                if (data.get(pageNum) === undefined) {
+                    data.set(pageNum, [book]);
+                } else {
+                    data.set(pageNum, [...data.get(pageNum), book]);
+                }
+                if (i === BOOKS_PER_PAGE) {
+                    pageNum += 1;
+                    i = 0;
+                }
+            }
+        });
+        return data;
+    }
 
     const paginateList = (list) => {
         list.sort(function(a, b) {
@@ -224,15 +233,6 @@ const Marketplace = () => {
         return data;
     }
     const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-    const handlePublish = () => {
-        navigate('/publish');
-    }
-
-    const handleRead = () => {
-        navigate(`/bookshelf/${user.userName}`);
-    }
-
     return (
         <React.Fragment>
             <Box
@@ -249,11 +249,10 @@ const Marketplace = () => {
                 color="text.primary"
                 gutterBottom
                 >
-                Spatium Stories Marketplace
+                {user.userName}'s Published Stories
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                We offer both rare edition and Mint on Demand books!
-                You can also publish your own book or read your book directly through Spatium Stories!
+                Manage your books, change prices, create promotions, create book clubs, and so much more to come!
                 </Typography>
                 <Stack
                 sx={{ pt: 4 }}
@@ -261,17 +260,29 @@ const Marketplace = () => {
                 spacing={2}
                 justifyContent="center"
                 >
-                    <Button onClick={handlePublish} variant="contained">Publish My Book!</Button>
-                    <Button onClick={handleRead} variant="outlined">Read My Books!</Button>
+                    {!promotion && <Button variant="contained" onClick={handleCreatePromotion}>Create a Promotion!</Button>}
+                    {!promotion && <Button disabled variant="contained">Create a Book Club! (Coming Soon)</Button>}
+                    {promotion && <Button variant="contained" onClick={handleSubmitPromotion} sx={{backgroundColor: "green"}}>Create!</Button>}
+                    {promotion && <Button variant="contained" onClick={handleCancelPromotion}>Cancel</Button>}
                 </Stack>
             </Container>
             <Stack spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '50px'}}>
-                <Typography variant="h6">Show prices in:</Typography>
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
-                    <Typography align="center">DESO</Typography>
-                    <Switch onChange={handleSwitchCurrency} color="secondary" />
-                    <Typography align="center">USD</Typography>
-                </Stack>
+                {
+                !promotion ? (
+                    <React.Fragment>
+                        <Typography variant="h6">Show prices in:</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{paddingTop: '5px'}}>
+                            <Typography align="center">DESO</Typography>
+                            <Switch onChange={handleSwitchCurrency} color="secondary" />
+                            <Typography align="center">USD</Typography>
+                        </Stack>
+                    </React.Fragment>
+                ) : (
+                    <React.Fragment>
+                        <Typography variant="h5">{selectedBooks.length} books selected</Typography>
+                    </React.Fragment>
+                )
+                }
             </Stack>
             </Box>
             <Container sx={{ py: 8 }} maxWidth="lg">
@@ -282,30 +293,31 @@ const Marketplace = () => {
                 spacing={2}
                 sx={{paddingTop:'50px'}}
             >
-                <CheckoutModal enoughFunds={enoughFunds} buyer={derivedKeyData} altPayment={altPayment} setAltPayment={handleUseAltPayment} bookToBuy={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <EditBookModal onCurrencyChange={handleSwitchCurrency} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={bookToBuy} open={open} handleClose={handleClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
+                <PromotionModal loading={false} books={selectedBooks} open={promotionOpen} exchangeRate={exchangeRate} handleClose={handlePromotionClose} handleOnFailure={handleOnFailure} handleOnSuccess={handleOnSuccess}/>
             </Stack>
             <Grid container spacing={4}>
                 {!booksLoaded &&
                 cards.map((card) => (
-                    <Book loading={true} card={card}/>
+                    <AuthorBook loading={true} card={card}/>
                 ))}
-                {booksLoaded && books.size > 0 &&
-                    Object.values(books.get(page)).map((book) => {
-                        return <Book showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} onBuy={handleOpen} loading={false} bookData={book} marketplace={true}/>;
+                {booksLoaded && currBooks.size > 0 &&
+                    Object.values(currBooks.get(page)).map((book) => {
+                        return <AuthorBook promotion={promotion} onEdit={handleOpen} showDesoPrice={!currencyDeso} exchangeRate={exchangeRate} loading={false} bookData={book} handleSelectionAdd={handleSelectionAdd} handleSelectionRemove={handleSelectionRemove}/>;
                     })
                 }
-                {booksLoaded && books.size === 0 &&
+                {booksLoaded && currBooks.size === 0 &&
                     <Grid item xs={12}>
-                        <NoBooks linkToMarketplace={false} message="Coming Soon!!"/>
+                        <NoBooks linkToMarketplace={false} message="Mint One Today!"/>
                     </Grid>
                 }
             </Grid>
             <Stack sx={{marginTop: '20px', alignItems: 'center', justifyItems: 'center'}} spacing={2}>
-                <Pagination page={page} onChange={handlePageChange} count={books.size} color="primary" />
+                <Pagination page={page} onChange={handlePageChange} count={currBooks.size} color="primary" />
             </Stack>
             </Container>
         </React.Fragment>
     );
-}
+};
 
-export default Marketplace;
+export default Profile;

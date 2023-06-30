@@ -24,7 +24,7 @@ const AuthorQRCodePayment = (props) => {
     const deso = new Deso();
     const runTimer = useRef(true);
 
-    const total = (props.bookData.price / 1000000000).toFixed(2);
+    const total = (props.bookData.convertedPrice / 1e9).toFixed(2);
     const fee = (0.025 * total).toFixed(4);
     const price = (Number(total) - Number(fee)).toFixed(2);
 
@@ -98,11 +98,12 @@ const AuthorQRCodePayment = (props) => {
         }
     }, []);
     const waitForDeposit = async () => {
-        let nft = props.bookData.postHashHex;
+        let author_type = props.bookData.authorType;
         let successfulPayment = true;  
 
         // Wait for deposit, then backend mints book
         let data = new FormData();
+        data.append("author_type", author_type);
         data.append("currency", props.currency);
         data.append("deposit_key", depositKey);
         const requestOptions = {
@@ -120,34 +121,29 @@ const AuthorQRCodePayment = (props) => {
 
 
         if (successfulPayment) {
-            data.append("post_hash_hex", nft);
+            data.append("subscription_type", props.yearly ? "YEARLY" : "MONTHLY");
             data.append("buyer_pub_key", props.buyer.publicKey);
             data.append("buyer_derived_pub_key", props.buyer.derivedPublicKeyBase58Check);
             data.append("buyer_prv_key", props.buyer.derivedSeedHex);
             data.append("author", props.bookData.publisher);
-            data.append("nanos", props.bookData.price);
+            data.append("nanos", props.bookData.convertedPrice);
             data.append("expiration_block", props.buyer.expirationBlock);
             data.append("access_sig", props.buyer.accessSignature);
             data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
-            let uri = 'https://api.spatiumstories.xyz/api';
+            // let uri = 'https://api.spatiumstories.xyz/api';
             // let uri = 'http://0.0.0.0:4201/api';
-            if (props.type === "RARE") {
-                data.append("random_mint", "true");
-                data.append("serial_number", props.serial);
-                data.append("username", props.buyer.userName);
-                await fetch(`${uri}/bid-rare-book`, requestOptions)
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                });
-            } else {
-                await fetch(`${uri}/buy-book`, requestOptions)
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                });
-            }
+            let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+            const response = await fetch(`${uri}/api/buy-author-nft`, requestOptions)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+            }).catch(e => {
+                successfulPayment = false;
+                console.log(e);
+                props.close();
+                props.handleOnFailure();
+            })
         }
 
         if (successfulPayment) {
@@ -167,7 +163,7 @@ const AuthorQRCodePayment = (props) => {
         props.handleOnSuccess();
     }
 
-    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your book with DeSo :) If this is for an R2M2 mint, we will keep your reserved book for 30 minutes.";
+    const timesUpText = "Simply go to your DeSo account and wait for your transfer to come through. You should see @Gringotts_Wizarding_Bank send you some DeSo. Then head back here and buy your author NFT with DeSo :)";
 
 
     return (
@@ -183,7 +179,7 @@ const AuthorQRCodePayment = (props) => {
                 <React.Fragment>
                     <Alert severity="warning">
                         <AlertTitle>Time Expired!</AlertTitle>
-                        Don't worry! — <strong>you can still get your book!</strong>
+                        Don't worry! — <strong>you can still get your author NFT!</strong>
                     </Alert>
                     <Typography variant="p" sx={{paddingTop: '10px', paddingBottom: '10px'}}>{timesUpText}</Typography>
                 </React.Fragment>

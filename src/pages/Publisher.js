@@ -5,14 +5,15 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import image from '../assets/hour.png';
-import Button from '@mui/material/Button';
-import Pricing from '../components/Author/Pricing';
-import PublishNewBook from '../components/Author/PublishNewBook';
-import CircularProgress from '@mui/material/CircularProgress';
-import Deso from 'deso-protocol';
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from 'react-redux';
 import { userActions } from '../store/user-slice';
+import Deso from 'deso-protocol';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Button } from "@mui/material";
+import Pricing from "../components/Author/Pricing";
+import PublishNewBook from "../components/Author/PublishNewBook";
 import LoginIcon from '@mui/icons-material/Login';
+
 
 
 
@@ -24,28 +25,42 @@ const Publisher = () => {
     const dispatch = useDispatch();
     const deso = new Deso();
 
+    // useEffect(() => {
+    //     const verify = async () => {
+    //       console.log("verifying!!");
+    //       const postHashHex = "61e5e2c68393b94d8be0bea87f093b80de67db261d3d3f21e81f2052940831eb";
+  
+    //       const request = {
+    //         "PostHashHex": postHashHex
+    //       };
+    //       deso.nft.getNftEntriesForPostHash(request).then(response => {
+    //         let nftResponses = response['NFTEntryResponses'];
+    //         let length = nftResponses['length'];
+    //         for (var i = 0; i < length; i++) {
+    //           if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {
+    //             setVerifying(false);
+    //             setAuthorized(true);
+    //             break;
+    //           }
+    //         }
+    //         setVerifying(false);
+    //       }).catch(e => {
+    //           setVerifying(false);
+    //       });
+    //     }
+    //     verify();
+    //   }, [userKey]);
+
     useEffect(() => {
         const verify = async () => {
           console.log("verifying!!");
-          const postHashHex = "61e5e2c68393b94d8be0bea87f093b80de67db261d3d3f21e81f2052940831eb";
-  
-          const request = {
-            "PostHashHex": postHashHex
-          };
-          deso.nft.getNftEntriesForPostHash(request).then(response => {
-            let nftResponses = response['NFTEntryResponses'];
-            let length = nftResponses['length'];
-            for (var i = 0; i < length; i++) {
-              if (userKey === nftResponses[`${i}`]['OwnerPublicKeyBase58Check']) {
-                setVerifying(false);
-                setAuthorized(true);
-                break;
-              }
-            }
-            setVerifying(false);
-          }).catch(e => {
-              setVerifying(false);
-          });
+          const response = await fetch(`http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/get-author-associations/${userKey}`);
+          let json = await response.json();
+          let associations = json["Associations"];
+          if (associations.length > 0) {
+            setAuthorized(true);
+          }
+          setVerifying(false);
         }
         verify();
       }, [userKey]);
