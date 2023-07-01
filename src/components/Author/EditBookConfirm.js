@@ -15,8 +15,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import Deso from 'deso-protocol';
-import { request } from 'http';
-
 
 
 const confirmText = "You sure you want to make these changes?";
@@ -63,6 +61,7 @@ const EditBookConfirm = (props) => {
         let serials = await getSerials(props.book.postHashHex);
         data.append("serials", serials.join(","));
         //for_sale
+        console.log(props.details.forSale);
         data.append("for_sale", props.details.forSale);
 
         const requestOptions = {
@@ -70,23 +69,25 @@ const EditBookConfirm = (props) => {
             body: data,
         };
         // let uri = 'http://0.0.0.0:4201';
-        // let uri = 'https://api.spatiumstories.xyz';
-        let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+        let uri = 'https://api.spatiumstories.xyz';
+        // let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
         await fetch(`${uri}/api/change-price`, requestOptions)
         .then(response => response.text())
         .then(data => {
-            setEdited(true);
-            setEditing(false);
+            console.log(data);
         }).catch(e => {
             console.log(e);
         });
 
-        if (props.details.pegged === "true") {
+        if (props.details.pegged) {
             let usdPrice = props.details.price;
-            if (props.details.currency === "DESO") {
+            if (props.details.currency === "deso") {
                 usdPrice = getUSDPrice(usdPrice);
             }
             pegBook(props.book.postHashHex, usdPrice);
+        } else {
+            setEdited(true);
+            setEditing(false);
         }
 
     }
@@ -94,12 +95,12 @@ const EditBookConfirm = (props) => {
     const pegBook = async (postHashHex, price) => {
         let uri = "https://r6pzu4a635.execute-api.us-east-1.amazonaws.com/prod/api";
         let data = {
-            postHashHex,
-            price,
+            "postHashHex": postHashHex,
+            "price": price,
         };
         const requestOptions = {
             method: "POST",
-            body: data,
+            body: JSON.stringify(data),
         };
         await fetch (uri, requestOptions)
         .then(response => response.text())
@@ -108,17 +109,21 @@ const EditBookConfirm = (props) => {
         }).catch(e => {
             console.log(e);
         });
+        setEdited(true);
+        setEditing(false);
     }
 
     const getSerials = async (postHashHex) => {
         const deso = new Deso();
         let nftEntryResponses = await deso.nft.getNftEntriesForPostHash({"PostHashHex": postHashHex});
+        console.log(nftEntryResponses);
         let serials = [];
-        nftEntryResponses.array.forEach(nft => {
+        nftEntryResponses["NFTEntryResponses"].forEach(nft => {
             if (nft["OwnerPublicKeyBase58Check"] === SPATIUM_PUBLISHER_PUBLIC_KEY) {
                 serials.push(nft["SerialNumber"]);
             }
         });
+        console.log(serials);
         return serials;
     }
 

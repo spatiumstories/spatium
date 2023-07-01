@@ -46,8 +46,8 @@ const EditBookForm = (props) => {
 
     const [currBook, setCurrBook] = useState({
         price: "",
-        pegged: "",
-        forSale: "",
+        pegged: false,
+        forSale: true,
         currency: "usd"
     });
 
@@ -74,7 +74,7 @@ const EditBookForm = (props) => {
         setCurrBook(oldBook => {
             return {
                 ...oldBook,
-                pegged: event.target.value,
+                pegged: event.target.checked ? true : false,
             };
         });
     }
@@ -130,7 +130,6 @@ const EditBookForm = (props) => {
           <Grid item xs={12}>
             <Stack direction="row" spacing={0.25} alignItems="center" justifyContent="center">
                 {props.bookData.type === "RARE" && currBook.forSale && <Switch defaultChecked onChange={handleForSaleChange} color="secondary" />}
-                {props.bookData.type === "RARE" && !currBook.forSale && <Switch onChange={handleForSaleChange} color="secondary" />}
                 {props.bookData.type === "MOD" && <Switch defaultChecked disabled/>}
                 <InputLabel id="minting-type">
                     Set For Sale <HelpIcon sx={{cursor: "pointer"}} onClick={handleForSaleOpen}/>
