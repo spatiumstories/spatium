@@ -54,7 +54,7 @@ const Publisher = () => {
     useEffect(() => {
         const verify = async () => {
           console.log("verifying!!");
-          const response = await fetch(`http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/get-author-associations/${userKey}`);
+          const response = await fetch(`https://api.spatiumstories.xyz/api/get-author-associations/${userKey}`);
           let json = await response.json();
           let associations = json["Associations"];
           if (associations.length > 0) {
