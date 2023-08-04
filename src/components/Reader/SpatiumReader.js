@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { userActions } from '../../store/user-slice';
 import LoginIcon from '@mui/icons-material/Login';
 import { Document, Page, pdfjs } from 'react-pdf';
+import {URL} from 'url';
 // import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
 
