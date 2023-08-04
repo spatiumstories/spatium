@@ -10,12 +10,27 @@ import Deso from 'deso-protocol';
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from '../../store/user-slice';
 import LoginIcon from '@mui/icons-material/Login';
+import { Document, Page, pdfjs } from 'react-pdf';
+// import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+
+
+
 
 
 
 const SpatiumReader = () => {
     const { book } = useParams();
     const [userKey, setUserKey] = useState(null);
+    const [epubData, setEpubData] = useState(null);
+    const [url, setUrl] = useState(null);
+    const [isEpub, setIsEpub] = useState(true);
+    const [numPages, setNumPages] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
+  
+    const onDocumentLoadSuccess = ({ numPages }) => {
+      setNumPages(numPages);
+    };
+
     let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
     // let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
     // let bookUrl = `http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/get-book/${book}`
@@ -33,9 +48,70 @@ const SpatiumReader = () => {
     const dispatch = useDispatch();
     const deso = new Deso();
     const request = 2;
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url,
+    ).toString();
 
     const changeSize = () => {
         setSize((size + 1) % 3);
+    }
+
+    const nextPage = () => {
+      setPageNumber((prevPage) => {
+        return prevPage + 2;
+      });
+    }
+
+    const previousPage = () => {
+      setPageNumber((prevPage) => {
+        return Math.max(0, prevPage - 2);
+      });
+    }
+
+    useEffect(() => {
+    // Fetch the EPUB file and convert the response to ArrayBuffer
+    fetch(bookUrl)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => setEpubData(arrayBuffer))
+      .catch(error => console.error('Error fetching EPUB:', error));
+
+      console.log("Fetched Book Data");
+
+    }, []);
+
+    useEffect(() => {
+      if (epubData !== null) {
+        if (isPDF(epubData)) {
+          setIsEpub(false);
+        }
+        convertBook();
+      }
+    }, [epubData]);
+
+    const convertBook = () => {
+      const pdfBlob = arrayBufferToBlob(epubData, 'application/pdf');
+      const pdfBlobUrl = URL.createObjectURL(pdfBlob);
+      setUrl(pdfBlobUrl);
+    }
+
+    const arrayBufferToBlob = (arrayBuffer, type) => {
+      return new Blob([arrayBuffer], { type });
+    }
+
+    const isPDF = (buffer) => {
+      const magicBytes = new Uint8Array(buffer.slice(0, 4));
+  
+      // PDF magic bytes: %PDF
+      const pdfMagicBytes = [0x25, 0x50, 0x44, 0x46];
+  
+      for (let i = 0; i < pdfMagicBytes.length; i++) {
+        if (magicBytes[i] !== pdfMagicBytes[i]) {
+          return false;
+        }
+      }
+  
+      return true;
     }
 
     useEffect(() => {
@@ -114,7 +190,23 @@ const SpatiumReader = () => {
             renditionRef.current.off("selected", setRenderSelection)
         }
     }
-    }, [setSelections, selections])
+    }, [setSelections, selections]);
+
+    useEffect(() => {
+      const handleKeyPress = (event) => {
+        if (event.key === 'ArrowRight') {
+          nextPage();
+        } else if (event.key === 'ArrowLeft') {
+          previousPage();
+        }
+      };
+  
+      window.addEventListener('keydown', handleKeyPress);
+  
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress);
+      };
+    }, [pageNumber]);
 
   const locationChanged = (epubcifi) => {
     // if (renditionRef.current && tocRef.current) {
@@ -129,10 +221,10 @@ const SpatiumReader = () => {
   }
 
   const getReader = () => {
-      if (isMobile) {
+      if (isMobile && isEpub) {
         return (
             <ReactReader
-            url={bookUrl}
+            url={url}
             epubInitOptions={{
               openAs: 'epub'
             }}
@@ -154,10 +246,10 @@ const SpatiumReader = () => {
             }}
           />
         );
-      } else {
+      } else if (isEpub) {
           return (
             <ReactReader
-            url={bookUrl}
+            url={url}
             epubInitOptions={{
               openAs: 'epub'
             }}
@@ -175,6 +267,40 @@ const SpatiumReader = () => {
             }}
           />
           );
+      } else {
+        return (
+          // <div style={{ display: 'flex' }}>
+          // <Document
+          //   file={url}
+          //   onLoadSuccess={onDocumentLoadSuccess}
+          //   options={{
+          //     cMapUrl: 'cmaps/',
+          //     cMapPacked: true,
+          //   }}
+          // >
+          //   <div style={{ display: 'flex' }}>
+          //     <Page pageNumber={pageNumber} width={!isMobile ? window.innerWidth / 2 : window.innerWidth} />
+          //     {!isMobile && <Page pageNumber={pageNumber + 1} width={window.innerWidth / 2} />}
+          //   </div>
+          // </Document>
+          // <p>
+          //   Page {pageNumber} of {numPages}
+          // </p>
+          // <Button onClick={previousPage}>Previous</Button>
+          // <Button onClick={nextPage}>Next</Button>
+          // </div>
+          <div>
+          <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
+            <div style={{ display: 'flex' }}>
+              <Page pageNumber={pageNumber} width={!isMobile ? window.innerWidth / 2 : window.innerWidth} />
+              {!isMobile && <Page pageNumber={pageNumber + 1} width={window.innerWidth / 2} />}
+            </div>          
+          </Document>
+          <p>
+            Page {pageNumber} of {numPages}
+          </p>
+        </div>
+        );
       }
   }
 
@@ -209,11 +335,13 @@ const SpatiumReader = () => {
               <div style={{position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'center', zIndex: 1}}>
                   {page}
               </div>
-          }  
-          <div style={{position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'right', zIndex: 1}}>
-                      <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'none', md: 'inline'}}}>Toggle Font</Button>
-                      <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'inline', md: 'none'}}}>+/-</Button>
-          </div>
+          }
+          {isEpub &&  
+            <div style={{position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', textAlign: 'right', zIndex: 1}}>
+                        <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'none', md: 'inline'}}}>Toggle Font</Button>
+                        <Button onClick={changeSize} color="secondary" variant="contained" sx={{backgroundColor: 'gray', display: {xs: 'inline', md: 'none'}}}>+/-</Button>
+            </div>
+          }
 
         </div>
       )}
