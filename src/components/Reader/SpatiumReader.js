@@ -11,7 +11,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { userActions } from '../../store/user-slice';
 import LoginIcon from '@mui/icons-material/Login';
 import { Document, Page, pdfjs } from 'react-pdf';
-// import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 
 
@@ -48,6 +49,7 @@ const SpatiumReader = () => {
     const dispatch = useDispatch();
     const deso = new Deso();
     const request = 2;
+
     pdfjs.GlobalWorkerOptions.workerSrc = new URL(
       'pdfjs-dist/build/pdf.worker.min.js',
       import.meta.url,
@@ -89,11 +91,29 @@ const SpatiumReader = () => {
       }
     }, [epubData]);
 
+    useEffect(() => {
+      if (!isEpub) {
+        openPdfInNewTabFromArrayBuffer(url);
+      }
+    }, [verified]);
+
     const convertBook = () => {
       const pdfBlob = arrayBufferToBlob(epubData, 'application/pdf');
       const pdfBlobUrl = URL.createObjectURL(pdfBlob);
+      if (verified) {
+        openPdfInNewTabFromArrayBuffer(pdfBlobUrl);
+      }
       setUrl(pdfBlobUrl);
     }
+
+    function openPdfInNewTabFromArrayBuffer(arrayBuffer) {    
+      window.location.href = url;
+
+      // Clean up: release the object URL
+      URL.revokeObjectURL(url);
+    }
+    
+    
 
     const arrayBufferToBlob = (arrayBuffer, type) => {
       return new Blob([arrayBuffer], { type });
@@ -267,41 +287,42 @@ const SpatiumReader = () => {
             }}
           />
           );
-      } else {
-        return (
-          // <div style={{ display: 'flex' }}>
-          // <Document
-          //   file={url}
-          //   onLoadSuccess={onDocumentLoadSuccess}
-          //   options={{
-          //     cMapUrl: 'cmaps/',
-          //     cMapPacked: true,
-          //   }}
-          // >
-          //   <div style={{ display: 'flex' }}>
-          //     <Page pageNumber={pageNumber} width={!isMobile ? window.innerWidth / 2 : window.innerWidth} />
-          //     {!isMobile && <Page pageNumber={pageNumber + 1} width={window.innerWidth / 2} />}
-          //   </div>
-          // </Document>
-          // <p>
-          //   Page {pageNumber} of {numPages}
-          // </p>
-          // <Button onClick={previousPage}>Previous</Button>
-          // <Button onClick={nextPage}>Next</Button>
-          // </div>
-          <div>
-          <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
-            <div style={{ display: 'flex' }}>
-              <Page pageNumber={pageNumber} width={!isMobile ? window.innerWidth / 2 : window.innerWidth} />
-              {!isMobile && <Page pageNumber={pageNumber + 1} width={window.innerWidth / 2} />}
-            </div>          
-          </Document>
-          <p>
-            Page {pageNumber} of {numPages}
-          </p>
-        </div>
-        );
       }
+      // } else {
+      //   return (
+      //     // <div style={{ display: 'flex' }}>
+      //     // <Document
+      //     //   file={url}
+      //     //   onLoadSuccess={onDocumentLoadSuccess}
+      //     //   options={{
+      //     //     cMapUrl: 'cmaps/',
+      //     //     cMapPacked: true,
+      //     //   }}
+      //     // >
+      //     //   <div style={{ display: 'flex' }}>
+      //     //     <Page pageNumber={pageNumber} width={!isMobile ? window.innerWidth / 2 : window.innerWidth} />
+      //     //     {!isMobile && <Page pageNumber={pageNumber + 1} width={window.innerWidth / 2} />}
+      //     //   </div>
+      //     // </Document>
+      //     // <p>
+      //     //   Page {pageNumber} of {numPages}
+      //     // </p>
+      //     // <Button onClick={previousPage}>Previous</Button>
+      //     // <Button onClick={nextPage}>Next</Button>
+      //     // </div>
+      //     <div>
+      //     <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
+      //       <div style={{ display: 'flex' }}>
+      //         <Page pageNumber={pageNumber} width={!isMobile ? window.innerWidth / 2 : window.innerWidth} />
+      //         {!isMobile && <Page pageNumber={pageNumber + 1} width={window.innerWidth / 2} />}
+      //       </div>          
+      //     </Document>
+      //     <p>
+      //       Page {pageNumber} of {numPages}
+      //     </p>
+      //   </div>
+      //   );
+      // }
   }
 
   useEffect(() => {
