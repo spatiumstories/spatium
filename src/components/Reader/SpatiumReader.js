@@ -97,12 +97,15 @@ const SpatiumReader = () => {
       }
     }, [verified]);
 
+    useEffect(() => {
+      if (!isEpub) {
+        openPdfInNewTabFromArrayBuffer(url);
+      }
+    }, [url]);
+
     const convertBook = () => {
       const pdfBlob = arrayBufferToBlob(epubData, 'application/pdf');
       const pdfBlobUrl = URL.createObjectURL(pdfBlob);
-      if (verified) {
-        openPdfInNewTabFromArrayBuffer(pdfBlobUrl);
-      }
       setUrl(pdfBlobUrl);
     }
 
