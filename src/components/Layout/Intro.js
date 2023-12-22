@@ -34,7 +34,7 @@ const Intro = (props) => {
                     paddingBottom: '50px',
                     paddingTop: '50px'
                     }}>Spatium Stories</Typography>
-                <Typography variant="h6">A brand new NFT book marketplace.</Typography>
+                <Typography variant="h6">A one of a kind book publishing platform.</Typography>
                 <Typography variant="h6" sx={{paddingTop: '20px'}}>Decentralized and protected books, social connections on chain, and so much more.</Typography>
                 <Typography variant="h6" sx={{
                     paddingTop: '50px'
