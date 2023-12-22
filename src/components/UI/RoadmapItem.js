@@ -37,7 +37,8 @@ const RoadmapItem = (props) => {
                 <ListItemIcon>
                     <CircleTwoToneIcon />
                 </ListItemIcon>
-                <ListItemText primary={item}/>
+                {item.charAt(0) === "*" && <ListItemText sx={{textDecoration: "line-through"}}primary={item.substring(1)}/>}
+                {item.charAt(0) !== "*" && <ListItemText primary={item}/>}
             </ListItem>
         );
     });

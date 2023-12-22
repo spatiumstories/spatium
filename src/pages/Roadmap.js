@@ -25,9 +25,9 @@ import Success from '../components/UI/Success';
 import { useState } from 'react';
 
 const authorToolsData = [
-    "Publish Your Book - Q4 2022",
-    "Mint on Demand or Rarely Minted Options - Q4 2022",
-    "Community tools for you and your fans - Q1 2023",
+    "*Publish Your Book - Q4 2022",
+    "*Mint on Demand or Rarely Minted Options - Q4 2022",
+    "Community tools for you and your fans - Q1 2024",
     "Other file formats (like audio books)",
     "Author verification tools",
     "Character NFT Creation Tool",
@@ -36,7 +36,7 @@ const authorToolsData = [
 ];
 
 const decentralizeData = [
-    "Dragon encryption for authors - Q4 2022",
+    "*Dragon encryption for authors - Q4 2022",
     "Dev tools to expand the Spatium Stories ecosystem",
     "A fully decentralized e-reader device",
     "Book Staking",
@@ -44,12 +44,12 @@ const decentralizeData = [
 ];
 
 const readerData = [
-    "Discounts for Spatium coin holders - Q4 2022",
-    "Offer mutliple crypto currency options - Q4 2022",
-    "Review system stored on chain - Q1 2023",
-    "Reader app on iOS and Android - Q1 2023",
-    "Book location stored on chain - Q1 2023",
-    "Book clubs! - Q1 2023",
+    "Discounts for Spatium coin holders - Q1 2024",
+    "*Offer mutliple crypto currency options - Q4 2022",
+    "Review system stored on chain - Q1 2024",
+    "Reader app on iOS and Android - 2024",
+    "Book location stored on chain - Q1 2024",
+    "Book clubs! - 2024",
     "Highlight and notes stored on chain",
     "Readers for other types of 'books'",
     "PrintaMint",
