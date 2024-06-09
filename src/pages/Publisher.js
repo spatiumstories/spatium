@@ -56,7 +56,7 @@ const Publisher = () => {
           if (userKey === "BC1YLg9piUDwrwTZfRipfXNq3hW3RZHW3fJZ7soDNNNnftcqrJvyrbq") {
             setAuthorized(true);
           } else {
-            const response = await fetch(`https://api.spatiumstories.xyz/api/get-author-associations/${userKey}`);
+            const response = await fetch(`${process.env.REACT_APP_API}/api/get-author-associations/${userKey}`);
             let json = await response.json();
             let associations = json["Associations"];
             if (associations.length > 0) {

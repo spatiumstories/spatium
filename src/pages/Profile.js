@@ -134,9 +134,7 @@ const Profile = (props) => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                // const response = await fetch('https://api.spatiumstories.xyz/api/marketplace');
-                const response = await fetch(`https://api.spatiumstories.xyz/api/author-books/${user.publicKey}`);
-                // const response = await fetch('http://0.0.0.0:4201/api/marketplace');
+                const response = await fetch(`${process.env.REACT_APP_API}/api/author-books/${user.publicKey}`);
                 const books = await response.json();
                 let data = [];
                 Object.values(books['mod_books']).map((book) => {

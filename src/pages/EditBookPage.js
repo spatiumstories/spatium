@@ -101,9 +101,7 @@ const EditBookPage = () => {
             setLoading(true);
             //loading books
             const fetchData = async () => {
-                const response = await fetch(`https://api.spatiumstories.xyz/api/book-data/${postHashHex}`);
-                // const response = await fetch(`http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/book-data/${postHashHex}`);
-                // const response = await fetch(`http://0.0.0.0:4201/api/book-data/${postHashHex}`);
+                const response = await fetch(`${process.env.REACT_APP_API}/api/book-data/${postHashHex}`);
                 const book = await response.json();
                 var newBook = {
                     cover: book['covers'],

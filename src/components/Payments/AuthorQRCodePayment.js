@@ -131,9 +131,8 @@ const AuthorQRCodePayment = (props) => {
             data.append("access_sig", props.buyer.accessSignature);
             data.append("tx_spending_limit", props.buyer.transactionSpendingLimitHex);
             data.append("deposit_tx", depositTx);
-            let uri = 'https://api.spatiumstories.xyz/api';
-            // let uri = 'http://0.0.0.0:4201/api';
-            // let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+            let uri = process.env.REACT_APP_API;
+
             const response = await fetch(`${uri}/api/buy-author-nft`, requestOptions)
             .then(response => response.text())
             .then(data => {

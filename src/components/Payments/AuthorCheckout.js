@@ -51,9 +51,8 @@ const AuthorCheckout = (props) => {
             body: data,
         };
         let successResponse = true;
-        let uri = 'https://api.spatiumstories.xyz';
-        // let uri = 'http://0.0.0.0:4201';
-        // let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+        let uri = process.env.REACT_APP_API;
+
         const response = await fetch(`${uri}/api/buy-author-nft`, requestOptions)
         .then(response => response.text())
         .then(data => {

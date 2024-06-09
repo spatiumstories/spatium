@@ -13,7 +13,6 @@ import Roadmap from "./pages/Roadmap";
 import SpatiumReader from "./components/Reader/SpatiumReader";
 import MintingNow from "./pages/MintingNow";
 import BookPage from "./pages/BookPage";
-import Auth from "./components/Nav/Auth";
 import Profile from "./pages/Profile";
 import EditBookPage from "./pages/EditBookPage";
 

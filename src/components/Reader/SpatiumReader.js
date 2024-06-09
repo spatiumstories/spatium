@@ -32,9 +32,8 @@ const SpatiumReader = () => {
       setNumPages(numPages);
     };
 
-    let bookUrl = `https://api.spatiumstories.xyz/api/get-book/${book}`;
-    // let bookUrl = `http://0.0.0.0:4201/api/get-book/${book}`;
-    // let bookUrl = `http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com/api/get-book/${book}`
+    let uri = `${process.env.REACT_APP_API}/api/get-book/${book}`;
+
 
     const [verifying, setVerifying] = useState(true);
     const [verified, setVerified] = useState(false);
@@ -48,6 +47,7 @@ const SpatiumReader = () => {
     const tocRef = useRef(null)
     const dispatch = useDispatch();
     const deso = new Deso();
+    
     const request = 2;
 
     pdfjs.GlobalWorkerOptions.workerSrc = new URL(

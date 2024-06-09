@@ -15,6 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import Deso from 'deso-protocol';
+import { env } from 'process';
 
 
 const confirmText = "You sure you want to make these changes?";
@@ -68,9 +69,7 @@ const EditBookConfirm = (props) => {
             method: 'POST',
             body: data,
         };
-        // let uri = 'http://0.0.0.0:4201';
-        let uri = 'https://api.spatiumstories.xyz';
-        // let uri = 'http://spatiumtest-env.eba-wke3mfsm.us-east-1.elasticbeanstalk.com'
+        let uri = process.env.REACT_APP_API;
         await fetch(`${uri}/api/change-price`, requestOptions)
         .then(response => response.text())
         .then(data => {
@@ -114,7 +113,9 @@ const EditBookConfirm = (props) => {
     }
 
     const getSerials = async (postHashHex) => {
-        const deso = new Deso();
+        const deso = new Deso({
+            nodeURI: "https://test.deso.org"
+        });
         let nftEntryResponses = await deso.nft.getNftEntriesForPostHash({"PostHashHex": postHashHex});
         console.log(nftEntryResponses);
         let serials = [];
